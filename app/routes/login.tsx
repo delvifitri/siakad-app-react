@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { EnvelopeIcon, LockClosedIcon } from "@heroicons/react/24/outline";
 
 export function meta() {
@@ -8,6 +9,12 @@ export function meta() {
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  const handleLogin = () => {
+    // TODO: add auth logic
+    navigate('/');
+  };
 
   return (
     <main
@@ -43,7 +50,7 @@ export default function Login() {
               />
             </div>
 
-          <button className="w-full mt-2 rounded-full py-4 text-white font-semibold bg-gradient-to-r from-orange-500 to-orange-400 shadow-lg">Masuk</button>
+          <button onClick={handleLogin} className="w-full mt-2 rounded-full py-4 text-white font-semibold bg-gradient-to-r from-orange-500 to-orange-400 shadow-lg">Masuk</button>
 
           <div className="text-center">
             <a href="#" className="text-sm text-white/90 underline">Lupa Password?</a>

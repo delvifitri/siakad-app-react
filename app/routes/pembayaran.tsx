@@ -23,7 +23,7 @@ export default function Pembayaran() {
           <div
             key={payment.id}
             onClick={() => handlePaymentClick(payment.id)}
-            className="rounded-xl p-3 cursor-pointer transition-shadow"
+            className="rounded-xl p-1 cursor-pointer transition-shadow"
           >
             <div className="backdrop-blur-md bg-white/40 dark:bg-black/30 border border-white/20 dark:border-black/20 rounded-xl p-3 shadow-sm hover:shadow-md">
             <div className="flex justify-between items-start mb-3">
