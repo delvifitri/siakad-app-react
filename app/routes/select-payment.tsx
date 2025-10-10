@@ -98,24 +98,24 @@ export default function SelectPayment() {
     <SimpleLayout title="Pilih Channel Pembayaran">
       <div className="space-y-6">
         {/* Bank Transfer */}
-        <div className="bg-blue-50/80 dark:bg-blue-900/30 backdrop-blur-md rounded-2xl p-6 shadow-sm border border-blue-200/50 dark:border-blue-800/50">
+        <div className="bg-blue-50/80  backdrop-blur-md rounded-2xl p-6 shadow-sm border border-blue-200/50 ">
           <div className="flex items-center gap-3 mb-4">
             <BuildingLibraryIcon className="w-6 h-6 text-blue-600" />
-            <h3 className="text-lg font-semibold text-blue-800 dark:text-blue-200">Transfer Bank</h3>
+            <h3 className="text-lg font-semibold text-blue-800 ">Transfer Bank</h3>
           </div>
           <div className="space-y-3">
             {paymentChannels.banks.map((bank) => (
-              <div key={bank.id} className="flex items-center justify-between p-3 rounded-xl bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm border border-blue-200/60 dark:border-blue-700/60">
+              <div key={bank.id} className="flex items-center justify-between p-3 rounded-xl bg-white/70  backdrop-blur-sm border border-blue-200/60 ">
                 <div className="flex items-center gap-3">
                   <span className="text-lg">{getPaymentIcon(bank.id)}</span>
-                  <span className="font-medium text-blue-900 dark:text-blue-100">{bank.shortName}</span>
+                  <span className="font-medium text-blue-900 ">{bank.shortName}</span>
                 </div>
                 <button
                   onClick={() => handleSelectChannel(bank.id)}
                   className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-colors backdrop-blur-sm ${
                     selectedChannel === bank.id
                       ? "border-blue-500 bg-blue-500/80 text-white"
-                      : "border-blue-300/80 dark:border-blue-600/80 bg-white/50 dark:bg-gray-700/50"
+                      : "border-blue-300/80  bg-white/50 "
                   }`}
                 >
                   {selectedChannel === bank.id && <CheckCircleIcon className="w-5 h-5" />}
@@ -126,24 +126,24 @@ export default function SelectPayment() {
         </div>
 
         {/* Credit/Debit Cards */}
-        <div className="bg-purple-50/80 dark:bg-purple-900/30 backdrop-blur-md rounded-2xl p-6 shadow-sm border border-purple-200/50 dark:border-purple-800/50">
+        <div className="bg-purple-50/80  backdrop-blur-md rounded-2xl p-6 shadow-sm border border-purple-200/50 ">
           <div className="flex items-center gap-3 mb-4">
             <CreditCardIcon className="w-6 h-6 text-purple-600" />
-            <h3 className="text-lg font-semibold text-purple-800 dark:text-purple-200">Kartu Kredit/Debit</h3>
+            <h3 className="text-lg font-semibold text-purple-800 ">Kartu Kredit/Debit</h3>
           </div>
           <div className="space-y-3">
             {paymentChannels.cards.map((card) => (
-              <div key={card.id} className="flex items-center justify-between p-3 rounded-xl bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm border border-purple-200/60 dark:border-purple-700/60">
+              <div key={card.id} className="flex items-center justify-between p-3 rounded-xl bg-white/70  backdrop-blur-sm border border-purple-200/60 ">
                 <div className="flex items-center gap-3">
                   <span className="text-lg">{getPaymentIcon(card.id)}</span>
-                  <span className="font-medium text-purple-900 dark:text-purple-100">{card.shortName}</span>
+                  <span className="font-medium text-purple-900 ">{card.shortName}</span>
                 </div>
                 <button
                   onClick={() => handleSelectChannel(card.id)}
                   className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-colors backdrop-blur-sm ${
                     selectedChannel === card.id
                       ? "border-purple-500 bg-purple-500/80 text-white"
-                      : "border-purple-300/80 dark:border-purple-600/80 bg-white/50 dark:bg-gray-700/50"
+                      : "border-purple-300/80  bg-white/50 "
                   }`}
                 >
                   {selectedChannel === card.id && <CheckCircleIcon className="w-5 h-5" />}
@@ -154,24 +154,24 @@ export default function SelectPayment() {
         </div>
 
         {/* E-Wallet */}
-        <div className="bg-green-50/80 dark:bg-green-900/30 backdrop-blur-md rounded-2xl p-6 shadow-sm border border-green-200/50 dark:border-green-800/50">
+        <div className="bg-green-50/80  backdrop-blur-md rounded-2xl p-6 shadow-sm border border-green-200/50 ">
           <div className="flex items-center gap-3 mb-4">
             <WalletIcon className="w-6 h-6 text-green-600" />
-            <h3 className="text-lg font-semibold text-green-800 dark:text-green-200">E-Wallet</h3>
+            <h3 className="text-lg font-semibold text-green-800 ">E-Wallet</h3>
           </div>
           <div className="space-y-3">
             {paymentChannels.ewallet.map((wallet) => (
-              <div key={wallet.id} className="flex items-center justify-between p-3 rounded-xl bg-white/70 dark:bg-gray-700/70 backdrop-blur-sm border border-green-200/60 dark:border-green-700/60">
+              <div key={wallet.id} className="flex items-center justify-between p-3 rounded-xl bg-white/70  backdrop-blur-sm border border-green-200/60 ">
                 <div className="flex items-center gap-3">
                   <span className="text-lg">{getPaymentIcon(wallet.id)}</span>
-                  <span className="font-medium text-green-900 dark:text-green-100">{wallet.shortName}</span>
+                  <span className="font-medium text-green-900 ">{wallet.shortName}</span>
                 </div>
                 <button
                   onClick={() => handleSelectChannel(wallet.id)}
                   className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-colors backdrop-blur-sm ${
                     selectedChannel === wallet.id
                       ? "border-green-500 bg-green-500 text-white"
-                      : "border-green-300/80 dark:border-green-600/80 bg-white/50 dark:bg-gray-700/50"
+                      : "border-green-300/80  bg-white/50 "
                   }`}
                 >
                   {selectedChannel === wallet.id && <CheckCircleIcon className="w-5 h-5" />}
@@ -183,9 +183,9 @@ export default function SelectPayment() {
 
         {/* Selected Channel Details */}
         {selectedChannelDetails && (
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-6">
-            <h4 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">Detail {selectedChannelDetails.name}</h4>
-            <p className="text-sm text-blue-700 dark:text-blue-300">{selectedChannelDetails.details}</p>
+          <div className="bg-blue-50  border border-blue-200  rounded-2xl p-6">
+            <h4 className="font-semibold text-blue-800  mb-2">Detail {selectedChannelDetails.name}</h4>
+            <p className="text-sm text-blue-700 ">{selectedChannelDetails.details}</p>
           </div>
         )}
 

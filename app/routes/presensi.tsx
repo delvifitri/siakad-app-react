@@ -32,15 +32,15 @@ export default function Presensi() {
   return (
     <MobileLayout title="Presensi" bgImage="/bg simple.png">
       <div className="p-4 space-y-4">
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Presensi</h1>
-        <p className="text-gray-700 dark:text-gray-300">Daftar mata kuliah yang mengharuskan presensi hari ini.</p>
+        <h1 className="text-2xl font-semibold text-gray-900 ">Presensi</h1>
+        <p className="text-gray-700 ">Daftar mata kuliah yang mengharuskan presensi hari ini.</p>
 
         <div className="space-y-3 mt-3">
           {courses.map((c) => (
-            <div key={c.id} className="relative bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm flex items-center justify-between">
+            <div key={c.id} className="relative bg-white  rounded-xl p-4 shadow-sm flex items-center justify-between">
               <div>
                 <div className="text-sm text-gray-500">{c.code} • {c.room}</div>
-                <div className="font-medium text-gray-900 dark:text-gray-100">{c.name}</div>
+                <div className="font-medium text-gray-900 ">{c.name}</div>
                 <div className="text-xs text-gray-500">{c.time}</div>
               </div>
               <div className="flex flex-col items-end gap-2">
@@ -54,10 +54,10 @@ export default function Presensi() {
                     </button>
 
                     {openMenuId === c.id && (
-                      <div className="absolute right-4 top-12 w-36 bg-white dark:bg-gray-800 rounded-md shadow-lg z-20">
-                        <button onClick={() => handleSelect(c.id, 'hadir')} className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Hadir</button>
-                        <button onClick={() => handleSelect(c.id, 'izin')} className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Izin</button>
-                        <button onClick={() => handleSelect(c.id, 'sakit')} className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">Sakit</button>
+                      <div className="absolute right-4 top-12 w-36 bg-white  rounded-md shadow-lg z-20">
+                        <button onClick={() => handleSelect(c.id, 'hadir')} className="w-full text-left px-4 py-2 hover:bg-gray-100 ">Hadir</button>
+                        <button onClick={() => handleSelect(c.id, 'izin')} className="w-full text-left px-4 py-2 hover:bg-gray-100 ">Izin</button>
+                        <button onClick={() => handleSelect(c.id, 'sakit')} className="w-full text-left px-4 py-2 hover:bg-gray-100 ">Sakit</button>
                       </div>
                     )}
                   </>

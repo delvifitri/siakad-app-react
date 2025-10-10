@@ -41,13 +41,13 @@ export default function Notifications() {
   return (
     <SimpleLayout title="Pemberitahuan">
       <div className="mb-4">
-        <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+        <div className="flex bg-gray-100  rounded-lg p-1">
           <button
             onClick={() => setActiveTab('notifications')}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
               activeTab === 'notifications'
-                ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                : 'text-gray-600 dark:text-gray-300'
+                ? 'bg-white  text-gray-900  shadow-sm'
+                : 'text-gray-600 '
             }`}
           >
             Notifikasi
@@ -56,8 +56,8 @@ export default function Notifications() {
             onClick={() => setActiveTab('announcements')}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
               activeTab === 'announcements'
-                ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                : 'text-gray-600 dark:text-gray-300'
+                ? 'bg-white  text-gray-900  shadow-sm'
+                : 'text-gray-600'
             }`}
           >
             Pengumuman
@@ -68,9 +68,9 @@ export default function Notifications() {
       <div className="space-y-4">
         {activeTab === 'notifications' ? (
           notifications.map((item, index) => (
-            <div key={index} className="p-4 rounded-lg bg-white dark:bg-gray-800 shadow-sm">
+            <div key={index} className="p-4 rounded-lg bg-white  shadow-sm">
               <h2 className="font-medium">{item.title}</h2>
-              <p className="text-sm text-gray-600 dark:text-gray-300">{item.description}</p>
+              <p className="text-sm text-gray-600 ">{item.description}</p>
             </div>
           ))
         ) : (
@@ -78,10 +78,10 @@ export default function Notifications() {
             <Link
               key={item.id}
               to={`/announcements/${item.id}`}
-              className="block p-4 rounded-lg bg-white dark:bg-gray-800 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              className="block p-4 rounded-lg bg-white  shadow-sm hover:bg-gray-50  transition-colors"
             >
               <h2 className="font-medium">{item.title}</h2>
-              <p className="text-sm text-gray-600 dark:text-gray-300">{item.description}</p>
+              <p className="text-sm text-gray-600 ">{item.description}</p>
             </Link>
           ))
         )}

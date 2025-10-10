@@ -30,23 +30,23 @@ export default function Login() {
 
         <section className="space-y-4 px-4 mt-4">
             <label className="sr-only">Email atau NIM</label>
-            <div className="flex items-center gap-3 bg-white/60 dark:bg-white/6 rounded-2xl p-4">
+            <div className="flex items-center gap-3 bg-white/60  rounded-2xl p-4">
               <EnvelopeIcon className="w-5 h-5 text-gray-700" />
               <input
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email atau NIM"
-                className="bg-transparent flex-1 outline-none placeholder-gray-700 text-gray-900 dark:placeholder-gray-300 dark:text-white"
+                className="bg-transparent flex-1 outline-none placeholder-gray-700 text-gray-900  "
               />
             </div>
-            <div className="mt-3 flex items-center gap-3 bg-white/60 dark:bg-white/6 rounded-2xl p-4">
+            <div className="mt-3 flex items-center gap-3 bg-white/60  rounded-2xl p-4">
               <LockClosedIcon className="w-5 h-5 text-gray-700" />
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
-                className="bg-transparent flex-1 outline-none placeholder-gray-700 text-gray-900 dark:placeholder-gray-300 dark:text-white"
+                className="bg-transparent flex-1 outline-none placeholder-gray-700 text-gray-900  "
               />
             </div>
 

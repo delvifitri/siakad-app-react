@@ -13,7 +13,7 @@ export default function NewsDetail() {
         {news.img && <img src={news.img} alt={news.title} className="w-full h-48 rounded-lg object-cover" />}
         <h2 className="text-xl font-bold">{news.title}</h2>
         <p className="text-sm text-gray-500">{news.date}</p>
-        <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{news.content}</p>
+        <p className="text-gray-700  leading-relaxed">{news.content}</p>
       </div>
     </SimpleLayout>
   );

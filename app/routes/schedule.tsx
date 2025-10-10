@@ -85,13 +85,13 @@ export default function Schedule() {
   return (
     <SimpleLayout title="Jadwal Kuliah">
       <div className="mb-4">
-        <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+        <div className="flex bg-gray-100  rounded-lg p-1">
           <button
             onClick={() => setActiveTab('today')}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
               activeTab === 'today'
-                ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                : 'text-gray-600 dark:text-gray-300'
+                ? 'bg-white  text-gray-900  shadow-sm'
+                : 'text-gray-600 '
             }`}
           >
             Hari Ini
@@ -100,8 +100,8 @@ export default function Schedule() {
             onClick={() => setActiveTab('week')}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
               activeTab === 'week'
-                ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                : 'text-gray-600 dark:text-gray-300'
+                ? 'bg-white  text-gray-900  shadow-sm'
+                : 'text-gray-600 '
             }`}
           >
             Minggu Ini
@@ -112,9 +112,9 @@ export default function Schedule() {
       <div className="space-y-4">
         {currentSchedule.map((item, index) => (
           activeTab === 'today' ? (
-            <div key={index} className="p-4 rounded-lg bg-white dark:bg-gray-800 shadow-sm">
+            <div key={index} className="p-4 rounded-lg bg-white  shadow-sm">
               <h3 className="font-semibold text-lg mb-2">{item.course}</h3>
-              <div className="space-y-1 text-sm text-gray-600 dark:text-gray-300">
+              <div className="space-y-1 text-sm text-gray-600 ">
                 <div className="flex">
                   <span className="w-16 font-medium">Dosen</span>
                   <span>: {item.lecturer}</span>
@@ -130,13 +130,13 @@ export default function Schedule() {
               </div>
             </div>
           ) : (
-            <div key={index} className="flex rounded-lg bg-white dark:bg-gray-800 shadow-sm overflow-hidden">
+            <div key={index} className="flex rounded-lg bg-white  shadow-sm overflow-hidden">
               <div className={`w-20 flex items-center justify-center text-white font-semibold text-sm ${getDayColor(item.day)}`}>
                 {item.day}
               </div>
               <div className="flex-1 p-4">
                 <h3 className="font-semibold text-lg mb-2">{item.course}</h3>
-                <div className="space-y-1 text-sm text-gray-600 dark:text-gray-300">
+                <div className="space-y-1 text-sm text-gray-600 ">
                   <div className="flex">
                     <span className="w-16 font-medium">Dosen</span>
                     <span>: {item.lecturer}</span>

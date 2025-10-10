@@ -12,13 +12,13 @@ export default function Messages() {
           <Link
             key={t.id}
             to={`/chat/${t.id}`}
-            className="block p-4 rounded-lg bg-white dark:bg-gray-800 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700"
+            className="block p-4 rounded-lg bg-white  shadow-sm hover:bg-gray-50 "
           >
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">{t.name.charAt(0)}</div>
               <div className="flex-1">
                 <h2 className="font-medium">{t.name}</h2>
-                <p className="text-sm text-gray-600 dark:text-gray-300">{t.messages[t.messages.length - 1]?.text}</p>
+                <p className="text-sm text-gray-600 ">{t.messages[t.messages.length - 1]?.text}</p>
               </div>
               <span className="text-xs text-gray-500">{t.messages[t.messages.length - 1]?.time}</span>
             </div>

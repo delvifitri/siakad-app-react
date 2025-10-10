@@ -17,7 +17,7 @@ export default function MobileLayout({
         : undefined;
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900" style={style}>
+        <div className="min-h-screen bg-gray-50 " style={style}>
             <main className="pb-24">{/* leave space for bottom nav (24 = ~72px) */}
                 {children}
             </main>
