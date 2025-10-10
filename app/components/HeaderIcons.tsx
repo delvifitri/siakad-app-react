@@ -20,9 +20,13 @@ export default function HeaderIcons() {
           <ChatBubbleLeftEllipsisIcon className="w-6 h-6 text-blue-400" />
         </Link>
       </div>
-      <button aria-label="profile" className="p-1 rounded-full bg-white/20 backdrop-blur-md ring-2 ring-white/30 shadow-md overflow-hidden">
+      <Link
+        to="/edit-profile"
+        aria-label="profile"
+        className="p-1 rounded-full bg-white/20 backdrop-blur-md ring-2 ring-white/30 shadow-md overflow-hidden"
+      >
         <img src="/profile.jpg" alt="profile" className="w-12 h-12 rounded-full object-cover" />
-      </button>
+      </Link>
     </div>
   );
 }

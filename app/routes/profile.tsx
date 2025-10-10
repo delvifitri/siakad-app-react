@@ -1,4 +1,6 @@
+import { Link } from "react-router-dom";
 import MobileLayout from "../layouts/MobileLayout";
+import { PencilIcon, CogIcon, ArrowRightOnRectangleIcon, BellIcon, ShieldCheckIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 
 export function meta() {
   return [{ title: "Profil - Siakad" }];
@@ -6,10 +8,84 @@ export function meta() {
 
 export default function Profile() {
   return (
-    <MobileLayout title="Profil">
-      <div className="p-4">
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Profil</h1>
-        <p className="mt-4 text-gray-700 dark:text-gray-300">Halaman dummy profil pengguna.</p>
+    <MobileLayout title="Profil" bgImage="/bg simple.png">
+      <div className="p-4 space-y-6">
+        {/* Profile Header */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm">
+          <div className="flex items-center gap-4">
+            <img src="/profile.jpg" alt="profile" className="w-20 h-20 rounded-full object-cover" />
+            <div className="flex-1">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Budi Santoso</h2>
+              <p className="text-gray-600 dark:text-gray-400">Informatika (123456789)</p>
+              <p className="text-sm text-gray-500 dark:text-gray-500">Semester 6</p>
+            </div>
+            <button className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+              <PencilIcon className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+            </button>
+          </div>
+        </div>
+
+        {/* Academic Info */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm">
+          <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Informasi Akademik</h3>
+          <div className="space-y-3">
+            <div className="flex justify-between">
+              <span className="text-gray-600 dark:text-gray-400">IPK</span>
+              <span className="font-medium">3.75</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600 dark:text-gray-400">Total SKS</span>
+              <span className="font-medium">120</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600 dark:text-gray-400">Status KRS</span>
+              <span className="font-medium text-green-600">Disetujui</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Settings */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm">
+          <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Pengaturan</h3>
+          <div className="space-y-1">
+            <Link to="/settings/notifications" className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+              <div className="flex items-center gap-3">
+                <BellIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <span>Notifikasi</span>
+              </div>
+              <ArrowRightOnRectangleIcon className="w-4 h-4 text-gray-400" />
+            </Link>
+            <Link to="/settings/privacy" className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+              <div className="flex items-center gap-3">
+                <ShieldCheckIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <span>Privasi</span>
+              </div>
+              <ArrowRightOnRectangleIcon className="w-4 h-4 text-gray-400" />
+            </Link>
+            <Link to="/settings/general" className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+              <div className="flex items-center gap-3">
+                <CogIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <span>Umum</span>
+              </div>
+              <ArrowRightOnRectangleIcon className="w-4 h-4 text-gray-400" />
+            </Link>
+            <Link to="/help" className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+              <div className="flex items-center gap-3">
+                <QuestionMarkCircleIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <span>Bantuan</span>
+              </div>
+              <ArrowRightOnRectangleIcon className="w-4 h-4 text-gray-400" />
+            </Link>
+          </div>
+        </div>
+
+        {/* Logout */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm">
+          <button className="w-full flex items-center justify-center gap-3 p-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+            <ArrowRightOnRectangleIcon className="w-5 h-5" />
+            <span>Logout</span>
+          </button>
+        </div>
       </div>
     </MobileLayout>
   );

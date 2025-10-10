@@ -1,23 +1,90 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import SimpleLayout from "../layouts/SimpleLayout";
 
 export default function Notifications() {
+  const [activeTab, setActiveTab] = useState<'notifications' | 'announcements'>('notifications');
+
+  const notifications = [
+    {
+      title: "Pengumuman Sistem",
+      description: "Sistem akan menjalankan maintenance pada pukul 02:00.",
+    },
+    {
+      title: "Jadwal Kuliah",
+      description: "Perubahan jadwal untuk Mata Kuliah Pemrograman Web.",
+    },
+    {
+      title: "Pembayaran",
+      description: "Pembayaran Anda diterima pada 10 Oktober 2025.",
+    },
+  ];
+
+  const announcements = [
+    {
+      id: 1,
+      title: "Maintenance Sistem",
+      description: "Sistem akan menjalankan maintenance pada pukul 02:00.",
+    },
+    {
+      id: 2,
+      title: "Perubahan Jadwal Kuliah",
+      description: "Perubahan jadwal untuk Mata Kuliah Pemrograman Web.",
+    },
+    {
+      id: 3,
+      title: "Pembayaran SPP",
+      description: "Pembayaran SPP semester ini telah dibuka.",
+    },
+  ];
+
   return (
     <SimpleLayout title="Pemberitahuan">
+      <div className="mb-4">
+        <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+          <button
+            onClick={() => setActiveTab('notifications')}
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+              activeTab === 'notifications'
+                ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                : 'text-gray-600 dark:text-gray-300'
+            }`}
+          >
+            Notifikasi
+          </button>
+          <button
+            onClick={() => setActiveTab('announcements')}
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+              activeTab === 'announcements'
+                ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                : 'text-gray-600 dark:text-gray-300'
+            }`}
+          >
+            Pengumuman
+          </button>
+        </div>
+      </div>
+
       <div className="space-y-4">
-        <div className="p-4 rounded-lg bg-white dark:bg-gray-800 shadow-sm">
-          <h2 className="font-medium">Pengumuman Sistem</h2>
-          <p className="text-sm text-gray-600 dark:text-gray-300">Sistem akan menjalankan maintenance pada pukul 02:00.</p>
-        </div>
-
-        <div className="p-4 rounded-lg bg-white dark:bg-gray-800 shadow-sm">
-          <h2 className="font-medium">Jadwal Kuliah</h2>
-          <p className="text-sm text-gray-600 dark:text-gray-300">Perubahan jadwal untuk Mata Kuliah Pemrograman Web.</p>
-        </div>
-
-        <div className="p-4 rounded-lg bg-white dark:bg-gray-800 shadow-sm">
-          <h2 className="font-medium">Pembayaran</h2>
-          <p className="text-sm text-gray-600 dark:text-gray-300">Pembayaran Anda diterima pada 10 Oktober 2025.</p>
-        </div>
+        {activeTab === 'notifications' ? (
+          notifications.map((item, index) => (
+            <div key={index} className="p-4 rounded-lg bg-white dark:bg-gray-800 shadow-sm">
+              <h2 className="font-medium">{item.title}</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{item.description}</p>
+            </div>
+          ))
+        ) : (
+          announcements.map((item) => (
+            <Link
+              key={item.id}
+              to={`/announcements/${item.id}`}
+              className="block p-4 rounded-lg bg-white dark:bg-gray-800 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              <h2 className="font-medium">{item.title}</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{item.description}</p>
+            </Link>
+          ))
+        )}
       </div>
     </SimpleLayout>
   );

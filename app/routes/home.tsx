@@ -36,11 +36,13 @@ export default function Home() {
             icon={<CalendarDaysIcon className="w-7 h-7 mb-2 text-white" />}
             label="Jadwal"
             className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white"
+            to="/schedule"
           />
           <QuickAction
             icon={<CreditCardIcon className="w-7 h-7 mb-2 text-white" />}
             label="Pembayaran"
             className="bg-gradient-to-br from-orange-400 to-amber-500 text-white"
+            to="/detail-pembayaran"
           />
           <QuickAction
             icon={<ShieldCheckIcon className="w-7 h-7 mb-2 text-blue-600" />}

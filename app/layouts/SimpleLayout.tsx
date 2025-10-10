@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 
 interface SimpleLayoutProps {
   title: string;
@@ -10,7 +10,9 @@ export default function SimpleLayout({ title, children, footer }: SimpleLayoutPr
   return (
     <div className="min-h-screen flex flex-col text-gray-900 dark:text-gray-100" style={{ backgroundImage: 'url("/bg simple.png")', backgroundSize: 'cover', backgroundPosition: 'center' }}>
       <header className="flex items-center justify-between p-4 bg-white/10 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
-        <Link to="/" className="text-sm font-medium text-blue-600 dark:text-blue-400">Back</Link>
+        <button onClick={() => window.history.back()} className="text-sm font-medium text-blue-600 dark:text-blue-400">
+          <ArrowLeftIcon className="w-5 h-5" />
+        </button>
         <h1 className="text-lg font-semibold">{title}</h1>
         <div className="w-8" />
       </header>
