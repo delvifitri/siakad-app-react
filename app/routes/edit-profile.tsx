@@ -133,7 +133,7 @@ export default function EditProfile() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300  rounded-lg bg-white  text-gray-900 "
+              className="w-full px-3 py-2 border border-orange-500 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-200"
             />
           </div>
 
@@ -143,7 +143,7 @@ export default function EditProfile() {
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300  rounded-lg bg-white  text-gray-900 "
+              className="w-full px-3 py-2 border border-orange-500 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-200"
             />
           </div>
 
@@ -153,7 +153,7 @@ export default function EditProfile() {
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300  rounded-lg bg-white  text-gray-900 "
+              className="w-full px-3 py-2 border border-orange-500 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-200"
             />
           </div>
         </div>
