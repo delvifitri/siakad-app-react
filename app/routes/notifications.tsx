@@ -1,9 +1,13 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import SimpleLayout from "../layouts/SimpleLayout";
 
 export default function Notifications() {
-  const [activeTab, setActiveTab] = useState<'notifications' | 'announcements'>('notifications');
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState<'notifications' | 'announcements'>(() => {
+    const q = new URLSearchParams(location.search).get('tab');
+    return q === 'announcements' ? 'announcements' : 'notifications';
+  });
 
   const notifications = [
     {
@@ -23,8 +27,8 @@ export default function Notifications() {
   const announcements = [
     {
       id: 1,
-      title: "Maintenance Sistem",
-      description: "Sistem akan menjalankan maintenance pada pukul 02:00.",
+      title: "Pengumuman Wisuda Campus 2025",
+      description: "Wisuda akan dilaksanakan 25 Okt 2025 di Aula Utama. Cek portal untuk info lengkap.",
     },
     {
       id: 2,
@@ -69,7 +73,7 @@ export default function Notifications() {
         {activeTab === 'notifications' ? (
           notifications.map((item, index) => (
             <div key={index} className="p-4 rounded-lg bg-white  shadow-sm">
-              <h2 className="font-medium">{item.title}</h2>
+              <h2 className="font-bold">{item.title}</h2>
               <p className="text-sm text-gray-600 ">{item.description}</p>
             </div>
           ))
@@ -80,7 +84,7 @@ export default function Notifications() {
               to={`/announcements/${item.id}`}
               className="block p-4 rounded-lg bg-white  shadow-sm hover:bg-gray-50  transition-colors"
             >
-              <h2 className="font-medium">{item.title}</h2>
+              <h2 className="font-bold">{item.title}</h2>
               <p className="text-sm text-gray-600 ">{item.description}</p>
             </Link>
           ))

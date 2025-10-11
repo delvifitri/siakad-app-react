@@ -83,7 +83,6 @@ export default function Home() {
           <div className="space-y-3">
             <NewsItem
               title="Pendaftaran Beasiswa Dibuka"
-              excerpt="Pendaftaran beasiswa semester genap telah dibuka. Mahasiswa diharapkan menyiapkan berkas persyaratan sebelum tanggal tutup."
               to="/news/1"
               day="07"
               month="Sep"
@@ -91,7 +90,6 @@ export default function Home() {
 
             <NewsItem
               title="Seminar Industri Minggu Ini"
-              excerpt="Ikuti seminar bersama perusahaan mitra untuk insight karir dan peluang magang. Terbuka untuk seluruh mahasiswa."
               to="/news/2"
               day="17"
               month="Des"

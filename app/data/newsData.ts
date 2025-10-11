@@ -7,17 +7,17 @@ export type NewsItem = {
 
 export const newsData: Record<number, NewsItem> = {
   1: {
-    title: "Pengumuman Sistem Maintenance",
+    title: "Pendaftaran Beasiswa Dibuka",
     date: "10 Oktober 2025",
     img: "/favicon.ico",
     content:
-      "Sistem SIAKAD akan menjalankan maintenance pada pukul 02:00 hingga 04:00 WIB. Selama maintenance, sistem tidak dapat diakses. Mohon maaf atas ketidaknyamanannya.",
+      "Pendaftaran beasiswa semester genap telah dibuka. Mahasiswa diharapkan menyiapkan berkas persyaratan sebelum tanggal tutup.",
   },
   2: {
-    title: "Jadwal Kuliah Diperbarui",
+    title: "Seminar Industri Minggu Ini",
     date: "9 Oktober 2025",
     img: "/favicon.ico",
     content:
-      "Perubahan jadwal kuliah untuk Mata Kuliah Pemrograman Web. Jadwal baru: Senin, 08:00 - 10:00 di Ruang 101. Silakan periksa jadwal terbaru di portal.",
+      "Ikuti seminar bersama perusahaan mitra untuk insight karir dan peluang magang. Terbuka untuk seluruh mahasiswa.",
   },
 };
