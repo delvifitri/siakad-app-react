@@ -55,14 +55,14 @@ export default function Home() {
           <h2 className="text-base font-semibold text-gray-900 mb-3">Berita Kampus</h2>
           <div className="space-y-3">
             <NewsItem
-              img="/favicon.ico"
+              date="10 Oktober 2025"
               title="Pendaftaran Beasiswa Dibuka"
               excerpt="Pendaftaran beasiswa semester genap telah dibuka. Mahasiswa diharapkan menyiapkan berkas persyaratan sebelum tanggal tutup."
               to="/news/1"
             />
 
             <NewsItem
-              img="/favicon.ico"
+              date="9 Oktober 2025"
               title="Seminar Industri Minggu Ini"
               excerpt="Ikuti seminar bersama perusahaan mitra untuk insight karir dan peluang magang. Terbuka untuk seluruh mahasiswa."
               to="/news/2"
