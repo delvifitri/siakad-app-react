@@ -2,7 +2,16 @@ import type { Route } from "./+types/home";
 import MobileLayout from "../layouts/MobileLayout";
 import HeaderIcons from "../components/HeaderIcons";
 import NewsItem from "../components/NewsItem";
-import { CalendarDaysIcon, CreditCardIcon, ShieldCheckIcon, AcademicCapIcon, DocumentDuplicateIcon, UserGroupIcon, DocumentTextIcon, DocumentCheckIcon } from "@heroicons/react/24/outline";
+import {
+  CalendarDaysIcon,
+  CreditCardIcon,
+  ShieldCheckIcon,
+  AcademicCapIcon,
+  DocumentDuplicateIcon,
+  UserGroupIcon,
+  DocumentTextIcon,
+  DocumentCheckIcon,
+} from "@heroicons/react/24/outline";
 import QuickAction from "../components/QuickAction";
 import StatCard from "../components/StatCard";
 
@@ -25,10 +34,26 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-2 gap-3 mt-6">
-          <StatCard icon={<AcademicCapIcon className="w-6 h-6 text-blue-600" />} title="IPK" value={3.75} />
-          <StatCard icon={<DocumentDuplicateIcon className="w-6 h-6 text-green-600" />} title="Total SKS" value={120} />
-          <StatCard icon={<DocumentTextIcon className="w-6 h-6 text-orange-500" />} title="KRS / KHS" value="Lihat" />
-          <StatCard icon={<DocumentCheckIcon className="w-6 h-6 text-purple-600" />} title="Status KRS" value="Disetujui" />
+          <StatCard
+            icon={<AcademicCapIcon className="w-6 h-6 text-blue-600" />}
+            title="IPK"
+            value={3.75}
+          />
+          <StatCard
+            icon={<DocumentDuplicateIcon className="w-6 h-6 text-green-600" />}
+            title="Total SKS"
+            value={120}
+          />
+          <StatCard
+            icon={<DocumentTextIcon className="w-6 h-6 text-orange-500" />}
+            title="KRS / KHS"
+            value="Lihat"
+          />
+          <StatCard
+            icon={<DocumentCheckIcon className="w-6 h-6 text-purple-600" />}
+            title="Status KRS"
+            value="Disetujui"
+          />
         </div>
 
         <div className="grid grid-cols-3 gap-3 mt-6">
@@ -52,20 +77,24 @@ export default function Home() {
         </div>
 
         <div className="mt-3">
-          <h2 className="text-base font-semibold text-gray-900 mb-3">Berita Kampus</h2>
+          <h2 className="text-base font-semibold text-gray-900 mb-3">
+            Berita Kampus
+          </h2>
           <div className="space-y-3">
             <NewsItem
-              img="/favicon.ico"
               title="Pendaftaran Beasiswa Dibuka"
               excerpt="Pendaftaran beasiswa semester genap telah dibuka. Mahasiswa diharapkan menyiapkan berkas persyaratan sebelum tanggal tutup."
               to="/news/1"
+              day="07"
+              month="Sep"
             />
 
             <NewsItem
-              img="/favicon.ico"
               title="Seminar Industri Minggu Ini"
               excerpt="Ikuti seminar bersama perusahaan mitra untuk insight karir dan peluang magang. Terbuka untuk seluruh mahasiswa."
               to="/news/2"
+              day="17"
+              month="Des"
             />
           </div>
         </div>

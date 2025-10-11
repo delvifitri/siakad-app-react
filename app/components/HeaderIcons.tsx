@@ -1,4 +1,7 @@
-import { BellIcon, ChatBubbleLeftEllipsisIcon } from "@heroicons/react/24/outline";
+import {
+  BellIcon,
+  ChatBubbleLeftEllipsisIcon,
+} from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
 
 export default function HeaderIcons() {
@@ -25,7 +28,11 @@ export default function HeaderIcons() {
         aria-label="profile"
         className="p-1 rounded-full bg-white/20 backdrop-blur-md ring-2 ring-white/30 shadow-md overflow-hidden"
       >
-        <img src="/profile.jpg" alt="profile" className="w-12 h-12 rounded-full object-cover" />
+        <img
+          src="/profile.jpg"
+          alt="profile"
+          className="w-12 h-12 rounded-full object-cover"
+        />
       </Link>
     </div>
   );
