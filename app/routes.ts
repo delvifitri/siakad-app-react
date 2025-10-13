@@ -7,6 +7,7 @@ export default [
 	route("presensi", "routes/presensi.tsx"),
 	route("schedule", "routes/schedule.tsx"),
 	route("notifications", "routes/notifications.tsx"),
+	route("notification/:id", "routes/notification.$id.tsx"),
 	route("messages", "routes/messages.tsx"),
 	route("chat/:id", "routes/chat.$id.tsx"),
 	route("news/:id", "routes/news.$id.tsx"),

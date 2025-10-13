@@ -11,9 +11,12 @@ export default function HeaderIcons() {
         <Link
           to="/notifications"
           aria-label="notifications"
-          className="p-3 rounded-lg bg-white/12 backdrop-blur-md ring-1 ring-amber-300/30 shadow-sm inline-flex items-center"
+          className="relative p-3 rounded-lg bg-white/12 backdrop-blur-md ring-1 ring-amber-300/30 shadow-sm inline-flex items-center"
         >
           <BellIcon className="w-6 h-6 text-amber-500" />
+          <span className="absolute -top-2 -right-2 min-w-[18px] h-5 rounded-full bg-orange-500 text-white text-xs font-semibold flex items-center justify-center px-1.5">
+            1
+          </span>
         </Link>
         <Link
           to="/messages"

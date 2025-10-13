@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MobileLayout from "../layouts/MobileLayout";
+import notifications from "../data/notificationData";
 
 export function meta() {
   return [{ title: "Presensi - Siakad" }];
@@ -21,13 +22,40 @@ const initialCourses: Course[] = [
 
 export default function Presensi() {
   const [courses] = useState<Course[]>(initialCourses);
-  const [attendance, setAttendance] = useState<Record<number, 'hadir' | 'izin' | 'sakit' | undefined>>({});
-  const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+  const [statusMap, setStatusMap] = useState<Record<string, 'hadir' | 'izin' | 'sakit' | 'belum'>>({});
 
-  const handleSelect = (id: number, status: 'hadir' | 'izin' | 'sakit') => {
-    setAttendance((s) => ({ ...s, [id]: status }));
-    setOpenMenuId(null);
-  };
+  // Load saved presensi records and map them to course names using notifications data
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('presensiRecords');
+      const records: Array<{ id: string; status: 'hadir'|'izin'|'sakit'; fileName?: string|null; timestamp?: string }> = raw ? JSON.parse(raw) : [];
+      // map notification id -> course name
+      const idToCourse: Record<string, string> = {};
+      notifications.forEach((n) => {
+        if (n.type === 'presensi' && n.course) idToCourse[n.id] = n.course;
+      });
+
+      // for each record, keep latest by timestamp per course
+      const latestByCourse: Record<string, { status: string; ts: number }> = {};
+      records.forEach((r) => {
+        const course = idToCourse[r.id];
+        if (!course) return;
+        const ts = r.timestamp ? new Date(r.timestamp).getTime() : 0;
+        if (!latestByCourse[course] || ts > latestByCourse[course].ts) {
+          latestByCourse[course] = { status: r.status, ts };
+        }
+      });
+
+      const map: Record<string, 'hadir'|'izin'|'sakit'|'belum'> = {};
+      courses.forEach((c) => {
+        const s = latestByCourse[c.name];
+        map[c.name] = s ? (s.status as 'hadir'|'izin'|'sakit') : 'belum';
+      });
+      setStatusMap(map);
+    } catch (e) {
+      // ignore
+    }
+  }, [courses]);
 
   return (
     <MobileLayout title="Presensi" bgImage="/bg simple.png">
@@ -44,30 +72,15 @@ export default function Presensi() {
                 <div className="text-xs text-gray-500">{c.time}</div>
               </div>
               <div className="flex flex-col items-end gap-2">
-                {!attendance[c.id] ? (
-                  <>
-                    <button
-                      onClick={() => setOpenMenuId(openMenuId === c.id ? null : c.id)}
-                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors bg-orange-500 text-white`}
-                    >
-                      Presensi
-                    </button>
-
-                    {openMenuId === c.id && (
-                      <div className="absolute right-4 top-12 w-36 bg-white  rounded-md shadow-lg z-20">
-                        <button onClick={() => handleSelect(c.id, 'hadir')} className="w-full text-left px-4 py-2 hover:bg-gray-100 ">Hadir</button>
-                        <button onClick={() => handleSelect(c.id, 'izin')} className="w-full text-left px-4 py-2 hover:bg-gray-100 ">Izin</button>
-                        <button onClick={() => handleSelect(c.id, 'sakit')} className="w-full text-left px-4 py-2 hover:bg-gray-100 ">Sakit</button>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <span className="text-xs">
-                    <span className={`px-2 py-0.5 rounded-full text-white text-xs ${attendance[c.id] === 'hadir' ? 'bg-green-500' : attendance[c.id] === 'izin' ? 'bg-yellow-500' : 'bg-red-500'}`}>
-                      {attendance[c.id] === 'hadir' ? 'Hadir' : attendance[c.id] === 'izin' ? 'Izin' : 'Sakit'}
-                    </span>
-                  </span>
-                )}
+                <span className="text-xs">
+                  {(() => {
+                    const s = statusMap[c.name] ?? 'belum';
+                    if (s === 'hadir') return <span className="px-2 py-0.5 rounded-full text-white text-xs bg-green-500">Hadir</span>;
+                    if (s === 'izin') return <span className="px-2 py-0.5 rounded-full text-white text-xs bg-yellow-500">Izin</span>;
+                    if (s === 'sakit') return <span className="px-2 py-0.5 rounded-full text-white text-xs bg-red-500">Sakit</span>;
+                    return <span className="px-2 py-0.5 rounded-full text-gray-700 text-xs bg-gray-100">Belum</span>;
+                  })()}
+                </span>
               </div>
             </div>
           ))}
