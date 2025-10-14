@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import SimpleLayout from '../layouts/SimpleLayout';
 import notifications from '../data/notificationData';
@@ -12,21 +12,11 @@ export default function PresensiDetail() {
   const [sp] = useSearchParams();
   const hinted = sp.get('status') || undefined;
   const item = notifications.find((n) => n.id === id);
-  const [record, setRecord] = useState<{ id: string; status: string; fileName?: string | null; timestamp?: string } | null>(null);
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem('presensiRecords');
-      const records = raw ? JSON.parse(raw) : [];
-      const matched = records.filter((r: any) => r.id === id);
-      if (matched.length) {
-        const latest = matched.reduce((a: any, b: any) => (new Date(a.timestamp || 0).getTime() > new Date(b.timestamp || 0).getTime() ? a : b));
-        setRecord(latest);
-      }
-    } catch {}
-  }, [id]);
-
-  const status = useMemo(() => record?.status || hinted, [record, hinted]);
+  // Read record info from query params (passed from list page)
+  const qpStatus = sp.get('status') || undefined;
+  const qpFileName = sp.get('fileName') || undefined;
+  const qpTs = sp.get('ts') || undefined;
+  const status = useMemo(() => qpStatus || hinted, [qpStatus, hinted]);
 
   if (!item) {
     return (
@@ -50,8 +40,8 @@ export default function PresensiDetail() {
             <div className="p-4 rounded-lg bg-green-50 border border-green-200">
               <div className="text-green-800 font-semibold">✓ Presensi Hadir Tercatat</div>
               <div className="text-sm text-green-700 mt-1">Anda telah melakukan presensi hadir untuk mata kuliah ini.</div>
-              {record?.timestamp && (
-                <div className="text-xs text-green-700 mt-2">Waktu: {new Date(record.timestamp).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' })}</div>
+              {qpTs && (
+                <div className="text-xs text-green-700 mt-2">Waktu: {new Date(qpTs).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' })}</div>
               )}
             </div>
           ) : status === 'izin' || status === 'sakit' ? (
@@ -60,14 +50,14 @@ export default function PresensiDetail() {
               <div className="text-sm text-yellow-700 mt-1">Status: <strong className="capitalize">{status}</strong></div>
               <div className="mt-3">
                 <div className="text-xs text-gray-500 mb-1">Surat yang terlampir:</div>
-                {record?.fileName ? (
-                  <div className="p-2 bg-white rounded border text-sm text-gray-700">{record.fileName}</div>
+                {qpFileName ? (
+                  <div className="p-2 bg-white rounded border text-sm text-gray-700">{qpFileName}</div>
                 ) : (
                   <div className="text-sm text-gray-500 italic">Tidak ada file terlampir</div>
                 )}
               </div>
-              {record?.timestamp && (
-                <div className="text-xs text-yellow-700 mt-2">Waktu: {new Date(record.timestamp).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' })}</div>
+              {qpTs && (
+                <div className="text-xs text-yellow-700 mt-2">Waktu: {new Date(qpTs).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' })}</div>
               )}
             </div>
           ) : (

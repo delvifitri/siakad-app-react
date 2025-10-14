@@ -30,40 +30,15 @@ export default function Presensi() {
 
   // Load saved presensi records and map them to course names using notifications data
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem('presensiRecords');
-      const records: Array<{ id: string; status: 'hadir'|'izin'|'sakit'; fileName?: string|null; timestamp?: string }> = raw ? JSON.parse(raw) : [];
-      // map notification id -> course name
-      const idToCourse: Record<string, string> = {};
-      notifications.forEach((n) => {
-        if (n.type === 'presensi' && n.course) idToCourse[n.id] = n.course;
-      });
-
-      // for each record, keep latest by timestamp per course
-      const latestByCourse: Record<string, { status: string; ts: number }> = {};
-      records.forEach((r) => {
-        const course = idToCourse[r.id];
-        if (!course) return;
-        const ts = r.timestamp ? new Date(r.timestamp).getTime() : 0;
-        if (!latestByCourse[course] || ts > latestByCourse[course].ts) {
-          latestByCourse[course] = { status: r.status, ts };
-        }
-      });
-
-      const map: Record<string, 'hadir'|'izin'|'sakit'|'belum'> = {};
-      courses.forEach((c) => {
-        const s = latestByCourse[c.name];
-        map[c.name] = s ? (s.status as 'hadir'|'izin'|'sakit') : 'belum';
-      });
-
-      // Apply requested defaults when no saved presensi exists
-      if (map['Sistem Operasi'] === 'belum') map['Sistem Operasi'] = 'hadir';
-      if (map['Jaringan Komputer'] === 'belum') map['Jaringan Komputer'] = 'izin';
-
-      setStatusMap(map);
-    } catch (e) {
-      // ignore
-    }
+    // Set statuses purely from in-memory defaults (no localStorage)
+    const map: Record<string, 'hadir'|'izin'|'sakit'|'belum'> = {};
+    courses.forEach((c) => {
+      map[c.name] = 'belum';
+    });
+    // Default demo statuses as requested
+    map['Sistem Operasi'] = 'hadir';
+    map['Jaringan Komputer'] = 'izin';
+    setStatusMap(map);
   }, [courses]);
 
   return (
@@ -100,17 +75,8 @@ export default function Presensi() {
                       const notif = notifications.find(n => n.type === 'presensi' && n.course === c.name);
                       const go = () => {
                         if (notif) {
-                          // ensure a demo record exists so detail page shows attachment
-                          try {
-                            const raw = localStorage.getItem('presensiRecords');
-                            const records = raw ? JSON.parse(raw) : [];
-                            const hasRecord = records.some((r: any) => r.id === notif.id && r.status === 'izin');
-                            if (!hasRecord) {
-                              records.push({ id: notif.id, status: 'izin', fileName: 'surat_izin.pdf', timestamp: new Date().toISOString() });
-                              localStorage.setItem('presensiRecords', JSON.stringify(records));
-                            }
-                          } catch {}
-                          navigate(`/presensi/${notif.id}?status=izin`);
+                          const ts = new Date().toISOString();
+                          navigate(`/presensi/${notif.id}?status=izin&fileName=${encodeURIComponent('surat_izin.pdf')}&ts=${encodeURIComponent(ts)}`);
                         } else {
                           navigate('/presensi');
                         }
