@@ -5,6 +5,7 @@ export default [
 	index("routes/home.tsx"),
 	route("login", "routes/login.tsx"),
 	route("presensi", "routes/presensi.tsx"),
+	route("presensi/:id", "routes/presensi.$id.tsx"),
 	route("schedule", "routes/schedule.tsx"),
 	route("notifications", "routes/notifications.tsx"),
 	route("notification/:id", "routes/notification.$id.tsx"),
@@ -20,4 +21,5 @@ export default [
 	route("krs-khs", "routes/krs-khs.tsx"),
 	route("profile", "routes/profile.tsx"),
 	route("edit-profile", "routes/edit-profile.tsx"),
+	route("dev", "routes/dev.tsx"),
 ] satisfies RouteConfig;

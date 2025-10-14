@@ -16,7 +16,7 @@ export default function NewsItem({
   return (
     <Link to={to} className="block">
   <article className="flex items-center gap-3 bg-white/50 backdrop-blur-md rounded-xl p-3 ring-1 ring-white/30 hover:bg-white/70 transition-colors">
-        <div className="w-24 h-20 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0 flex-col shadow-lg">
+        <div className="w-24 h-20 rounded-lg bg-gradient-to-br from-orange-500 to-orange-400 flex items-center justify-center flex-shrink-0 flex-col shadow-lg">
           <span className="text-2xl font-bold text-white tracking-tight">{day}</span>
           <span className="text-sm font-semibold text-white uppercase tracking-wide">{month}</span>
         </div>
