@@ -98,11 +98,15 @@ export default function Pembayaran() {
                     })()}
                   </div>
                   <div className="flex items-center gap-2 mt-1">
-                    {unpaidCount === 0 ? (
-                      <span className="text-sm text-teal-600 font-medium">Lunas</span>
-                    ) : (
-                      <button onClick={() => navigate(`/pembayaran/semester/${slug}`)} className="text-sm text-orange-500 font-medium">Lihat Detail</button>
+                    {unpaidCount === 0 && (
+                      <span className="text-xs text-teal-600 font-medium">Lunas</span>
                     )}
+                    <button
+                      onClick={() => navigate(`/detail-pembayaran?semester=${encodeURIComponent(semester)}`)}
+                      className="text-sm text-orange-500 font-medium"
+                    >
+                      Lihat Detail
+                    </button>
                   </div>
                 </div>
               </div>

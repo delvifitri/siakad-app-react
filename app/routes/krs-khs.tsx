@@ -12,16 +12,7 @@ type Course = {
   className: string; // legacy default like "Kelas: A"
   note?: string;
   time: string; // default time (legacy, will be overridden by selected class)
-  classes: Record<
-    "A" | "B",
-    {
-      lecturer?: string; // legacy primary lecturer
-      lecturers?: string[]; // multiple lecturers for the class
-      day: string;
-      time: string;
-      remaining: number;
-    }
-  >; // per-class data with quota and day
+  classes: Record<"A" | "B", { lecturer: string; additionalLecturers?: string[]; day: string; additionalDays?: string[]; time: string; additionalTimes?: string[]; remaining: number }>; // per-class data with quota, optional multiple lecturers and time/day variants
   sks: number;
   status: "added" | "available";
 };
@@ -29,16 +20,7 @@ type Course = {
 type OtherCourse = {
   id: string;
   name: string;
-  classes: Record<
-    "A" | "B",
-    {
-      lecturer?: string;
-      lecturers?: string[];
-      day: string;
-      time: string;
-      remaining: number;
-    }
-  >;
+  classes: Record<"A" | "B", { lecturer: string; additionalLecturers?: string[]; day: string; additionalDays?: string[]; time: string; additionalTimes?: string[]; remaining: number }>;
   sks: number;
   originSemester: number;
   season: "Ganjil" | "Genap";
@@ -57,8 +39,8 @@ const krsCourses: Course[] = [
     className: "Kelas: A",
     time: "09:00–10:30",
     classes: {
-      A: { lecturer: "Dr. Ahmad Satful", lecturers: ["Dr. Ahmad Satful", "Dr. Farah Alia"], day: "Senin", time: "09:00–10:30", remaining: 5 },
-      B: { lecturer: "Dr. Rina Putri", lecturers: ["Dr. Rina Putri", "Ir. Dimas Prakoso"], day: "Rabu", time: "13:00–14:30", remaining: 6 },
+  A: { lecturer: "Dr. Ahmad Satful", additionalLecturers: ["Ir. Dewa Mahendra, M.Kom", "Dr. Lia Rahmat"], day: "Senin", additionalDays: ["Selasa", "Kamis"], time: "09:00–10:30", additionalTimes: ["10:45–12:15"], remaining: 5 },
+  B: { lecturer: "Dr. Rina Putri", additionalLecturers: ["Ir. Dewa Mahendra, M.Kom"], day: "Rabu", additionalDays: ["Jumat"], time: "13:00–14:30", additionalTimes: ["15:00–16:30"], remaining: 6 },
     },
     sks: 3,
     status: "added",
@@ -70,8 +52,8 @@ const krsCourses: Course[] = [
     className: "Kelas: B (Tersisa 20)",
     time: "10:00–11:30",
     classes: {
-      A: { lecturer: "Dr. Andi Saputra", lecturers: ["Dr. Andi Saputra"], day: "Selasa", time: "08:00–09:30", remaining: 10 },
-      B: { lecturer: "Dr. Setri Rahmawati", lecturers: ["Dr. Setri Rahmawati", "Dr. Cici Anggraini"], day: "Kamis", time: "10:00–11:30", remaining: 20 },
+  A: { lecturer: "Dr. Andi Saputra", additionalLecturers: ["Dr. Rudi Hartono"], day: "Selasa", additionalDays: ["Rabu"], time: "08:00–09:30", additionalTimes: ["09:45–11:15"], remaining: 10 },
+  B: { lecturer: "Dr. Setri Rahmawati", additionalLecturers: ["Dr. Rudi Hartono"], day: "Kamis", additionalDays: ["Selasa"], time: "10:00–11:30", additionalTimes: ["13:00–14:30"], remaining: 20 },
     },
     sks: 2,
     status: "available",
@@ -83,8 +65,8 @@ const krsCourses: Course[] = [
     className: "Kelas: A",
     time: "08:00–09:30",
     classes: {
-      A: { lecturer: "Dr. Bukit Santoso", lecturers: ["Dr. Bukit Santoso", "Ir. Reza Firmansyah"], day: "Jumat", time: "08:00–09:30", remaining: 5 },
-      B: { lecturer: "Ir. Sari Wulandari", lecturers: ["Ir. Sari Wulandari"], day: "Rabu", time: "14:00–15:30", remaining: 0 },
+  A: { lecturer: "Dr. Bukit Santoso", additionalLecturers: ["Ir. Sari Wulandari"], day: "Jumat", additionalDays: ["Kamis"], time: "08:00–09:30", additionalTimes: ["09:45–11:15"], remaining: 5 },
+  B: { lecturer: "Ir. Sari Wulandari", additionalLecturers: ["Dr. Bukit Santoso"], day: "Rabu", additionalDays: ["Senin"], time: "14:00–15:30", additionalTimes: ["16:00–17:30"], remaining: 0 },
     },
     sks: 3,
     status: "available",
@@ -97,8 +79,8 @@ const otherSemesterCourses: OtherCourse[] = [
     id: "if-sd",
     name: "Struktur Data",
     classes: {
-      A: { lecturer: "Dr. Naufal Akbar", day: "Senin", time: "07:30–09:00", remaining: 12 },
-      B: { lecturer: "Dr. Naufal Akbar", day: "Kamis", time: "10:00–11:30", remaining: 5 },
+  A: { lecturer: "Dr. Naufal Akbar", additionalLecturers: ["Dr. Tania Dewi"], day: "Senin", additionalDays: ["Rabu"], time: "07:30–09:00", additionalTimes: ["09:15–10:45"], remaining: 12 },
+  B: { lecturer: "Dr. Naufal Akbar", additionalLecturers: ["Dr. Tania Dewi"], day: "Kamis", additionalDays: ["Selasa"], time: "10:00–11:30", additionalTimes: ["12:30–14:00"], remaining: 5 },
     },
     sks: 3,
     originSemester: 4,
@@ -109,8 +91,8 @@ const otherSemesterCourses: OtherCourse[] = [
     id: "if-dm",
     name: "Data Mining",
     classes: {
-      A: { lecturer: "Dr. Raden Bagas", day: "Selasa", time: "13:00–14:30", remaining: 8 },
-      B: { lecturer: "Dr. Raden Bagas", day: "Jumat", time: "15:00–16:30", remaining: 0 },
+  A: { lecturer: "Dr. Raden Bagas", additionalLecturers: ["Dr. Winda Kurnia"], day: "Selasa", additionalDays: ["Kamis"], time: "13:00–14:30", additionalTimes: ["08:00–09:30"], remaining: 8 },
+  B: { lecturer: "Dr. Raden Bagas", additionalLecturers: ["Dr. Winda Kurnia"], day: "Jumat", additionalDays: ["Rabu"], time: "15:00–16:30", additionalTimes: ["10:15–11:45"], remaining: 0 },
     },
     sks: 3,
     originSemester: 4,
@@ -121,8 +103,8 @@ const otherSemesterCourses: OtherCourse[] = [
     id: "if-md",
     name: "Matematika Diskrit",
     classes: {
-      A: { lecturer: "Dr. Tania Dewi", day: "Rabu", time: "08:00–09:30", remaining: 20 },
-      B: { lecturer: "Dr. Tania Dewi", day: "Senin", time: "09:45–11:15", remaining: 18 },
+  A: { lecturer: "Dr. Tania Dewi", additionalLecturers: ["Dr. Naufal Akbar"], day: "Rabu", additionalDays: ["Senin"], time: "08:00–09:30", additionalTimes: ["13:00–14:30"], remaining: 20 },
+  B: { lecturer: "Dr. Tania Dewi", additionalLecturers: ["Dr. Naufal Akbar"], day: "Senin", additionalDays: ["Kamis"], time: "09:45–11:15", additionalTimes: ["07:30–09:00"], remaining: 18 },
     },
     sks: 2,
     originSemester: 2,
@@ -220,6 +202,14 @@ export default function KrsKhs() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [khsSemester, setKhsSemester] = useState<number>(currentSemester - 1);
+  // Track selected time variant per course id (defaults to primary time)
+  const [selectedTimes, setSelectedTimes] = useState<Record<string, string>>({});
+  // Track selected day variant per course id (defaults to primary day)
+  const [selectedDays, setSelectedDays] = useState<Record<string, string>>({});
+  // Track selected schedule (day|time) per course id for a single dropdown UX
+  const [selectedSchedules, setSelectedSchedules] = useState<Record<string, string>>({});
+  // Track selected lecturer per course id
+  const [selectedLecturers, setSelectedLecturers] = useState<Record<string, string>>({});
 
   const selectedCoursesMemo = useMemo(
     () => {
@@ -252,13 +242,15 @@ export default function KrsKhs() {
     // Quota check and time slots
     const slots: Array<{ name: string; cls: string; day: string; start: number; end: number }> = [];
     for (const c of selectedCoursesMemo) {
-      const cls = selectedClasses[c.id] ?? "A";
-      const d = c.classes[cls];
+  const cls = selectedClasses[c.id] ?? "A";
+  const d = c.classes[cls];
+      const timeToUse = selectedTimes[c.id] || d.time;
+      const dayToUse = selectedDays[c.id] || (d as any).day || "";
       if (d.remaining === 0) errs.push(`${c.name} (${cls}) kuota habis.`);
-      const minutes = parseRangeToMinutes(d.time);
+  const minutes = parseRangeToMinutes(timeToUse);
       if (!minutes) continue;
       const [start, end] = minutes;
-      slots.push({ name: c.name, cls, day: (d as any).day ?? "", start, end });
+      slots.push({ name: c.name, cls, day: dayToUse, start, end });
     }
     for (let i = 0; i < slots.length; i++) {
       for (let j = i + 1; j < slots.length; j++) {
@@ -340,29 +332,62 @@ export default function KrsKhs() {
             {krsFilter === "active" && krsCourses.map((c) => {
               const selected = selectedClasses[c.id] ?? "A";
               const selectedData = c.classes[selected];
+              const timeOptions = [selectedData.time, ...(selectedData.additionalTimes || [])];
+              const timeValue = selectedTimes[c.id] || selectedData.time;
               const isSelected = selectedMap[c.id] ?? false;
               return (
                 <div key={c.id} className="bg-white/70 backdrop-blur-md rounded-2xl ring-1 ring-white/30 p-4 shadow-sm">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <div className="font-semibold text-gray-900">{c.name}</div>
-                      <div className="text-sm text-gray-600 flex items-center gap-2 flex-wrap">
-                        <span>{selectedData.lecturer ?? (selectedData.lecturers?.[0] || "-")}</span>
-                        {selectedData.lecturers && selectedData.lecturers.length > 1 && (
-                          <details className="relative">
-                            <summary className="list-none cursor-pointer text-xs text-orange-600 select-none">+{selectedData.lecturers.length - 1}</summary>
-                            <div className="absolute z-50 mt-1 w-56 bg-white border border-gray-200 rounded-md shadow-lg p-2 max-h-48 overflow-auto">
-                              <div className="text-xs text-gray-500 mb-1">Dosen Pengampu:</div>
-                              <ul className="space-y-1">
-                                {selectedData.lecturers.map((lec, idx) => (
-                                  <li key={idx} className="text-sm text-gray-700">{lec}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          </details>
+                      <div className="text-sm text-gray-600 flex items-center gap-2 relative">
+                        <span>{selectedLecturers[c.id] || selectedData.lecturer}</span>
+                        {selectedData.additionalLecturers && selectedData.additionalLecturers.length > 0 && (
+                          <LecturersBadge
+                            lecturers={[selectedData.lecturer, ...selectedData.additionalLecturers]}
+                            onSelect={(name, index) => {
+                              if (submitted) return;
+                              setSelectedLecturers((prev) => ({ ...prev, [c.id]: name }));
+                              // pick schedule by aligning index to options length
+                              const dayOptions = [selectedData.day, ...(selectedData.additionalDays || [])];
+                              const timeOptionsLocal = [selectedData.time, ...(selectedData.additionalTimes || [])];
+                              const daySel = dayOptions[index % dayOptions.length];
+                              const timeSel = timeOptionsLocal[index % timeOptionsLocal.length];
+                              setSelectedDays((prev) => ({ ...prev, [c.id]: daySel }));
+                              setSelectedTimes((prev) => ({ ...prev, [c.id]: timeSel }));
+                              setSelectedSchedules((prev) => ({ ...prev, [c.id]: `${daySel}|${timeSel}` }));
+                            }}
+                          />
                         )}
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">{selectedData.day}, {selectedData.time}</div>
+                      <div className="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                        {(() => {
+                          const dayOptions = [selectedData.day, ...(selectedData.additionalDays || [])];
+                          const combined = dayOptions.flatMap((d) => timeOptions.map((t) => ({
+                            v: `${d}|${t}`,
+                            label: `${d}, ${t}`,
+                          })));
+                          const currentVal = selectedSchedules[c.id] || `${selectedDays[c.id] || selectedData.day}|${timeValue}`;
+                          return (
+                            <select
+                              className="px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200 text-[11px] text-gray-700 focus:outline-none focus:ring-1 focus:ring-orange-300"
+                              value={currentVal}
+                              onChange={(e) => {
+                                if (submitted) return;
+                                const [dSel, tSel] = e.target.value.split('|');
+                                setSelectedSchedules((prev) => ({ ...prev, [c.id]: e.target.value }));
+                                setSelectedDays((prev) => ({ ...prev, [c.id]: dSel }));
+                                setSelectedTimes((prev) => ({ ...prev, [c.id]: tSel }));
+                              }}
+                              disabled={submitted}
+                            >
+                              {combined.map((opt) => (
+                                <option key={opt.v} value={opt.v}>{opt.label}</option>
+                              ))}
+                            </select>
+                          );
+                        })()}
+                      </div>
                       <div className={`text-xs mt-1 ${selectedData.remaining === 0 ? "text-red-600 font-medium" : "text-gray-600"}`}>
                         {selectedData.remaining === 0 ? "Kuota habis" : `Sisa kuota: ${selectedData.remaining}`}
                       </div>
@@ -405,6 +430,8 @@ export default function KrsKhs() {
               .map((oc) => {
                 const selected = selectedClasses[oc.id] ?? "A";
                 const d = oc.classes[selected];
+                const timeOptions = [d.time, ...(d.additionalTimes || [])];
+                const timeValue = selectedTimes[oc.id] || d.time;
                 const isSelected = selectedMap[oc.id] ?? false;
                 return (
                   <div key={oc.id} className="bg-white/70 backdrop-blur-md rounded-2xl ring-1 ring-white/30 p-4 shadow-sm">
@@ -412,23 +439,53 @@ export default function KrsKhs() {
                       <div>
                         <div className="font-semibold text-gray-900">{oc.name}</div>
                         <div className="text-xs text-gray-500 mt-1">Semester {oc.originSemester} – {oc.season} {oc.isElective ? "• Pilihan" : "• Wajib"}</div>
-                        <div className="text-sm text-gray-600 mt-1 flex items-center gap-2 flex-wrap">
-                          <span>{d.lecturer ?? (d.lecturers?.[0] || "-")}</span>
-                          {d.lecturers && d.lecturers.length > 1 && (
-                            <details className="relative">
-                              <summary className="list-none cursor-pointer text-xs text-orange-600 select-none">+{d.lecturers.length - 1}</summary>
-                              <div className="absolute z-50 mt-1 w-56 bg-white border border-gray-200 rounded-md shadow-lg p-2 max-h-48 overflow-auto">
-                                <div className="text-xs text-gray-500 mb-1">Dosen Pengampu:</div>
-                                <ul className="space-y-1">
-                                  {d.lecturers.map((lec, idx) => (
-                                    <li key={idx} className="text-sm text-gray-700">{lec}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                            </details>
+                        <div className="text-sm text-gray-600 mt-1 flex items-center gap-2">
+                          <span>{selectedLecturers[oc.id] || d.lecturer}</span>
+                          {d.additionalLecturers && d.additionalLecturers.length > 0 && (
+                            <LecturersBadge
+                              lecturers={[d.lecturer, ...d.additionalLecturers]}
+                              onSelect={(name, index) => {
+                                if (submitted) return;
+                                setSelectedLecturers((prev) => ({ ...prev, [oc.id]: name }));
+                                const dayOptions = [d.day, ...(d.additionalDays || [])];
+                                const timeOptionsLocal = [d.time, ...(d.additionalTimes || [])];
+                                const daySel = dayOptions[index % dayOptions.length];
+                                const timeSel = timeOptionsLocal[index % timeOptionsLocal.length];
+                                setSelectedDays((prev) => ({ ...prev, [oc.id]: daySel }));
+                                setSelectedTimes((prev) => ({ ...prev, [oc.id]: timeSel }));
+                                setSelectedSchedules((prev) => ({ ...prev, [oc.id]: `${daySel}|${timeSel}` }));
+                              }}
+                            />
                           )}
                         </div>
-                        <div className="text-xs text-gray-500 mt-1">{d.day}, {d.time}</div>
+                        <div className="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                          {(() => {
+                            const dayOptions = [d.day, ...(d.additionalDays || [])];
+                            const combined = dayOptions.flatMap((dd) => timeOptions.map((t) => ({
+                              v: `${dd}|${t}`,
+                              label: `${dd}, ${t}`,
+                            })));
+                            const currentVal = selectedSchedules[oc.id] || `${selectedDays[oc.id] || d.day}|${timeValue}`;
+                            return (
+                              <select
+                                className="px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200 text-[11px] text-gray-700 focus:outline-none focus:ring-1 focus:ring-orange-300"
+                                value={currentVal}
+                                onChange={(e) => {
+                                  if (submitted) return;
+                                  const [dSel, tSel] = e.target.value.split('|');
+                                  setSelectedSchedules((prev) => ({ ...prev, [oc.id]: e.target.value }));
+                                  setSelectedDays((prev) => ({ ...prev, [oc.id]: dSel }));
+                                  setSelectedTimes((prev) => ({ ...prev, [oc.id]: tSel }));
+                                }}
+                                disabled={submitted}
+                              >
+                                {combined.map((opt) => (
+                                  <option key={opt.v} value={opt.v}>{opt.label}</option>
+                                ))}
+                              </select>
+                            );
+                          })()}
+                        </div>
                         <div className={`text-xs mt-1 ${d.remaining === 0 ? "text-red-600 font-medium" : "text-gray-600"}`}>
                           {d.remaining === 0 ? "Kuota habis" : `Sisa kuota: ${d.remaining}`}
                         </div>
@@ -707,4 +764,49 @@ export function links() {
       href: `data:text/css,${encodeURIComponent(css)}`,
     },
   ];
+}
+
+// Small inline component to render a +N badge and a scrollable dropdown list of lecturers
+function LecturersBadge({ lecturers, onSelect }: { lecturers: string[]; onSelect?: (name: string, index: number) => void }) {
+  const [open, setOpen] = useState(false);
+  const extra = Math.max(0, lecturers.length - 1);
+  if (extra <= 0) return null;
+  return (
+    <span className="relative inline-block" onMouseLeave={() => setOpen(false)}>
+      <button
+        type="button"
+        className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200"
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpen((v) => !v);
+        }}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        +{extra}
+      </button>
+      {open && (
+        <div
+          className="absolute z-50 left-full top-0 ml-2 w-56 max-h-48 overflow-y-auto overscroll-contain rounded-lg bg-white ring-1 ring-black/10 shadow-lg p-2 text-xs"
+          role="listbox"
+        >
+          <div className="text-[11px] font-semibold text-gray-500 px-1 pb-1">Dosen Pengampu</div>
+          {lecturers.map((name, idx) => (
+            <button
+              key={idx}
+              type="button"
+              className="w-full text-left px-2 py-1 rounded hover:bg-gray-50 text-gray-800"
+              onClick={(e) => {
+                e.stopPropagation();
+                onSelect?.(name, idx);
+                setOpen(false);
+              }}
+            >
+              {name}
+            </button>
+          ))}
+        </div>
+      )}
+    </span>
+  );
 }
