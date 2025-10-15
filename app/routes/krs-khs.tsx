@@ -415,9 +415,9 @@ export default function KrsKhs() {
                             if (submitted) return;
                             setSelectedMap((prev) => ({ ...prev, [c.id]: !isSelected }));
                           }}
-                          disabled={submitted}
+                          disabled={submitted || selectedData.remaining === 0}
                         />
-                        <span className="select-none">{isSelected ? 'Dipilih' : 'Pilih'}</span>
+                        <span className="select-none">{isSelected ? 'Dipilih' : (selectedData.remaining === 0 ? 'Kuota Habis' : 'Pilih')}</span>
                       </label>
                     </div>
                   </div>
