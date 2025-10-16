@@ -14,6 +14,7 @@ import {
 } from "@heroicons/react/24/outline";
 import QuickAction from "../components/QuickAction";
 import StatCard from "../components/StatCard";
+import { useKrsContext } from "../context/KrsContext";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -23,6 +24,10 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
+  const { submission } = useKrsContext();
+  const approvedCount = submission.items.filter((i) => i.status === "disetujui").length;
+  const totalCount = submission.items.length || 20;
+  const summary = submission.submitted ? `${approvedCount}/${totalCount} Disetujui` : "19/20 Disetujui";
   return (
     <MobileLayout title="Siakad" bgImage="/bg white.png">
       <HeaderIcons />
@@ -44,16 +49,20 @@ export default function Home() {
             title="Total SKS"
             value={120}
           />
-          <StatCard
-            icon={<DocumentTextIcon className="w-6 h-6 text-orange-500" />}
-            title="KRS / KHS"
-            value="Lihat"
-          />
-          <StatCard
-            icon={<DocumentCheckIcon className="w-6 h-6 text-purple-600" />}
-            title="Status KRS"
-            value="Disetujui"
-          />
+          <a href="/krs-khs?tab=khs" className="block">
+            <StatCard
+              icon={<DocumentTextIcon className="w-6 h-6 text-orange-500" />}
+              title="KRS / KHS"
+              value="Lihat"
+            />
+          </a>
+          <a href="/status-krs" className="block">
+            <StatCard
+              icon={<DocumentCheckIcon className="w-6 h-6 text-purple-600" />}
+              title="Status KRS"
+              value={summary}
+            />
+          </a>
         </div>
 
         <div className="grid grid-cols-3 gap-3 mt-6">

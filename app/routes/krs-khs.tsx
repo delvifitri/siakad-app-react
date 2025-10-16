@@ -1,4 +1,6 @@
 import { useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useKrsContext } from "../context/KrsContext";
 import MobileLayout from "../layouts/MobileLayout";
 
 export function meta() {
@@ -176,7 +178,10 @@ const khsData: Record<number, KhsSemester> = {
 };
 
 export default function KrsKhs() {
-  const [tab, setTab] = useState<"krs" | "khs">("krs");
+  const { submitKrs } = useKrsContext();
+  const [sp] = useSearchParams();
+  const initialTab = (sp.get("tab") as "krs" | "khs") || "krs";
+  const [tab, setTab] = useState<"krs" | "khs">(initialTab);
   const [krsFilter, setKrsFilter] = useState<"active" | "other">("active");
   const khsRef = useRef<HTMLDivElement>(null);
   // Map of courseId -> selected class (A/B). Initialize from legacy className when available.
@@ -281,6 +286,13 @@ export default function KrsKhs() {
       setIsSubmitting(false);
       setSubmitted(true);
       setShowConfirm(false);
+      const items = selectedCoursesMemo.map((c) => ({
+        id: c.id,
+        name: c.name,
+        sks: c.sks,
+        cls: selectedClasses[c.id] ?? "A",
+      }));
+      submitKrs({ items, advisor: "Dr. Rina Putri" });
     }, 700);
   }
 
@@ -661,7 +673,7 @@ export default function KrsKhs() {
                   selectedCourses.map((c) => (
                     <div key={c.id} className="flex items-center justify-between">
                       <span>
-                        {c.name} ({selectedClasses[c.id]})
+                        {c.name} ({selectedClasses[c.id] ?? "A"})
                       </span>
                       <span className="text-gray-600">{c.sks} SKS</span>
                     </div>
@@ -715,7 +727,7 @@ export default function KrsKhs() {
               {selectedCoursesMemo.map((c) => (
                 <div key={c.id} className="py-2 flex items-center justify-between text-sm">
                   <span>
-                    {c.name} ({selectedClasses[c.id]})
+                    {c.name} ({selectedClasses[c.id] ?? "A"})
                   </span>
                   <span className="text-gray-600">{c.sks} SKS</span>
                 </div>

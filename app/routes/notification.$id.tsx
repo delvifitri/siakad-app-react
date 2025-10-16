@@ -106,7 +106,7 @@ export default function NotificationDetail() {
                           <label className="text-sm text-gray-600 block mb-1">Unggah bukti (surat izin / surat sakit)</label>
                           <div className="mt-1">
                             <input
-                              ref={(el) => (fileInputRef.current = el)}
+                              ref={fileInputRef}
                               id="notif-file-input"
                               type="file"
                               className="hidden"
