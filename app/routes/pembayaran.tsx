@@ -61,10 +61,10 @@ export default function Pembayaran() {
 
           // override academic year and season per semester index (1-based)
           const preset = [
-            { year: '2019/2020', season: 'Ganjil' },
-            { year: '2020/2021', season: 'Genap' },
-            { year: '2022/2023', season: 'Ganjil' },
-            { year: '2023/2024', season: 'Genap' }
+            { year: '2020/2021', season: 'Ganjil' },
+            { year: '2021/2022', season: 'Genap' },
+            { year: '2023/2024', season: 'Ganjil' },
+            { year: '2024/2025', season: 'Genap' }
           ];
 
           const info = preset[index] || null;
@@ -102,7 +102,7 @@ export default function Pembayaran() {
                       <span className="text-xs text-teal-600 font-medium">Lunas</span>
                     )}
                     <button
-                      onClick={() => navigate(`/detail-pembayaran?semester=${encodeURIComponent(semester)}`)}
+                      onClick={() => navigate(`/detail-pembayaran?sem=${index + 1}`)}
                       className="text-sm text-orange-500 font-medium"
                     >
                       Lihat Detail

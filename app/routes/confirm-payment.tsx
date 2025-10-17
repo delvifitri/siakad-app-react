@@ -1,4 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
 import SimpleLayout from "../layouts/SimpleLayout";
 import { CreditCardIcon, CalendarDaysIcon, BanknotesIcon } from "@heroicons/react/24/outline";
 import { defaultPaymentDetails } from "../data/paymentData";
@@ -19,6 +20,24 @@ export default function ConfirmPayment() {
     shortName: "BCA",
     details: "Transfer ke rekening BCA 1234567890 a.n Universitas"
   };
+
+  // Countdown timer for payment time window (e.g., 15 minutes)
+  const DURATION_SEC = 15 * 60;
+  const [endAt] = useState<number>(() => Date.now() + DURATION_SEC * 1000);
+  const [now, setNow] = useState<number>(Date.now());
+
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  const remainingSec = Math.max(0, Math.floor((endAt - now) / 1000));
+  const isExpired = remainingSec <= 0;
+  const timeStr = useMemo(() => {
+    const m = Math.floor(remainingSec / 60).toString().padStart(2, "0");
+    const s = Math.floor(remainingSec % 60).toString().padStart(2, "0");
+    return `${m}:${s}`;
+  }, [remainingSec]);
 
   const handleContinuePayment = () => {
     // Navigate to actual payment processing
@@ -55,15 +74,18 @@ export default function ConfirmPayment() {
         <div className="bg-white/90  backdrop-blur-sm rounded-2xl p-6 shadow-sm">
           <h3 className="text-lg font-semibold mb-4">Detail Pembayaran</h3>
           <div className="space-y-4">
-            {/* Semester Info */}
-            <div className="bg-yellow-50  border border-yellow-200  rounded-xl p-4">
+            {/* Countdown (Replace semester and due date) */}
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
               <div className="flex items-center gap-3">
-                <CalendarDaysIcon className="w-5 h-5 text-yellow-600" />
+                <CalendarDaysIcon className="w-5 h-5 text-blue-600" />
                 <div>
-                  <h4 className="font-medium text-yellow-800 ">Semester {currentPaymentDetails.semester}</h4>
-                  <p className="text-sm text-yellow-700 ">Batas Pembayaran: {currentPaymentDetails.dueDate}</p>
+                  <h4 className="font-medium text-blue-800">Waktu Pembayaran</h4>
+                  <p className={`text-lg font-bold ${isExpired ? "text-red-700" : "text-blue-900"}`}>{timeStr}</p>
                 </div>
               </div>
+              {isExpired && (
+                <p className="mt-2 text-sm text-red-700">Waktu pembayaran habis. Silakan kembali dan mulai ulang.</p>
+              )}
             </div>
 
             {/* Payment Breakdown */}
@@ -100,9 +122,14 @@ export default function ConfirmPayment() {
         <div className="space-y-4">
           <button
             onClick={handleContinuePayment}
-            className="w-full bg-blue-500 text-white py-4 px-6 rounded-3xl font-semibold text-lg hover:bg-blue-600 transition-colors shadow-lg"
+            disabled={isExpired}
+            className={`w-full py-4 px-6 rounded-3xl font-semibold text-lg transition-colors shadow-lg ${
+              isExpired
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-blue-500 text-white hover:bg-blue-600"
+            }`}
           >
-            Lanjut Bayar
+            {isExpired ? "Waktu Habis" : "Lanjut Bayar"}
           </button>
           <button
             onClick={handleChangePayment}
