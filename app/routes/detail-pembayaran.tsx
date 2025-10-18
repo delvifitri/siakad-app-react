@@ -97,7 +97,8 @@ export default function Pembayaran() {
   );
 
   const handlePayItem = (type: string) => {
-    const params = new URLSearchParams({ type });
+    // Sertakan semester terpilih agar halaman pay-now bisa menampilkan ringkasan yang sesuai
+    const params = new URLSearchParams({ type, sem: String(semIndex + 1) });
     navigate(`/pay-now?${params.toString()}`);
   };
 

@@ -15,6 +15,7 @@ import {
 import QuickAction from "../components/QuickAction";
 import StatCard from "../components/StatCard";
 import { useKrsContext } from "../context/KrsContext";
+import { khsData, gradePoint } from "../data/khsData";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -28,6 +29,27 @@ export default function Home() {
   const approvedCount = submission.items.filter((i) => i.status === "disetujui").length;
   const totalCount = submission.items.length || 20;
   const summary = submission.submitted ? `${approvedCount}/${totalCount} Disetujui` : "19/20 Disetujui";
+
+  // Hitung IPK terbaru dari data KHS bersama
+  const semesters = Object.keys(khsData).map(Number).sort((a, b) => a - b);
+  let cumSks = 0;
+  let cumNxS = 0;
+  for (const s of semesters) {
+    const sem = khsData[s];
+    if (!sem) continue;
+    cumSks += sem.courses.reduce((sum, c) => sum + c.sks, 0);
+    cumNxS += sem.courses.reduce((sum, c) => sum + gradePoint(c.grade) * c.sks, 0);
+  }
+  const latestIpk = cumSks > 0 ? cumNxS / cumSks : 0;
+  // Total SKS dari data IPK (kumulatif lulus). Default: lulus jika gradePoint > 0
+  const totalSks = semesters.reduce((sum, s) => {
+    const sem = khsData[s];
+    if (!sem) return sum;
+    const sksLulus = sem.courses
+      .filter((c) => gradePoint(c.grade) > 0)
+      .reduce((acc, c) => acc + c.sks, 0);
+    return sum + sksLulus;
+  }, 0);
   return (
     <MobileLayout title="Siakad" bgImage="/bg white.png">
       <HeaderIcons />
@@ -39,15 +61,17 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-2 gap-3 mt-6">
-          <StatCard
-            icon={<AcademicCapIcon className="w-6 h-6 text-blue-600" />}
-            title="IPK"
-            value={3.75}
-          />
+          <a href="/krs-khs?tab=ipk" className="block" aria-label="Lihat IPK">
+            <StatCard
+              icon={<AcademicCapIcon className="w-6 h-6 text-blue-600" />}
+              title="IPK"
+              value={latestIpk.toFixed(2)}
+            />
+          </a>
           <StatCard
             icon={<DocumentDuplicateIcon className="w-6 h-6 text-green-600" />}
             title="Total SKS"
-            value={120}
+            value={totalSks}
           />
           <a href="/krs-khs?tab=khs" className="block">
             <StatCard

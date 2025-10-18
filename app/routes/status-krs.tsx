@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import MobileLayout from "../layouts/MobileLayout";
 import { useKrsContext } from "../context/KrsContext";
 
@@ -11,6 +12,27 @@ export function meta() {
 
 export default function StatusKrs() {
   const { submission } = useKrsContext();
+  const [searchParams] = useSearchParams();
+
+  // Semester aktif dari query param (fallback ke 1)
+  const semParam = searchParams.get("sem");
+  const preset = useMemo(
+    () => [
+      { year: "2020/2021", season: "Ganjil" },
+      { year: "2021/2022", season: "Genap" },
+      { year: "2023/2024", season: "Ganjil" },
+      { year: "2024/2025", season: "Genap" },
+    ],
+    []
+  );
+  const semIndex = useMemo(() => {
+    const n = parseInt(semParam || "1", 10);
+    if (!Number.isFinite(n) || n < 1) return 0;
+    return Math.min(n - 1, preset.length - 1);
+  }, [semParam, preset.length]);
+  const semesterLabel = `Semester ${semIndex + 1}`;
+  const academicYear = preset[semIndex]?.year || "";
+  const season = preset[semIndex]?.season || "";
 
   // Dummy fallback when belum ada pengajuan
   const dummyItems = [
@@ -39,6 +61,11 @@ export default function StatusKrs() {
           {submission.submittedAt && (
             <p className="text-xs text-gray-500">Dikirim pada: {new Date(submission.submittedAt).toLocaleString()}</p>
           )}
+          {/* Semester aktif */}
+          <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">
+            <span>{semesterLabel}</span>
+            {(academicYear || season) && <span className="text-[11px] text-blue-600">({academicYear} {season})</span>}
+          </div>
         </header>
 
         <div className="flex items-center gap-2">
