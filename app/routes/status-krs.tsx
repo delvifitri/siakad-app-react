@@ -12,20 +12,30 @@ export function meta() {
 export default function StatusKrs() {
   const { submission } = useKrsContext();
 
+  // Dummy fallback when belum ada pengajuan
+  const dummyItems = [
+    { id: "IF101", name: "Algoritma dan Pemrograman", sks: 3, cls: "A" as const, status: "disetujui" as const },
+    { id: "IF102", name: "Struktur Data", sks: 3, cls: "B" as const, status: "menunggu" as const },
+    { id: "IF201", name: "Basis Data", sks: 3, cls: "A" as const, status: "disetujui" as const },
+    { id: "IF202", name: "Sistem Operasi", sks: 3, cls: "A" as const, status: "menunggu" as const },
+  ];
+  const items = submission.items.length > 0 ? submission.items : dummyItems;
+  const advisor = submission.advisor || "Dr. Andi Wijaya, M.Kom";
+
   const { approved, pending, rejected, summary } = useMemo(() => {
-    const approved = submission.items.filter((i) => i.status === "disetujui");
-    const pending = submission.items.filter((i) => i.status === "menunggu");
-    const rejected = submission.items.filter((i) => i.status === "ditolak");
-    const summary = `${approved.length}/${submission.items.length} Disetujui`;
+    const approved = items.filter((i) => i.status === "disetujui");
+    const pending = items.filter((i) => i.status === "menunggu");
+    const rejected = items.filter((i) => i.status === "ditolak");
+    const summary = `${approved.length}/${items.length} Disetujui`;
     return { approved, pending, rejected, summary };
-  }, [submission]);
+  }, [items]);
 
   return (
-    <MobileLayout title="Status KRS" showNav={false}>
+    <MobileLayout title="Status KRS" showNav={false} bgImage="/bg simple.png">
       <div className="p-4 space-y-4">
         <header className="space-y-1">
           <h1 className="text-xl font-semibold text-gray-900">Status Pengajuan KRS</h1>
-          <p className="text-sm text-gray-600">Dosen PA: <span className="font-medium text-gray-800">{submission.advisor || "-"}</span></p>
+          <p className="text-sm text-gray-600">Dosen PA: <span className="font-medium text-gray-800">{advisor}</span></p>
           {submission.submittedAt && (
             <p className="text-xs text-gray-500">Dikirim pada: {new Date(submission.submittedAt).toLocaleString()}</p>
           )}
@@ -89,11 +99,7 @@ export default function StatusKrs() {
           </section>
         )}
 
-        {!submission.submitted && (
-          <div className="text-sm text-gray-600 bg-white/70 p-4 rounded-xl ring-1 ring-gray-200">
-            Kamu belum mengirim KRS pada semester ini.
-          </div>
-        )}
+        {/* Message removed: we always show items (real or dummy) */}
 
         <div className="h-8" />
       </div>
