@@ -106,6 +106,7 @@ export default function Home() {
             icon={<ShieldCheckIcon className="w-7 h-7 mb-2 text-blue-600" />}
             label="Pengajuan"
             className="bg-white text-blue-600 border border-gray-200"
+            to="/pengajuan"
           />
         </div>
 

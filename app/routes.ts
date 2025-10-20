@@ -23,5 +23,7 @@ export default [
 	route("status-krs", "routes/status-krs.tsx"),
 	route("profile", "routes/profile.tsx"),
 	route("edit-profile", "routes/edit-profile.tsx"),
+	route("pengajuan", "routes/pengajuan.tsx"),
+	route("log-bimbingan", "routes/log-bimbingan.tsx"),
 	route("dev", "routes/dev.tsx"),
 ] satisfies RouteConfig;
