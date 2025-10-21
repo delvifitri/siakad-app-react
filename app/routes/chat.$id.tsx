@@ -10,13 +10,13 @@ export default function Chat() {
 
   return (
     <SimpleLayout title={chat.name} footer={
-      <div className="flex gap-2">
+      <div className="flex items-center gap-2">
         <input
           type="text"
           placeholder="Ketik pesan..."
-          className="flex-1 p-3 rounded-3xl bg-white  border border-gray-300  focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 h-11 px-4 rounded-3xl bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-0"
         />
-        <button className="p-3 rounded-full bg-blue-500 text-white hover:bg-blue-600">
+        <button className="h-11 w-11 shrink-0 rounded-full bg-blue-500 text-white hover:bg-blue-600 flex items-center justify-center">
           <PaperAirplaneIcon className="w-5 h-5" />
         </button>
       </div>

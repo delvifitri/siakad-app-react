@@ -29,11 +29,51 @@ export default function Pengajuan() {
 
   // Modal Ajukan Proposal
   const [showAjukan, setShowAjukan] = useState(false);
-  const [form, setForm] = useState<{ title: string; fileName: string }>({ title: "", fileName: "" });
+  const [form, setForm] = useState<{ title: string; fileName: string; fileError?: string }>({ title: "", fileName: "" });
   // Status perkuliahan sederhana untuk logika cuti (dummy)
   const [isPerkuliahanAktif] = useState<boolean>(false);
   // Modal Log Bimbingan (global untuk semua pembimbing)
   const [showLogPembimbing, setShowLogPembimbing] = useState<boolean>(false);
+  // Cuti state & modal
+  const [showAjukanCuti, setShowAjukanCuti] = useState<boolean>(false);
+  const todayStr = new Date().toISOString().slice(0, 10);
+  function getAcademicYears() {
+    const now = new Date();
+    const year = now.getFullYear();
+    // simple list: current/next and previous/current
+    return [
+      `${year}/${year + 1}`,
+      `${year - 1}/${year}`,
+      `${year - 2}/${year - 1}`,
+    ];
+  }
+  const [cutiForm, setCutiForm] = useState<{
+    semester: "Ganjil" | "Genap";
+    tahun: string;
+    durasi: string;
+    tanggal: string;
+    noHp: string;
+    alasan: string;
+    fileName?: string;
+    fileError?: string;
+  }>({
+    semester: "Ganjil",
+    tahun: getAcademicYears()[0],
+    durasi: "1 Semester",
+    tanggal: todayStr,
+    noHp: "",
+    alasan: "",
+  });
+  const [cuti, setCuti] = useState<null | {
+    semester: string;
+    tahun: string;
+    durasi: string;
+    tanggal: string;
+    noHp?: string;
+    alasan: string;
+    fileName?: string;
+    status: "Diajukan" | "Disetujui" | "Ditolak";
+  }>(null);
 
   return (
     <MobileLayout title="Pengajuan" bgImage="/bg simple.png">
@@ -102,7 +142,12 @@ export default function Pengajuan() {
                 >
                   Ajukan Proposal
                 </button>
-                <button className="py-2 rounded-full text-white bg-blue-600 hover:bg-blue-700">Lihat Pesan</button>
+                <button
+                  className="py-2 rounded-full text-white bg-blue-600 hover:bg-blue-700"
+                  onClick={() => navigate("/chat/4")}
+                >
+                  Lihat Pesan
+                </button>
               </div>
             </div>
 
@@ -128,7 +173,11 @@ export default function Pengajuan() {
                       <div className="font-medium text-gray-900">{p.nama}</div>
                       <div className="text-[11px] text-gray-600">Pembimbing ke {p.ke}</div>
                     </div>
-                    <button type="button" className="px-2 py-1 rounded-full text-white bg-blue-600 hover:bg-blue-700 text-[11px]">
+                    <button
+                      type="button"
+                      className="px-2 py-1 rounded-full text-white bg-blue-600 hover:bg-blue-700 text-[11px]"
+                      onClick={() => navigate(`/chat/${p.ke === 1 ? 5 : 6}`)}
+                    >
                       Lihat Pesan
                     </button>
                   </div>
@@ -146,7 +195,11 @@ export default function Pengajuan() {
                       <div className="font-medium text-gray-900">{p.nama}</div>
                       <div className="text-[11px] text-gray-600">Penguji ke {p.ke}</div>
                     </div>
-                    <button type="button" className="px-2 py-1 rounded-full text-white bg-blue-600 hover:bg-blue-700 text-[11px]">
+                    <button
+                      type="button"
+                      className="px-2 py-1 rounded-full text-white bg-blue-600 hover:bg-blue-700 text-[11px]"
+                      onClick={() => navigate(`/chat/${p.ke === 1 ? 7 : 8}`)}
+                    >
                       Lihat Pesan
                     </button>
                   </div>
@@ -183,9 +236,35 @@ export default function Pengajuan() {
                       : "text-white bg-blue-600 hover:bg-blue-700"
                   }`}
                   disabled={isPerkuliahanAktif}
+                  onClick={() => {
+                    if (!isPerkuliahanAktif) setShowAjukanCuti(true);
+                  }}
                 >
                   Ajukan Cuti
                 </button>
+              {cuti && (
+                <div className="mt-3 p-3 rounded-xl border border-gray-200 bg-white/70 text-sm">
+                  <div className="flex items-center justify-between">
+                    <div className="font-medium text-gray-900">Pengajuan Cuti Terkini</div>
+                    <span className={`px-2 py-0.5 rounded-full text-xs border ${
+                      cuti.status === "Disetujui" ? "bg-green-100 text-green-700 border-green-200" :
+                      cuti.status === "Ditolak" ? "bg-red-100 text-red-700 border-red-200" :
+                      "bg-yellow-100 text-yellow-700 border-yellow-200"
+                    }`}>{cuti.status}</span>
+                  </div>
+                  <div className="mt-2 grid grid-cols-1 gap-1 text-xs text-gray-700">
+                    <div className="flex items-center justify-between"><span>Semester</span><span className="font-medium text-gray-900">{cuti.semester} {cuti.tahun}</span></div>
+                    <div className="flex items-center justify-between"><span>Durasi</span><span className="font-medium text-gray-900">{cuti.durasi}</span></div>
+                    <div className="flex items-center justify-between"><span>Tanggal Pengajuan</span><span className="font-medium text-gray-900">{cuti.tanggal}</span></div>
+                    {cuti.noHp ? (<div className="flex items-center justify-between"><span>No. HP</span><span className="font-medium text-gray-900">{cuti.noHp}</span></div>) : null}
+                  </div>
+                  <div className="mt-2">
+                    <div className="text-xs text-gray-600 mb-1">Alasan</div>
+                    <div className="rounded-lg border border-amber-200 bg-amber-50 p-2 text-gray-800 whitespace-pre-wrap">{cuti.alasan}</div>
+                  </div>
+                  {cuti.fileName ? (<div className="mt-2 text-xs text-gray-700">Berkas: <span className="font-medium text-gray-900">{cuti.fileName}</span></div>) : null}
+                </div>
+              )}
               </div>
             </div>
           </div>
@@ -196,8 +275,8 @@ export default function Pengajuan() {
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
           <div className="absolute inset-0 bg-black/40" onClick={() => setShowAjukan(false)} />
           <div className="relative bg-white rounded-2xl w-full sm:max-w-md mx-4 p-4 shadow-lg">
-            <div className="font-semibold text-gray-900">Ajukan Proposal Tugas Akhir</div>
-            <div className="mt-2 text-xs text-gray-600">Isi judul proposal Anda dan (opsional) unggah berkas pendukung.</div>
+            <div className="font-semibold text-gray-900">Form Detail Proposal</div>
+            <div className="mt-2 text-xs text-gray-600">Isi detail proposal Anda dan unggah berkas PDF (jika diperlukan).</div>
             <div className="mt-3 space-y-3">
               <div>
                 <label className="block text-xs text-gray-700 mb-1">Judul Proposal</label>
@@ -209,20 +288,48 @@ export default function Pengajuan() {
                   className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
                 />
               </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-700">Status</span>
+                <span className="px-2 py-0.5 rounded-full text-xs border bg-yellow-100 text-yellow-700 border-yellow-200">Diajukan</span>
+              </div>
               <div>
-                <label className="block text-xs text-gray-700 mb-1">Unggah Berkas (opsional)</label>
+                <label className="block text-xs text-gray-700 mb-1">Unggah Proposal (PDF)</label>
                 <input
+                  id="proposal-file"
                   type="file"
-                  accept=".pdf,.doc,.docx"
+                  accept=".pdf,application/pdf"
                   onChange={(e) => {
                     const file = e.target.files && e.target.files[0];
-                    setForm((prev) => ({ ...prev, fileName: file ? file.name : "" }));
+                    if (!file) {
+                      setForm((prev) => ({ ...prev, fileName: "", fileError: undefined }));
+                      return;
+                    }
+                    const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
+                    if (!isPdf) {
+                      setForm((prev) => ({ ...prev, fileName: "", fileError: "Hanya file PDF yang diizinkan." }));
+                      e.currentTarget.value = "";
+                      return;
+                    }
+                    setForm((prev) => ({ ...prev, fileName: file.name, fileError: undefined }));
                   }}
-                  className="w-full text-sm"
+                  className="sr-only"
                 />
-                {form.fileName ? (
-                  <div className="mt-1 text-xs text-gray-600">Dipilih: {form.fileName}</div>
-                ) : null}
+                <div className="rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 p-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="text-sm text-gray-800 truncate">
+                        {form.fileName ? `Dipilih: ${form.fileName}` : "Belum ada file yang dipilih"}
+                      </div>
+                      <div className="text-[11px] text-gray-500">Format yang diizinkan: PDF</div>
+                    </div>
+                    <label htmlFor="proposal-file" className="shrink-0 inline-flex items-center px-3 py-1.5 rounded-full text-white bg-blue-600 hover:bg-blue-700 text-xs cursor-pointer">
+                      Pilih File
+                    </label>
+                  </div>
+                  {form.fileError ? (
+                    <div className="mt-2 text-xs text-red-600">{form.fileError}</div>
+                  ) : null}
+                </div>
               </div>
             </div>
             <div className="mt-4 grid grid-cols-2 gap-2">
@@ -233,8 +340,8 @@ export default function Pengajuan() {
                 Batal
               </button>
               <button
-                className={`py-2 rounded-full text-white ${form.title.trim() ? "bg-orange-500 hover:bg-orange-600" : "bg-gray-400"}`}
-                disabled={!form.title.trim()}
+                className={`py-2 rounded-full text-white ${form.title.trim() && !form.fileError ? "bg-orange-500 hover:bg-orange-600" : "bg-gray-400"}`}
+                disabled={!form.title.trim() || !!form.fileError}
                 onClick={() => {
                   if (!form.title.trim()) return;
                   setTa({
@@ -247,7 +354,148 @@ export default function Pengajuan() {
                   setForm({ title: "", fileName: "" });
                 }}
               >
-                Ajukan
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showAjukanCuti && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShowAjukanCuti(false)} />
+          <div className="relative bg-white rounded-2xl w-full sm:max-w-md mx-4 p-4 shadow-lg">
+            <div className="font-semibold text-gray-900">Ajukan Cuti Akademik</div>
+            <div className="mt-2 text-xs text-gray-600">Isi data berikut untuk mengajukan cuti. Pastikan alasan terisi dan (opsional) unggah surat dalam bentuk PDF.</div>
+            <div className="mt-3 space-y-3 text-sm">
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-[11px] text-gray-700 mb-1">Semester</label>
+                  <select
+                    value={cutiForm.semester}
+                    onChange={(e) => setCutiForm((s) => ({ ...s, semester: e.target.value as any }))}
+                    className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
+                  >
+                    <option value="Ganjil">Ganjil</option>
+                    <option value="Genap">Genap</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[11px] text-gray-700 mb-1">Tahun Akademik</label>
+                  <select
+                    value={cutiForm.tahun}
+                    onChange={(e) => setCutiForm((s) => ({ ...s, tahun: e.target.value }))}
+                    className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
+                  >
+                    {getAcademicYears().map((y) => (
+                      <option key={y} value={y}>{y}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-[11px] text-gray-700 mb-1">Durasi</label>
+                  <select
+                    value={cutiForm.durasi}
+                    onChange={(e) => setCutiForm((s) => ({ ...s, durasi: e.target.value }))}
+                    className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
+                  >
+                    <option>1 Semester</option>
+                    <option>2 Semester</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[11px] text-gray-700 mb-1">Tanggal Pengajuan</label>
+                  <input
+                    type="date"
+                    value={cutiForm.tanggal}
+                    onChange={(e) => setCutiForm((s) => ({ ...s, tanggal: e.target.value }))}
+                    className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-[11px] text-gray-700 mb-1">No. HP Aktif</label>
+                <input
+                  type="tel"
+                  inputMode="numeric"
+                  placeholder="08xxxxxxxxxx"
+                  value={cutiForm.noHp}
+                  onChange={(e) => setCutiForm((s) => ({ ...s, noHp: e.target.value }))}
+                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] text-gray-700 mb-1">Alasan Pengajuan</label>
+                <textarea
+                  rows={3}
+                  placeholder="Tulis alasan Anda..."
+                  value={cutiForm.alasan}
+                  onChange={(e) => setCutiForm((s) => ({ ...s, alasan: e.target.value }))}
+                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] text-gray-700 mb-1">Unggah Surat Pendukung (PDF, opsional)</label>
+                <input
+                  id="cuti-file"
+                  type="file"
+                  accept=".pdf,application/pdf"
+                  onChange={(e) => {
+                    const file = e.target.files && e.target.files[0];
+                    if (!file) {
+                      setCutiForm((s) => ({ ...s, fileName: undefined, fileError: undefined }));
+                      return;
+                    }
+                    const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
+                    if (!isPdf) {
+                      setCutiForm((s) => ({ ...s, fileName: undefined, fileError: "Hanya file PDF yang diizinkan." }));
+                      e.currentTarget.value = "";
+                      return;
+                    }
+                    setCutiForm((s) => ({ ...s, fileName: file.name, fileError: undefined }));
+                  }}
+                  className="sr-only"
+                />
+                <div className="rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 p-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="text-sm text-gray-800 truncate">{cutiForm.fileName ? `Dipilih: ${cutiForm.fileName}` : "Belum ada file yang dipilih"}</div>
+                      <div className="text-[11px] text-gray-500">Format yang diizinkan: PDF</div>
+                    </div>
+                    <label htmlFor="cuti-file" className="shrink-0 inline-flex items-center px-3 py-1.5 rounded-full text-white bg-blue-600 hover:bg-blue-700 text-xs cursor-pointer">Pilih File</label>
+                  </div>
+                  {cutiForm.fileError ? (<div className="mt-2 text-xs text-red-600">{cutiForm.fileError}</div>) : null}
+                </div>
+              </div>
+            </div>
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <button
+                className="py-2 rounded-full border border-gray-300 text-gray-700"
+                onClick={() => setShowAjukanCuti(false)}
+              >
+                Batal
+              </button>
+              <button
+                className={`py-2 rounded-full text-white ${cutiForm.alasan.trim() && !cutiForm.fileError ? "bg-orange-500 hover:bg-orange-600" : "bg-gray-400"}`}
+                disabled={!cutiForm.alasan.trim() || !!cutiForm.fileError}
+                onClick={() => {
+                  if (!cutiForm.alasan.trim()) return;
+                  setCuti({
+                    semester: cutiForm.semester,
+                    tahun: cutiForm.tahun,
+                    durasi: cutiForm.durasi,
+                    tanggal: cutiForm.tanggal,
+                    noHp: cutiForm.noHp || undefined,
+                    alasan: cutiForm.alasan.trim(),
+                    fileName: cutiForm.fileName,
+                    status: "Diajukan",
+                  });
+                  setShowAjukanCuti(false);
+                }}
+              >
+                Ajukan Cuti
               </button>
             </div>
           </div>
