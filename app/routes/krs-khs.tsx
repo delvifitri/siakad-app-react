@@ -309,6 +309,36 @@ export default function KrsKhs() {
     return { ipk, totalSks: cum.sks, lastIps };
   }, [ipsBySemester]);
 
+  // Info tambahan untuk tab IPK
+  const admissionInfo = useMemo(() => {
+    try {
+      const sems = Object.keys(khsData)
+        .map(Number)
+        .sort((a, b) => a - b);
+      const first = sems[0];
+      const firstYearStr = khsData[first]?.academicYear || academicYear; // fallback
+      const startYear = parseInt(String(firstYearStr).split("/")[0] || "", 10) || new Date().getFullYear();
+      // Asumsi awal tahun akademik dimulai 1 Agustus
+      const startDate = new Date(startYear, 7, 1);
+      const now = new Date();
+      const durationYears = Math.max(
+        0,
+        (now.getTime() - startDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000)
+      );
+      return {
+        tanggalMasuk: startDate.toLocaleDateString("id-ID", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+        }),
+        tanggalLulus: "-", // Belum lulus; bisa diubah jika ada status kelulusan
+        durasiTahun: durationYears.toFixed(1),
+      };
+    } catch {
+      return { tanggalMasuk: "-", tanggalLulus: "-", durasiTahun: "-" };
+    }
+  }, []);
+
   const selectedCoursesMemo = useMemo(() => {
     const courseMap: Record<string, { id: string; name: string; sks: number }> = {};
     for (const c of krsCourses) {
@@ -737,6 +767,23 @@ export default function KrsKhs() {
                 <div className="rounded-xl bg-gray-50 p-3">
                   <div className="text-[11px] text-gray-600">IPS Terakhir</div>
                   <div className="text-xl font-bold text-gray-900">{ipkSummary.lastIps.toFixed(2)}</div>
+                </div>
+              </div>
+              <div className="mt-3 space-y-1 text-xs text-gray-800">
+                <div className="flex items-baseline">
+                  <div className="w-32 shrink-0 font-semibold whitespace-nowrap">Tanggal Masuk</div>
+                  <div className="w-2">:</div>
+                  <div className="font-bold text-gray-900">{admissionInfo.tanggalMasuk}</div>
+                </div>
+                <div className="flex items-baseline">
+                  <div className="w-32 shrink-0 font-semibold whitespace-nowrap">Tanggal Lulus</div>
+                  <div className="w-2">:</div>
+                  <div className="font-bold text-gray-900">{admissionInfo.tanggalLulus}</div>
+                </div>
+                <div className="flex items-baseline">
+                  <div className="w-32 shrink-0 font-semibold whitespace-nowrap">Sudah menempuh</div>
+                  <div className="w-2">:</div>
+                  <div className="font-bold text-gray-900">{admissionInfo.durasiTahun} tahun</div>
                 </div>
               </div>
             </div>

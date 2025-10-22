@@ -122,17 +122,9 @@ export default function Pengajuan() {
                     {ta.status}
                   </span>
                 </div>
-                <div>
-                  <div className="flex items-center justify-between text-xs text-gray-600">
-                    <span>Status Progress</span>
-                    <span className="font-medium text-gray-900">{ta.progress}%</span>
-                  </div>
-                  <div className="mt-1 h-2 rounded bg-gray-100">
-                    <div
-                      className="h-2 rounded bg-orange-500"
-                      style={{ width: `${Math.max(0, Math.min(100, ta.progress))}%` }}
-                    />
-                  </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-600">Hasil Nilai TA</span>
+                  <span className="font-medium text-gray-900">-</span>
                 </div>
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2">

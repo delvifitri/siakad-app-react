@@ -1,5 +1,5 @@
 import MobileLayout from "../layouts/MobileLayout";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import jsPDF from "jspdf";
 
@@ -75,6 +75,12 @@ export default function LogBimbingan() {
     isi: "",
     tanggal: new Date().toISOString().slice(0, 10),
   });
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const INITIAL_COUNT = 8;
+  const LOAD_MORE_COUNT = 8;
+  const [visibleCount, setVisibleCount] = useState<number>(INITIAL_COUNT);
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   // Load from localStorage
   useEffect(() => {
@@ -101,7 +107,13 @@ export default function LogBimbingan() {
   // Ensure always at least two dummies exist when empty: one approved and one pending
   useEffect(() => {
     if (data.length === 0) {
-      setData([createApprovedSeed(), createPendingSeed()]);
+      // Seed with 4 dummy items (at least one approved and one pending)
+      setData([
+        createApprovedSeed(),
+        createPendingSeed(),
+        createApprovedSeed(),
+        createPendingSeed(),
+      ]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.length]);
@@ -118,19 +130,35 @@ export default function LogBimbingan() {
       .sort((a, b) => (a.tanggalInput < b.tanggalInput ? 1 : -1));
   }, [data, filterPembimbing, query]);
 
-  // Group by month-year of tanggalInput for nicer sections
-  const grouped = useMemo(() => {
-    const map = new Map<string, { label: string; items: LogItem[]; sortKey: string }>();
-    for (const it of filtered) {
-      const d = new Date(it.tanggalInput);
-      const label = d.toLocaleDateString("id-ID", { month: "long", year: "numeric" });
-      const sortKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-      const existing = map.get(sortKey) ?? { label, items: [], sortKey };
-      existing.items.push(it);
-      map.set(sortKey, existing);
-    }
-    return Array.from(map.values()).sort((a, b) => (a.sortKey < b.sortKey ? 1 : -1));
-  }, [filtered]);
+  // (Grouping removed as per request; display a flat list instead)
+  // Reset visible count whenever filter/search changes
+  useEffect(() => {
+    setVisibleCount(INITIAL_COUNT);
+  }, [filterPembimbing, query, data.length]);
+
+  // Infinite scroll: load more when sentinel comes into view
+  useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const first = entries[0];
+        if (first.isIntersecting && !isLoadingMore && visibleCount < filtered.length) {
+          setIsLoadingMore(true);
+          // Defer to next tick to avoid rapid multiple increments
+          setTimeout(() => {
+            setVisibleCount((c) => Math.min(c + LOAD_MORE_COUNT, filtered.length));
+            setIsLoadingMore(false);
+          }, 0);
+        }
+      },
+      { root: null, rootMargin: "200px", threshold: 0 }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [filtered.length, visibleCount, isLoadingMore]);
+
+  const visibleItems = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount]);
 
   function onSubmit() {
     if (!isi.trim()) return;
@@ -381,80 +409,71 @@ export default function LogBimbingan() {
               )}
             </div>
           ) : (
-            <div className="mt-4 space-y-6">
-              {grouped.map((group) => (
-                <div key={group.label}>
-                  <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">{group.label}</div>
-                  <div className="mt-2 relative pl-6">
-                    <div className="absolute left-2 top-0 bottom-0 w-px bg-gray-200" />
-                    <div className="space-y-3">
-                      {group.items.map((item) => {
-                        const dotColor =
-                          item.approve === "Disetujui"
-                            ? "bg-green-500"
-                            : item.approve === "Ditolak"
-                            ? "bg-red-500"
-                            : "bg-yellow-400";
-                        const badgeColor =
-                          item.approve === "Disetujui"
-                            ? "bg-green-100 text-green-700 border-green-200"
-                            : item.approve === "Ditolak"
-                            ? "bg-red-100 text-red-700 border-red-200"
-                            : "bg-yellow-100 text-yellow-700 border-yellow-200";
-                        return (
-                          <div key={item.id} className="relative">
-                            <span className={`absolute left-0 top-3 inline-flex h-3.5 w-3.5 rounded-full ring-2 ring-white ${dotColor}`} />
-                            <div className="ml-4 p-3 rounded-xl border border-gray-200 bg-white/80 shadow-sm">
-                              <div className="flex items-start justify-between gap-2">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <span className="px-2 py-0.5 rounded-full text-xs border bg-blue-50 text-blue-700 border-blue-200">Pembimbing {item.pembimbing}</span>
-                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs border bg-gray-100 text-gray-700 border-gray-200">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5">
-                                      <path d="M6.5 2A2.5 2.5 0 0 0 4 4.5V6h16V4.5A2.5 2.5 0 0 0 17.5 2h-11ZM20 8H4v9.5A2.5 2.5 0 0 0 6.5 20h11a2.5 2.5 0 0 0 2.5-2.5V8ZM8 11.75A.75.75 0 0 1 8.75 11h6.5a.75.75 0 0 1 0 1.5h-6.5A.75.75 0 0 1 8 11.75ZM8.75 14a.75.75 0 0 0 0 1.5h4.5a.75.75 0 0 0 0-1.5h-4.5Z" />
-                                    </svg>
-                                    {formatDate(item.tanggalBimbingan)}
-                                  </span>
-                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs border bg-gray-100 text-gray-700 border-gray-200">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5">
-                                      <path fillRule="evenodd" d="M12 2.25a9.75 9.75 0 1 0 9.75 9.75A9.762 9.762 0 0 0 12 2.25Zm.75 4.5a.75.75 0 0 0-1.5 0v5.19l-2.28 2.28a.75.75 0 1 0 1.06 1.06l2.47-2.47a1.5 1.5 0 0 0 .44-1.06V6.75Z" clipRule="evenodd" />
-                                    </svg>
-                                    {formatDate(item.tanggalInput)}
-                                  </span>
-                                </div>
-                                <span className={`h-fit px-2 py-0.5 rounded-full text-xs border ${badgeColor}`}>{item.approve}</span>
-                              </div>
-                              <div className="mt-2">
-                                <div className="text-xs text-gray-600 mb-1">Isi Bimbingan:</div>
-                                <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-gray-800 whitespace-pre-wrap shadow-sm">
-                                  {item.isi}
-                                </div>
-                              </div>
-                              <div className="mt-3 flex items-center gap-2 text-xs">
-                                <button
-                                  className="px-2 py-1 rounded-full text-white bg-blue-600 hover:bg-blue-700"
-                                  onClick={() => {
-                                    setEditState({ open: true, id: item.id, isi: item.isi, tanggal: item.tanggalBimbingan.slice(0, 10) });
-                                  }}
-                                >
-                                  Edit
-                                </button>
-                                <button
-                                  className="px-2 py-1 rounded-full text-white bg-red-600 hover:bg-red-700"
-                                  onClick={() => {
-                                    setData((prev) => prev.filter((x) => x.id !== item.id));
-                                  }}
-                                >
-                                  Hapus
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
+            <div className="mt-4 space-y-3">
+              {visibleItems.map((item) => {
+                const badgeColor =
+                  item.approve === "Disetujui"
+                    ? "bg-green-100 text-green-700 border-green-200"
+                    : item.approve === "Ditolak"
+                    ? "bg-red-100 text-red-700 border-red-200"
+                    : "bg-yellow-100 text-yellow-700 border-yellow-200";
+                return (
+                  <div key={item.id} className="p-3 rounded-xl border border-gray-200 bg-white/80 shadow-sm">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex flex-col gap-1">
+                        <span className="px-2 py-0.5 rounded-full text-xs border bg-blue-50 text-blue-700 border-blue-200">Pembimbing {item.pembimbing}</span>
+                        <div className="inline-flex items-center gap-1 text-xs text-gray-600">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5">
+                            <path d="M6.5 2A2.5 2.5 0 0 0 4 4.5V6h16V4.5A2.5 2.5 0 0 0 17.5 2h-11ZM20 8H4v9.5A2.5 2.5 0 0 0 6.5 20h11a2.5 2.5 0 0 0 2.5-2.5V8ZM8 11.75A.75.75 0 0 1 8.75 11h6.5a.75.75 0 0 1 0 1.5h-6.5A.75.75 0 0 1 8 11.75ZM8.75 14a.75.75 0 0 0 0 1.5h4.5a.75.75 0 0 0 0-1.5h-4.5Z" />
+                          </svg>
+                          {formatDate(item.tanggalBimbingan)}
+                        </div>
+                      </div>
+                      <span className={`h-fit px-2 py-0.5 rounded-full text-xs border ${badgeColor}`}>{item.approve}</span>
+                    </div>
+                    <div className="mt-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="text-xs text-gray-600">Isi Bimbingan:</div>
+                        <button
+                          type="button"
+                          className="text-xs text-orange-600 hover:underline shrink-0"
+                          onClick={() => setExpanded((s) => ({ ...s, [item.id]: !s[item.id] }))}
+                        >
+                          {expanded[item.id] ? "Sembunyikan" : "Detail"}
+                        </button>
+                      </div>
+                      {!expanded[item.id] ? (
+                        <div className="mt-1 text-sm text-gray-800 truncate">{item.isi}</div>
+                      ) : (
+                        <div className="mt-1 text-sm text-gray-800 whitespace-pre-wrap">{item.isi}</div>
+                      )}
+                    </div>
+                    <div className="mt-3 flex items-center gap-2 text-xs">
+                      <button
+                        className="px-2 py-1 rounded-full text-white bg-blue-600 hover:bg-blue-700"
+                        onClick={() => {
+                          setEditState({ open: true, id: item.id, isi: item.isi, tanggal: item.tanggalBimbingan.slice(0, 10) });
+                        }}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="px-2 py-1 rounded-full text-white bg-red-600 hover:bg-red-700"
+                        onClick={() => {
+                          setData((prev) => prev.filter((x) => x.id !== item.id));
+                        }}
+                      >
+                        Hapus
+                      </button>
                     </div>
                   </div>
+                );
+              })}
+              {visibleCount < filtered.length && (
+                <div ref={sentinelRef} className="h-8 flex items-center justify-center text-xs text-gray-500">
+                  {isLoadingMore ? "Memuat..." : "Gulir untuk memuat lagi"}
                 </div>
-              ))}
+              )}
             </div>
           )}
         </div>

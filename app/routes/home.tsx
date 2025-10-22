@@ -68,11 +68,13 @@ export default function Home() {
               value={latestIpk.toFixed(2)}
             />
           </a>
-          <StatCard
-            icon={<DocumentDuplicateIcon className="w-6 h-6 text-green-600" />}
-            title="Total SKS"
-            value={totalSks}
-          />
+          <a href="/krs-khs?tab=ipk" className="block" aria-label="Lihat IPK">
+            <StatCard
+              icon={<DocumentDuplicateIcon className="w-6 h-6 text-green-600" />}
+              title="Total SKS"
+              value={totalSks}
+            />
+          </a>
           <a href="/krs-khs?tab=khs" className="block">
             <StatCard
               icon={<DocumentTextIcon className="w-6 h-6 text-orange-500" />}
