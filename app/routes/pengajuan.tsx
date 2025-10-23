@@ -37,6 +37,8 @@ export default function Pengajuan() {
   // Cuti state & modal
   const [showAjukanCuti, setShowAjukanCuti] = useState<boolean>(false);
   const todayStr = new Date().toISOString().slice(0, 10);
+  // Data dari sistem (contoh)
+  const systemPhone = "081234567890";
   function getAcademicYears() {
     const now = new Date();
     const year = now.getFullYear();
@@ -59,9 +61,9 @@ export default function Pengajuan() {
   }>({
     semester: "Ganjil",
     tahun: getAcademicYears()[0],
-    durasi: "1 Semester",
+    durasi: "6",
     tanggal: todayStr,
-    noHp: "",
+    noHp: systemPhone,
     alasan: "",
   });
   const [cuti, setCuti] = useState<null | {
@@ -72,8 +74,18 @@ export default function Pengajuan() {
     noHp?: string;
     alasan: string;
     fileName?: string;
-    status: "Diajukan" | "Disetujui" | "Ditolak";
-  }>(null);
+    status: "Menunggu" | "Disetujui" | "Ditolak";
+  }>({
+    // Dummy pengajuan cuti awal (contoh)
+    semester: "Ganjil",
+    tahun: getAcademicYears()[0],
+    durasi: "6",
+    tanggal: todayStr,
+    noHp: systemPhone,
+    alasan: "Keperluan keluarga selama beberapa bulan, mohon persetujuan cuti akademik.",
+    fileName: "surat_cuti.pdf",
+    status: "Menunggu",
+  });
 
   return (
     <MobileLayout title="Pengajuan" bgImage="/bg simple.png">
@@ -246,13 +258,14 @@ export default function Pengajuan() {
                   </div>
                   <div className="mt-2 grid grid-cols-1 gap-1 text-xs text-gray-700">
                     <div className="flex items-center justify-between"><span>Semester</span><span className="font-medium text-gray-900">{cuti.semester} {cuti.tahun}</span></div>
-                    <div className="flex items-center justify-between"><span>Durasi</span><span className="font-medium text-gray-900">{cuti.durasi}</span></div>
+                    <div className="flex items-center justify-between"><span>Durasi</span><span className="font-medium text-gray-900">{cuti.durasi} Bulan</span></div>
                     <div className="flex items-center justify-between"><span>Tanggal Pengajuan</span><span className="font-medium text-gray-900">{cuti.tanggal}</span></div>
                     {cuti.noHp ? (<div className="flex items-center justify-between"><span>No. HP</span><span className="font-medium text-gray-900">{cuti.noHp}</span></div>) : null}
                   </div>
-                  <div className="mt-2">
-                    <div className="text-xs text-gray-600 mb-1">Alasan</div>
-                    <div className="rounded-lg border border-amber-200 bg-amber-50 p-2 text-gray-800 whitespace-pre-wrap">{cuti.alasan}</div>
+                  <div className="mt-2 text-xs text-gray-700 whitespace-pre-wrap">
+                    <span className="text-gray-600">Alasan</span>
+                    <span className="mx-1">:</span>
+                    <span className="font-medium text-gray-900">{cuti.alasan}</span>
                   </div>
                   {cuti.fileName ? (<div className="mt-2 text-xs text-gray-700">Berkas: <span className="font-medium text-gray-900">{cuti.fileName}</span></div>) : null}
                 </div>
@@ -366,7 +379,8 @@ export default function Pengajuan() {
                   <select
                     value={cutiForm.semester}
                     onChange={(e) => setCutiForm((s) => ({ ...s, semester: e.target.value as any }))}
-                    className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
+                    disabled
+                    className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 disabled:bg-gray-100 disabled:text-gray-600 disabled:cursor-not-allowed appearance-none"
                   >
                     <option value="Ganjil">Ganjil</option>
                     <option value="Genap">Genap</option>
@@ -377,7 +391,8 @@ export default function Pengajuan() {
                   <select
                     value={cutiForm.tahun}
                     onChange={(e) => setCutiForm((s) => ({ ...s, tahun: e.target.value }))}
-                    className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
+                    disabled
+                    className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 disabled:bg-gray-100 disabled:text-gray-600 disabled:cursor-not-allowed appearance-none"
                   >
                     {getAcademicYears().map((y) => (
                       <option key={y} value={y}>{y}</option>
@@ -387,15 +402,15 @@ export default function Pengajuan() {
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-[11px] text-gray-700 mb-1">Durasi</label>
-                  <select
+                  <label className="block text-[11px] text-gray-700 mb-1">Durasi (bulan)</label>
+                  <input
+                    type="number"
+                    min={1}
+                    step={1}
                     value={cutiForm.durasi}
                     onChange={(e) => setCutiForm((s) => ({ ...s, durasi: e.target.value }))}
                     className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
-                  >
-                    <option>1 Semester</option>
-                    <option>2 Semester</option>
-                  </select>
+                  />
                 </div>
                 <div>
                   <label className="block text-[11px] text-gray-700 mb-1">Tanggal Pengajuan</label>
@@ -415,7 +430,8 @@ export default function Pengajuan() {
                   placeholder="08xxxxxxxxxx"
                   value={cutiForm.noHp}
                   onChange={(e) => setCutiForm((s) => ({ ...s, noHp: e.target.value }))}
-                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
+                  disabled
+                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300 disabled:bg-gray-100 disabled:text-gray-600 disabled:cursor-not-allowed"
                 />
               </div>
               <div>
@@ -482,7 +498,7 @@ export default function Pengajuan() {
                     noHp: cutiForm.noHp || undefined,
                     alasan: cutiForm.alasan.trim(),
                     fileName: cutiForm.fileName,
-                    status: "Diajukan",
+                    status: "Menunggu",
                   });
                   setShowAjukanCuti(false);
                 }}

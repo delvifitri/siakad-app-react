@@ -4,6 +4,7 @@ import { type RouteConfig, index, route } from "@react-router/dev/routes";
 export default [
 	index("routes/home.tsx"),
 	route("login", "routes/login.tsx"),
+	route("dosen", "routes/dosen.tsx"),
 	route("presensi", "routes/presensi.tsx"),
 	route("presensi/:id", "routes/presensi.$id.tsx"),
 	route("schedule", "routes/schedule.tsx"),

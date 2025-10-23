@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { EnvelopeIcon, LockClosedIcon } from "@heroicons/react/24/outline";
 
 export function meta() {
@@ -9,11 +9,19 @@ export function meta() {
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState<"mahasiswa" | "dosen">("mahasiswa");
   const navigate = useNavigate();
 
   const handleLogin = () => {
     // TODO: add auth logic
-    navigate('/');
+    try {
+      localStorage.setItem("userRole", role);
+    } catch {}
+    if (role === "dosen") {
+      navigate("/dosen");
+    } else {
+      navigate("/");
+    }
   };
 
   return (
@@ -29,13 +37,29 @@ export default function Login() {
         </header>
 
         <section className="space-y-4 px-4 mt-4">
+            <div className="flex items-center gap-2 bg-white/50 rounded-full p-1 w-fit mx-auto">
+              <button
+                type="button"
+                onClick={() => setRole("mahasiswa")}
+                className={`px-4 py-1.5 text-sm rounded-full transition ${role === "mahasiswa" ? "bg-blue-600 text-white" : "text-gray-700"}`}
+              >
+                Mahasiswa
+              </button>
+              <button
+                type="button"
+                onClick={() => setRole("dosen")}
+                className={`px-4 py-1.5 text-sm rounded-full transition ${role === "dosen" ? "bg-blue-600 text-white" : "text-gray-700"}`}
+              >
+                Dosen
+              </button>
+            </div>
             <label className="sr-only">Email atau NIM</label>
             <div className="flex items-center gap-3 bg-white/60  rounded-2xl p-4">
               <EnvelopeIcon className="w-5 h-5 text-gray-700" />
               <input
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email atau NIM"
+                placeholder={role === "dosen" ? "Email atau NIP" : "Email atau NIM"}
                 className="bg-transparent flex-1 outline-none placeholder-gray-700 text-gray-900  "
               />
             </div>

@@ -492,14 +492,19 @@ export default function KrsKhs() {
                         )}
                       </div>
                       <div className="text-xs text-gray-500 mt-1 flex items-center gap-2">
-                        <button
-                          type="button"
-                          className="px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200 text-[11px] text-gray-700 hover:bg-gray-200"
-                          onClick={() => openSchedule(c.id, dayOptions, timeOptions, { day: dayValue, time: timeValue })}
-                        >
+                        <span className="text-gray-700">
                           {dayValue}, {timeValue}
-                        </button>
-
+                        </span>
+                        {Math.max(0, dayOptions.length * timeOptions.length - 1) > 0 && (
+                          <button
+                            type="button"
+                            title={`${Math.max(0, dayOptions.length * timeOptions.length - 1)} jadwal lain`}
+                            className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200"
+                            onClick={() => openSchedule(c.id, dayOptions, timeOptions, { day: dayValue, time: timeValue })}
+                          >
+                            +{Math.max(0, dayOptions.length * timeOptions.length - 1)}
+                          </button>
+                        )}
                       </div>
                       <div className={`text-xs mt-1 ${d.remaining === 0 ? "text-red-600 font-medium" : "text-gray-600"}`}>
                         {d.remaining === 0 ? "Kuota habis" : `Sisa kuota: ${d.remaining}`}
@@ -571,16 +576,21 @@ export default function KrsKhs() {
                               )}
                             </div>
                             <div className="text-xs text-gray-500 mt-1 flex items-center gap-2">
-                              <button
-                                type="button"
-                                className="px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200 text-[11px] text-gray-700 hover:bg-gray-200"
-                                onClick={() =>
-                                  openSchedule(oc.id, dayOptions, timeOptions, { day: dayValue, time: timeValue })
-                                }
-                              >
+                              <span className="text-gray-700">
                                 {dayValue}, {timeValue}
-                              </button>
-
+                              </span>
+                              {Math.max(0, dayOptions.length * timeOptions.length - 1) > 0 && (
+                                <button
+                                  type="button"
+                                  title={`${Math.max(0, dayOptions.length * timeOptions.length - 1)} jadwal lain`}
+                                  className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200"
+                                  onClick={() =>
+                                    openSchedule(oc.id, dayOptions, timeOptions, { day: dayValue, time: timeValue })
+                                  }
+                                >
+                                  +{Math.max(0, dayOptions.length * timeOptions.length - 1)}
+                                </button>
+                              )}
                             </div>
                             <div className={`text-xs mt-1 ${d.remaining === 0 ? "text-red-600 font-medium" : "text-gray-600"}`}>
                               {d.remaining === 0 ? "Kuota habis" : `Sisa kuota: ${d.remaining}`}
@@ -919,18 +929,12 @@ export default function KrsKhs() {
                 </div>
                 <div className="mt-3 max-h-64 overflow-auto divide-y">
                   {modal.options?.lecturers?.map((name: string, idx: number) => (
-                    <button
+                    <div
                       key={idx}
-                      type="button"
-                      className="w-full text-left px-3 py-2 hover:bg-gray-50 text-sm text-gray-800"
-                      onClick={() => {
-                        if (!modal.courseId) return;
-                        setSelectedLecturers((prev) => ({ ...prev, [modal.courseId!]: name }));
-                        closeModal();
-                      }}
+                      className="w-full text-left px-3 py-2 text-sm text-gray-800"
                     >
                       {name}
-                    </button>
+                    </div>
                   ))}
                 </div>
                 <div className="mt-3">
@@ -954,22 +958,13 @@ export default function KrsKhs() {
                 <div className="mt-3 max-h-64 overflow-auto divide-y">
                   {modal.options?.combos?.map((opt: { day: string; time: string }, idx: number) => {
                     const label = `${opt.day}, ${opt.time}`;
-                    const isCurrent =
-                      modal.options?.current?.day === opt.day && modal.options?.current?.time === opt.time;
                     return (
-                      <button
+                      <div
                         key={`${opt.day}-${opt.time}-${idx}`}
-                        type="button"
-                        className={`w-full text-left px-3 py-2 hover:bg-gray-50 text-sm ${isCurrent ? "bg-orange-50" : "text-gray-800"}`}
-                        onClick={() => {
-                          if (!modal.courseId) return;
-                          setSelectedDays((prev) => ({ ...prev, [modal.courseId!]: opt.day }));
-                          setSelectedTimes((prev) => ({ ...prev, [modal.courseId!]: opt.time }));
-                          closeModal();
-                        }}
+                        className="w-full text-left px-3 py-2 text-sm text-gray-800"
                       >
                         {label}
-                      </button>
+                      </div>
                     );
                   })}
                 </div>
