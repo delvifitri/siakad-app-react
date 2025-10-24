@@ -5,6 +5,13 @@ export default [
 	index("routes/home.tsx"),
 	route("login", "routes/login.tsx"),
 	route("dosen", "routes/dosen.tsx"),
+	// Dosen-scoped sections
+	route("dosen/nilai-presensi", "routes/dosen.nilai-presensi.tsx"),
+	route("dosen/ujian", "routes/dosen.ujian.tsx"),
+	route("dosen/bimbingan", "routes/dosen.bimbingan.tsx"),
+	route("dosen/profile", "routes/dosen.profile.tsx"),
+	route("nilai-presensi", "routes/nilai-presensi.tsx"),
+	route("ujian", "routes/ujian.tsx"),
 	route("presensi", "routes/presensi.tsx"),
 	route("presensi/:id", "routes/presensi.$id.tsx"),
 	route("schedule", "routes/schedule.tsx"),
