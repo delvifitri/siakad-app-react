@@ -60,16 +60,16 @@ export default function DosenDashboard() {
         {/* Kartu Ringkasan Cepat */}
         <div className="grid grid-cols-2 gap-3 mt-6">
           <div className="block">
-          <StatCard variant="large" wrapTitle icon={<DocumentTextIcon className="w-6 h-6 text-blue-600" />} title="Mata Kuliah Aktif" value={activeCourses} />
+          <StatCard wrapTitle icon={<DocumentTextIcon className="w-6 h-6 text-blue-600" />} title="Mata Kuliah Aktif" value={activeCourses} />
           </div>
           <a href="/dosen/bimbingan" className="block" aria-label="Lihat Bimbingan">
-          <StatCard variant="large" wrapTitle icon={<UserGroupIcon className="w-6 h-6 text-green-600" />} title="Lihat Bimbingan" value={bimbinganCount} />
+          <StatCard wrapTitle icon={<UserGroupIcon className="w-6 h-6 text-green-600" />} title="Lihat Bimbingan" value={bimbinganCount} />
           </a>
           <a href="/status-krs" className="block" aria-label="Approve KRS">
-          <StatCard variant="large" wrapTitle icon={<DocumentCheckIcon className="w-6 h-6 text-purple-600" />} title="Approve KRS" value={krsPending} />
+          <StatCard wrapTitle icon={<DocumentCheckIcon className="w-6 h-6 text-purple-600" />} title="Approve KRS" value={krsPending} />
           </a>
           <div className="block">
-          <StatCard variant="large" wrapTitle icon={<AcademicCapIcon className="w-6 h-6 text-orange-500" />} title="Ujian Minggu Ini" value={examsThisWeek} />
+          <StatCard wrapTitle icon={<AcademicCapIcon className="w-6 h-6 text-orange-500" />} title="Ujian Minggu Ini" value={examsThisWeek} />
           </div>
         </div>
 
