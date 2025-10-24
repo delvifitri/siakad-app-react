@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import SimpleLayout from '../layouts/SimpleLayout';
 import notifications from '../data/notificationData';
@@ -9,6 +9,13 @@ export default function NotificationDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const item = notifications.find((n) => n.id === id);
+
+  // Determine late cutoff for presensi based on item's time range
+  const isLate = useMemo(() => {
+    // Only one example should be late: rely on the 'closed' flag from data
+    if (!item || item.type !== 'presensi') return false;
+    return !!item.closed;
+  }, [item]);
 
   const [showPresensiForm, setShowPresensiForm] = useState(false);
   const [status, setStatus] = useState<'hadir' | 'izin' | 'sakit' | ''>('');
@@ -32,6 +39,21 @@ export default function NotificationDetail() {
       // ignore
     }
   }, [id]);
+
+  // If presensi already melewati batas waktu, seed dummy record and keep button disabled
+  useEffect(() => {
+    if (!item || item.type !== 'presensi' || !isLate) return;
+    try {
+      const raw = localStorage.getItem('presensiRecords');
+      const records: Array<{ id: string; status: string; fileName?: string | null; timestamp: string }>
+        = raw ? JSON.parse(raw) : [];
+      const exists = records.some((r) => r.id === item.id && r.status === 'ditutup');
+      if (!exists) {
+        records.push({ id: item.id, status: 'ditutup', fileName: null, timestamp: new Date().toISOString() });
+        localStorage.setItem('presensiRecords', JSON.stringify(records));
+      }
+    } catch (_) {}
+  }, [item, isLate]);
 
   if (!item) {
     return (
@@ -88,7 +110,18 @@ export default function NotificationDetail() {
           {item.type === 'presensi' && (
             <div className="mt-6">
               {!showPresensiForm ? (
-                <button onClick={() => setShowPresensiForm(true)} className="w-full py-3 rounded-full bg-gradient-to-br from-orange-500 to-orange-400 text-white">Isi Presensi</button>
+                <div className="space-y-2">
+                  <button
+                    onClick={() => !isLate && setShowPresensiForm(true)}
+                    disabled={isLate}
+                    className={`w-full py-3 rounded-full ${isLate ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gradient-to-br from-orange-500 to-orange-400 text-white'}`}
+                  >
+                    Isi Presensi
+                  </button>
+                  {isLate && (
+                    <div className="text-sm text-red-600 text-center">Maaf Anda terlambat presensi</div>
+                  )}
+                </div>
               ) : (
                 <div className="mt-4 space-y-3">
                   {submitted ? (

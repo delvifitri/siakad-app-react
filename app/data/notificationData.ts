@@ -7,6 +7,8 @@ export type NotificationItem = {
   instructor?: string;
   className?: string;
   type?: 'presensi' | 'info' | 'payment' | 'other';
+  // Demo flag: when true, this presensi is considered closed/late
+  closed?: boolean;
 };
 
 export const notifications: NotificationItem[] = [
@@ -19,6 +21,7 @@ export const notifications: NotificationItem[] = [
     className: 'Kelas A',
     time: '09:00 - 10:30',
     instructor: 'Dr. Ananda Satful',
+    closed: true, // contoh kasus terlambat (hanya satu)
   },
   {
     id: 'presensi-2',
@@ -38,6 +41,16 @@ export const notifications: NotificationItem[] = [
     course: 'Jaringan Komputer',
     className: 'Kelas A',
     time: '08:45 - 09:00',
+    instructor: 'Dr. Ananda Satful',
+  },
+  {
+    id: 'presensi-4',
+    type: 'presensi',
+    title: 'Presensi Hari Ini',
+    description: 'Silakan melakukan presensi untuk mata kuliah Anda hari ini.',
+    course: 'Analisis Algoritma',
+    className: 'Kelas A',
+    time: '10:45 - 12:15',
     instructor: 'Dr. Ananda Satful',
   },
   {
