@@ -8,6 +8,7 @@ export default function EditProfile() {
   const [major, setMajor] = useState("Informatika");
   const [semester, setSemester] = useState("6");
   const [email, setEmail] = useState("budi.santoso@example.com");
+  const [autoEmail, setAutoEmail] = useState(false);
   const [phone, setPhone] = useState("081234567890");
   const [address, setAddress] = useState("Jl. Contoh No. 123, Jakarta");
   const [isSaved, setIsSaved] = useState(false);
@@ -24,21 +25,57 @@ export default function EditProfile() {
     }
   }, []);
 
+  // Helper: generate institutional email from name for Dosen
+  const toEmailFromName = (fullName: string, domain = "kampus.ac.id") => {
+    try {
+      const cleaned = fullName
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/\./g, " ")
+        .replace(/[^a-zA-Z\s'-]/g, "")
+        .trim()
+        .toLowerCase();
+      const titles = new Set(["dr", "prof", "ir", "h", "hj"]);
+      const parts = cleaned
+        .split(/\s+/)
+        .filter(Boolean)
+        .filter((p) => !titles.has(p));
+      if (parts.length === 0) return `dosen@${domain}`;
+      const first = parts[0].replace(/[^a-z]/g, "");
+      const last = (parts.length > 1 ? parts[parts.length - 1] : "").replace(/[^a-z]/g, "");
+      const user = last ? `${first}.${last}` : first;
+      return `${user}@${domain}`;
+    } catch {
+      return "dosen@kampus.ac.id";
+    }
+  };
+
   // Sesuaikan default field untuk Dosen (NIP, Prodi; semester tidak dipakai)
   useEffect(() => {
     if (isDosen) {
-      setName("Dr. Ahmad Fauzi");
+      const defaultName = "Dr. Ahmad Fauzi";
+      setName(defaultName);
       setNim("1987654321"); // NIP contoh
       setMajor("Teknik Informatika"); // Prodi/Departemen
       setSemester("");
-      setEmail("budi.santoso@universitas.ac.id");
+      setEmail(toEmailFromName(defaultName));
+      setAutoEmail(true);
     }
   }, [isDosen]);
+
+  // Jika nama diubah dan autoEmail aktif (khusus dosen), sinkronkan email
+  useEffect(() => {
+    if (isDosen && autoEmail) {
+      setEmail(toEmailFromName(name));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [name, isDosen, autoEmail]);
 
   const handleSave = () => {
     // Handle save logic here
     try {
       localStorage.setItem('profileName', name);
+      localStorage.setItem('profileEmail', email);
     } catch {}
     setIsSaved(true);
     setShowToast(true);
@@ -156,9 +193,12 @@ export default function EditProfile() {
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => { setEmail(e.target.value); setAutoEmail(false); }}
               className="w-full px-3 py-2 border border-orange-500 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-200"
             />
+            {isDosen && autoEmail && (
+              <p className="text-xs text-gray-500 mt-1">Email otomatis disesuaikan dari nama dosen. Ubah manual jika diperlukan.</p>
+            )}
           </div>
 
           <div>

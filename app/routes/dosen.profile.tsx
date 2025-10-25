@@ -18,6 +18,37 @@ export default function DosenProfile() {
       return 'Dr. Ahmad Fauzi';
     }
   }, []);
+  const email = useMemo(() => {
+    try {
+      const stored = localStorage.getItem('profileEmail');
+      if (stored && stored.trim().length > 0) return stored;
+    } catch {}
+    // derive from displayName if not stored
+    const toEmailFromName = (fullName: string, domain = "kampus.ac.id") => {
+      try {
+        const cleaned = fullName
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/\./g, " ")
+          .replace(/[^a-zA-Z\s'-]/g, "")
+          .trim()
+          .toLowerCase();
+        const titles = new Set(["dr", "prof", "ir", "h", "hj"]);
+        const parts = cleaned
+          .split(/\s+/)
+          .filter(Boolean)
+          .filter((p) => !titles.has(p));
+        if (parts.length === 0) return `dosen@${domain}`;
+        const first = parts[0].replace(/[^a-z]/g, "");
+        const last = (parts.length > 1 ? parts[parts.length - 1] : "").replace(/[^a-z]/g, "");
+        const user = last ? `${first}.${last}` : first;
+        return `${user}@${domain}`;
+      } catch {
+        return "dosen@kampus.ac.id";
+      }
+    };
+    return toEmailFromName(displayName);
+  }, [displayName]);
   useEffect(() => {
     try {
       const role = localStorage.getItem("userRole");
@@ -51,7 +82,7 @@ export default function DosenProfile() {
           <div className="mt-4 grid grid-cols-2 gap-2 text-sm text-gray-700">
             <div className="bg-gray-50 rounded-xl p-3">
               <div className="text-xs text-gray-500">Email</div>
-              <div className="font-medium">budi@kampus.ac.id</div>
+              <div className="font-medium">{email}</div>
             </div>
             <div className="bg-gray-50 rounded-xl p-3">
               <div className="text-xs text-gray-500">No. HP</div>
