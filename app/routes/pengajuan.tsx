@@ -30,6 +30,9 @@ export default function Pengajuan() {
   // Modal Ajukan Proposal
   const [showAjukan, setShowAjukan] = useState(false);
   const [form, setForm] = useState<{ title: string; fileName: string; fileError?: string }>({ title: "", fileName: "" });
+  // Modal Detail Nilai TA/Pendadaran
+  const [showDetailNilai, setShowDetailNilai] = useState<boolean>(false);
+  const [detailTab, setDetailTab] = useState<'ta' | 'pendadaran'>('ta');
   // Status perkuliahan sederhana untuk logika cuti (dummy)
   const [isPerkuliahanAktif] = useState<boolean>(false);
   // Modal Log Bimbingan (global untuk semua pembimbing)
@@ -127,7 +130,16 @@ export default function Pengajuan() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Hasil Nilai TA</span>
-                  <span className="font-medium text-gray-900">-</span>
+                  <span className="flex items-center gap-2">
+                    <span className="font-semibold text-gray-900">80</span>
+                    <button
+                      type="button"
+                      className="px-2 py-0.5 rounded-full text-white bg-blue-600 hover:bg-blue-700 text-xs"
+                      onClick={() => { setDetailTab('ta'); setShowDetailNilai(true); }}
+                    >
+                      Detail
+                    </button>
+                  </span>
                 </div>
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2">
@@ -350,6 +362,82 @@ export default function Pengajuan() {
               >
                 Submit
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDetailNilai && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShowDetailNilai(false)} />
+          <div className="relative bg-white rounded-2xl w-full sm:max-w-md mx-4 p-4 shadow-lg">
+            <div className="flex items-center justify-between">
+              <div className="font-semibold text-gray-900">Detail Nilai</div>
+              <button
+                onClick={() => setShowDetailNilai(false)}
+                className="text-sm px-2 py-1 rounded-md text-gray-600 hover:bg-gray-100"
+              >Tutup</button>
+            </div>
+            <div className="mt-3">
+              <div className="flex bg-gray-100 rounded-lg p-1 text-sm">
+                <button
+                  onClick={() => setDetailTab('ta')}
+                  className={`flex-1 py-2 px-3 rounded-md font-medium transition-colors ${detailTab === 'ta' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'}`}
+                >Nilai TA</button>
+                <button
+                  onClick={() => setDetailTab('pendadaran')}
+                  className={`flex-1 py-2 px-3 rounded-md font-medium transition-colors ${detailTab === 'pendadaran' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'}`}
+                >Nilai Pendadaran</button>
+              </div>
+            </div>
+            <div className="mt-4 text-sm">
+              {detailTab === 'ta' ? (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-600">Proposal</span>
+                    <span className="font-medium text-gray-900">80</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-600">Metodologi</span>
+                    <span className="font-medium text-gray-900">78</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-600">Implementasi</span>
+                    <span className="font-medium text-gray-900">82</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-600">Presentasi</span>
+                    <span className="font-medium text-gray-900">85</span>
+                  </div>
+                  <div className="pt-2 border-t mt-2 flex items-center justify-between">
+                    <span className="text-gray-800 font-semibold">Rata-rata</span>
+                    <span className="font-semibold text-gray-900">81</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-600">Penguji 1</span>
+                    <span className="font-medium text-gray-900">82</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-600">Penguji 2</span>
+                    <span className="font-medium text-gray-900">78</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-600">Penguji 3</span>
+                    <span className="font-medium text-gray-900">80</span>
+                  </div>
+                  <div className="pt-2 border-t mt-2 flex items-center justify-between">
+                    <span className="text-gray-800 font-semibold">Rata-rata</span>
+                    <span className="font-semibold text-gray-900">80</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-600">Status</span>
+                    <span className="px-2 py-0.5 rounded-full text-xs border bg-green-100 text-green-700 border-green-200">Lulus</span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

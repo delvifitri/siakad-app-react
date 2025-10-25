@@ -36,7 +36,7 @@ export default function HeaderIcons() {
           className="relative p-3 rounded-lg bg-white/12 backdrop-blur-md ring-1 ring-blue-300/30 shadow-sm inline-flex items-center"
         >
           <ChatBubbleLeftEllipsisIcon className="w-6 h-6 text-blue-400" />
-          <span className="absolute -top-2 -right-2 min-w-[18px] h-5 rounded-full bg-blue-500 text-white text-xs font-semibold flex items-center justify-center px-1.5">
+          <span className="absolute -top-2 -right-2 min-w-[18px] h-5 rounded-full bg-red-500 text-white text-xs font-semibold flex items-center justify-center px-1.5">
             1
           </span>
         </Link>
