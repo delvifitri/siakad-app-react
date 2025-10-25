@@ -1,5 +1,5 @@
 import DosenLayout from "../layouts/DosenLayout";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router";
 import HeaderIcons from "../components/HeaderIcons";
 import QuickAction from "../components/QuickAction";
@@ -42,6 +42,15 @@ export default function DosenDashboard() {
       }
     } catch {}
   }, [navigate]);
+  const displayName = useMemo(() => {
+    try {
+      const stored = localStorage.getItem('profileName');
+      if (stored && stored.trim().length > 0) return stored;
+      return 'Dr. Ahmad Fauzi';
+    } catch {
+      return 'Dr. Ahmad Fauzi';
+    }
+  }, []);
   const classesToday = scheduleToday.length;
   const krsPending = 3; // ringkas sesuai kartu
   const bimbinganCount = 12; // dummy
@@ -54,22 +63,22 @@ export default function DosenDashboard() {
 
       <section className="px-4 mt-6">
         <div className="text-black">
-          <p className="text-2xl font-bold">Selamat datang, Budi 👋</p>
+          <p className="text-2xl font-bold">Selamat datang, {displayName} 👋</p>
         </div>
 
         {/* Kartu Ringkasan Cepat */}
         <div className="grid grid-cols-2 gap-3 mt-6">
           <div className="block">
-          <StatCard wrapTitle icon={<DocumentTextIcon className="w-6 h-6 text-blue-600" />} title="Mata Kuliah Aktif" value={activeCourses} />
+          <StatCard variant="small" wrapTitle icon={<DocumentTextIcon className="w-6 h-6 text-blue-600" />} title="Mata Kuliah Aktif" value={activeCourses} />
           </div>
-          <a href="/dosen/bimbingan" className="block" aria-label="Lihat Bimbingan">
-          <StatCard wrapTitle icon={<UserGroupIcon className="w-6 h-6 text-green-600" />} title="Lihat Bimbingan" value={bimbinganCount} />
+          <a href="/dosen/bimbingan-akademik" className="block" aria-label="Bimbingan Akademik">
+          <StatCard variant="small" wrapTitle icon={<UserGroupIcon className="w-6 h-6 text-green-600" />} title="Bimbingan Akademik" value={bimbinganCount} />
           </a>
           <a href="/status-krs" className="block" aria-label="Approve KRS">
-          <StatCard wrapTitle icon={<DocumentCheckIcon className="w-6 h-6 text-purple-600" />} title="Approve KRS" value={krsPending} />
+          <StatCard variant="small" wrapTitle icon={<DocumentCheckIcon className="w-6 h-6 text-purple-600" />} title="Approve KRS" value={krsPending} />
           </a>
           <div className="block">
-          <StatCard wrapTitle icon={<AcademicCapIcon className="w-6 h-6 text-orange-500" />} title="Ujian Minggu Ini" value={examsThisWeek} />
+          <StatCard variant="small" wrapTitle icon={<AcademicCapIcon className="w-6 h-6 text-orange-500" />} title="Ujian Pendadaran" value={examsThisWeek} />
           </div>
         </div>
 

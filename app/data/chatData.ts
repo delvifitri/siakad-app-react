@@ -67,4 +67,25 @@ export const chatData: Record<number, ChatThread> = {
       { sender: "You", text: "Baik, akan saya sesuaikan.", time: "Kemarin" },
     ],
   },
+  9: {
+    name: "Ani Lestari",
+    messages: [
+      { sender: "You", text: "Halo Ani, bagaimana progres akademiknya?", time: "08:00" },
+      { sender: "Ani Lestari", text: "Baik Bu/Pak, IP semester kemarin 3.5.", time: "08:02" },
+    ],
+  },
+  10: {
+    name: "Budi Santoso",
+    messages: [
+      { sender: "Budi Santoso", text: "Pak/Bu, saya ingin konsultasi rencana KRS.", time: "09:10" },
+      { sender: "You", text: "Boleh, silakan share mata kuliah yang diambil.", time: "09:12" },
+    ],
+  },
+  11: {
+    name: "Citra Rahma",
+    messages: [
+      { sender: "You", text: "Citra, ada kendala pada perkuliahan?", time: "Kemarin" },
+      { sender: "Citra Rahma", text: "Tidak Bu/Pak, semua lancar.", time: "Kemarin" },
+    ],
+  },
 };

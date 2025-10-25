@@ -4,7 +4,7 @@ import DosenLayout from "../layouts/DosenLayout";
 import { ChatBubbleLeftRightIcon, CheckCircleIcon, ClockIcon } from "@heroicons/react/24/outline";
 
 export function meta() {
-  return [{ title: "Bimbingan (Dosen) - Siakad" }];
+  return [{ title: "Bimbingan TA (Dosen) - Siakad" }];
 }
 
 const requests = [
@@ -23,10 +23,10 @@ export default function DosenBimbingan() {
   }, [navigate]);
 
   return (
-    <DosenLayout>
+    <DosenLayout bgImage="/bg simple.png">
       <section className="px-4 pt-6">
-        <h1 className="text-xl font-bold text-gray-900">Bimbingan</h1>
-        <p className="text-sm text-gray-600 mt-1">Kelola permintaan dan log bimbingan mahasiswa.</p>
+  <h1 className="text-xl font-bold text-gray-900">Bimbingan TA</h1>
+  <p className="text-sm text-gray-600 mt-1">Kelola bimbingan tugas akhir mahasiswa.</p>
 
         <div className="mt-4 space-y-3">
           {requests.map((r, idx) => (

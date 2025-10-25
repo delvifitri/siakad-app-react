@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import SimpleLayout from "../layouts/SimpleLayout";
-import { ArrowLeftIcon, CameraIcon } from "@heroicons/react/24/outline";
+import { CameraIcon } from "@heroicons/react/24/outline";
 
 export default function EditProfile() {
   const [name, setName] = useState("Budi Santoso");
@@ -16,8 +16,30 @@ export default function EditProfile() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const prevObjectUrlRef = useRef<string | null>(null);
 
+  const isDosen = useMemo(() => {
+    try {
+      return localStorage.getItem('userRole') === 'dosen';
+    } catch {
+      return false;
+    }
+  }, []);
+
+  // Sesuaikan default field untuk Dosen (NIP, Prodi; semester tidak dipakai)
+  useEffect(() => {
+    if (isDosen) {
+      setName("Dr. Ahmad Fauzi");
+      setNim("1987654321"); // NIP contoh
+      setMajor("Teknik Informatika"); // Prodi/Departemen
+      setSemester("");
+      setEmail("budi.santoso@universitas.ac.id");
+    }
+  }, [isDosen]);
+
   const handleSave = () => {
     // Handle save logic here
+    try {
+      localStorage.setItem('profileName', name);
+    } catch {}
     setIsSaved(true);
     setShowToast(true);
     setTimeout(() => setShowToast(false), 3000); // Hide toast after 3 seconds
@@ -95,7 +117,7 @@ export default function EditProfile() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700  mb-1">NIM</label>
+            <label className="block text-sm font-medium text-gray-700  mb-1">{isDosen ? 'NIP' : 'NIM'}</label>
             <input
               type="text"
               value={nim}
@@ -106,7 +128,7 @@ export default function EditProfile() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700  mb-1">Jurusan</label>
+            <label className="block text-sm font-medium text-gray-700  mb-1">{isDosen ? 'Program Studi' : 'Jurusan'}</label>
             <input
               type="text"
               value={major}
@@ -116,16 +138,18 @@ export default function EditProfile() {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700  mb-1">Semester</label>
-            <input
-              type="number"
-              value={semester}
-              onChange={(e) => setSemester(e.target.value)}
-              disabled
-              className="w-full px-3 py-2 border border-gray-300  rounded-lg bg-gray-100  text-gray-500  cursor-not-allowed"
-            />
-          </div>
+          {!isDosen && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700  mb-1">Semester</label>
+              <input
+                type="number"
+                value={semester}
+                onChange={(e) => setSemester(e.target.value)}
+                disabled
+                className="w-full px-3 py-2 border border-gray-300  rounded-lg bg-gray-100  text-gray-500  cursor-not-allowed"
+              />
+            </div>
+          )}
 
           <div>
             <label className="block text-sm font-medium text-gray-700  mb-1">Email</label>

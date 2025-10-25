@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router";
 import DosenLayout from "../layouts/DosenLayout";
 import { PencilSquareIcon, ArrowRightOnRectangleIcon, UserIcon, ShieldCheckIcon } from "@heroicons/react/24/outline";
@@ -9,6 +9,15 @@ export function meta() {
 
 export default function DosenProfile() {
   const navigate = useNavigate();
+  const displayName = useMemo(() => {
+    try {
+      const stored = localStorage.getItem('profileName');
+      if (stored && stored.trim().length > 0) return stored;
+      return 'Dr. Ahmad Fauzi';
+    } catch {
+      return 'Dr. Ahmad Fauzi';
+    }
+  }, []);
   useEffect(() => {
     try {
       const role = localStorage.getItem("userRole");
@@ -34,7 +43,7 @@ export default function DosenProfile() {
           <div className="flex items-center gap-3">
             <div className="w-14 h-14 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center"><UserIcon className="w-7 h-7"/></div>
             <div>
-              <div className="text-base font-semibold text-gray-900">Budi Santoso, M.Kom</div>
+              <div className="text-base font-semibold text-gray-900">{displayName}</div>
               <div className="text-xs text-gray-600">NIDN 012345678 • Program Studi Informatika</div>
               <div className="text-xs text-emerald-700 mt-1 inline-flex items-center gap-1"><ShieldCheckIcon className="w-4 h-4"/> Dosen</div>
             </div>
