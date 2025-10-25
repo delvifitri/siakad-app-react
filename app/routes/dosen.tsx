@@ -82,12 +82,13 @@ export default function DosenDashboard() {
 
         {/* Berita Kampus untuk Dosen */}
         <div className="mt-6">
-          <h2 className="text-base font-semibold text-gray-900 mb-3">Berita Kampus</h2>
-          <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-base font-semibold text-gray-900">Berita Kampus</h2>
+            <a href="/dosen/news" className="text-sm font-medium text-orange-600">Read more</a>
+          </div>
+          <div className="space-y-3">
             <NewsItem title="Rapat Dosen Mingguan: Agenda Kurikulum" to="/news/3" day="12" month="Okt" />
             <NewsItem title="Pembukaan Hibah Penelitian Internal 2025" to="/news/4" day="15" month="Okt" />
-            <NewsItem title="Sosialisasi Kurikulum MBKM untuk Dosen" to="/news/5" day="18" month="Okt" />
-            <NewsItem title="Workshop Penulisan Proposal Hibah" to="/news/6" day="20" month="Okt" />
           </div>
         </div>
 

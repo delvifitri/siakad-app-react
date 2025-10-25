@@ -35,9 +35,10 @@ export default function Presensi() {
     });
     map['Sistem Operasi'] = 'hadir';
     map['Jaringan Komputer'] = 'izin';
-    // Apply demo closed presensi from notifications data (only one example)
+    // Apply demo closed presensi from notifications data, except Pemrograman Web per request
     notifications.forEach((n) => {
       if (n.type === 'presensi' && n.closed && n.course) {
+        if (n.course === 'Pemrograman Web') return; // keep as 'belum' for Pemrograman Web
         map[n.course] = 'ditutup';
       }
     });
@@ -60,6 +61,7 @@ export default function Presensi() {
               const notif = notifications.find(n => n.id === r.id);
               // Only mark as ditutup if the notification is flagged closed in data (avoid overriding others)
               if (notif?.course && notif.closed) {
+                if (notif.course === 'Pemrograman Web') return; // keep Pemrograman Web as 'belum'
                 next[notif.course] = 'ditutup';
               }
             }

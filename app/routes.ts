@@ -20,6 +20,8 @@ export default [
 	route("messages", "routes/messages.tsx"),
 	route("chat/:id", "routes/chat.$id.tsx"),
 	route("news/:id", "routes/news.$id.tsx"),
+	route("news", "routes/news.tsx"),
+	route("dosen/news", "routes/dosen.news.tsx"),
 	route("announcements/:id", "routes/announcement.$id.tsx"),
 	route("pembayaran", "routes/pembayaran.tsx"),
 	route("pembayaran/:id", "routes/pembayaran.$id.tsx"),

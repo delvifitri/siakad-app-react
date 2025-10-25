@@ -24,12 +24,13 @@ export default function DosenProfile() {
   };
 
   return (
-    <DosenLayout>
+    <DosenLayout bgImage="/bg simple.png">
       <section className="px-4 pt-6 pb-24">
         <h1 className="text-xl font-bold text-gray-900">Profil Dosen</h1>
         <p className="text-sm text-gray-600 mt-1">Kelola informasi akun dan preferensi Anda.</p>
 
-        <div className="mt-4 bg-white/60 rounded-2xl border border-gray-200 p-4">
+        {/* Card utama dengan background simple */}
+        <div className="mt-4 bg-white rounded-2xl border border-gray-200 p-4">
           <div className="flex items-center gap-3">
             <div className="w-14 h-14 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center"><UserIcon className="w-7 h-7"/></div>
             <div>
@@ -56,27 +57,15 @@ export default function DosenProfile() {
               <div className="font-medium">Web, Basis Data, Jaringan</div>
             </div>
           </div>
-
-          <div className="mt-4 flex items-center gap-2">
-            <button className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-white bg-blue-600 text-sm">
-              <PencilSquareIcon className="w-5 h-5"/> Edit Profil
-            </button>
-            <button className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-blue-700 bg-blue-50 text-sm">
-              Ubah Password
+          {/* Ganti tombol aksi menjadi satu tombol Logout */}
+          <div className="mt-4">
+            <button onClick={logout} className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-white bg-red-600 text-sm">
+              <ArrowRightOnRectangleIcon className="w-5 h-5"/> Logout
             </button>
           </div>
         </div>
 
-        <div className="mt-4 bg-white/60 rounded-2xl border border-gray-200 p-4">
-          <div className="text-sm font-semibold text-gray-900">Tentang Aplikasi</div>
-          <div className="text-xs text-gray-600 mt-1">Versi 1.0.0 • Build demo</div>
-        </div>
-
-        <div className="mt-6">
-          <button onClick={logout} className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-white bg-red-600 text-sm">
-            <ArrowRightOnRectangleIcon className="w-5 h-5"/> Keluar
-          </button>
-        </div>
+        {/* Bagian 'Tentang Aplikasi' dihapus sesuai permintaan */}
       </section>
     </DosenLayout>
   );

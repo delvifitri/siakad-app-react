@@ -36,7 +36,6 @@ export default function Pengajuan() {
   const [showLogPembimbing, setShowLogPembimbing] = useState<boolean>(false);
   // Cuti state & modal
   const [showAjukanCuti, setShowAjukanCuti] = useState<boolean>(false);
-  const todayStr = new Date().toISOString().slice(0, 10);
   // Data dari sistem (contoh)
   const systemPhone = "081234567890";
   function getAcademicYears() {
@@ -52,8 +51,6 @@ export default function Pengajuan() {
   const [cutiForm, setCutiForm] = useState<{
     semester: "Ganjil" | "Genap";
     tahun: string;
-    durasi: string;
-    tanggal: string;
     noHp: string;
     alasan: string;
     fileName?: string;
@@ -61,16 +58,12 @@ export default function Pengajuan() {
   }>({
     semester: "Ganjil",
     tahun: getAcademicYears()[0],
-    durasi: "6",
-    tanggal: todayStr,
     noHp: systemPhone,
     alasan: "",
   });
   const [cuti, setCuti] = useState<null | {
     semester: string;
     tahun: string;
-    durasi: string;
-    tanggal: string;
     noHp?: string;
     alasan: string;
     fileName?: string;
@@ -79,8 +72,6 @@ export default function Pengajuan() {
     // Dummy pengajuan cuti awal (contoh)
     semester: "Ganjil",
     tahun: getAcademicYears()[0],
-    durasi: "6",
-    tanggal: todayStr,
     noHp: systemPhone,
     alasan: "Keperluan keluarga selama beberapa bulan, mohon persetujuan cuti akademik.",
     fileName: "surat_cuti.pdf",
@@ -258,8 +249,6 @@ export default function Pengajuan() {
                   </div>
                   <div className="mt-2 grid grid-cols-1 gap-1 text-xs text-gray-700">
                     <div className="flex items-center justify-between"><span>Semester</span><span className="font-medium text-gray-900">{cuti.semester} {cuti.tahun}</span></div>
-                    <div className="flex items-center justify-between"><span>Durasi</span><span className="font-medium text-gray-900">{cuti.durasi} Bulan</span></div>
-                    <div className="flex items-center justify-between"><span>Tanggal Pengajuan</span><span className="font-medium text-gray-900">{cuti.tanggal}</span></div>
                     {cuti.noHp ? (<div className="flex items-center justify-between"><span>No. HP</span><span className="font-medium text-gray-900">{cuti.noHp}</span></div>) : null}
                   </div>
                   <div className="mt-2 text-xs text-gray-700 whitespace-pre-wrap">
@@ -400,28 +389,7 @@ export default function Pengajuan() {
                   </select>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block text-[11px] text-gray-700 mb-1">Durasi (bulan)</label>
-                  <input
-                    type="number"
-                    min={1}
-                    step={1}
-                    value={cutiForm.durasi}
-                    onChange={(e) => setCutiForm((s) => ({ ...s, durasi: e.target.value }))}
-                    className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] text-gray-700 mb-1">Tanggal Pengajuan</label>
-                  <input
-                    type="date"
-                    value={cutiForm.tanggal}
-                    onChange={(e) => setCutiForm((s) => ({ ...s, tanggal: e.target.value }))}
-                    className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
-                  />
-                </div>
-              </div>
+              {/* Input Durasi dan Tanggal Pengajuan dihapus sesuai permintaan */}
               <div>
                 <label className="block text-[11px] text-gray-700 mb-1">No. HP Aktif</label>
                 <input
@@ -493,8 +461,6 @@ export default function Pengajuan() {
                   setCuti({
                     semester: cutiForm.semester,
                     tahun: cutiForm.tahun,
-                    durasi: cutiForm.durasi,
-                    tanggal: cutiForm.tanggal,
                     noHp: cutiForm.noHp || undefined,
                     alasan: cutiForm.alasan.trim(),
                     fileName: cutiForm.fileName,

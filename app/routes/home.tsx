@@ -113,9 +113,10 @@ export default function Home() {
         </div>
 
         <div className="mt-3">
-          <h2 className="text-base font-semibold text-gray-900 mb-3">
-            Berita Kampus
-          </h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-base font-semibold text-gray-900">Berita Kampus</h2>
+            <a href="/news" className="text-sm font-medium text-orange-600">Read more</a>
+          </div>
           <div className="space-y-3">
             <NewsItem
               title="Pendaftaran Beasiswa Dibuka"
