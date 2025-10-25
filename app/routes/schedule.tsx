@@ -22,24 +22,68 @@ export default function Schedule() {
 
   // Dosen-specific view (moved from Dosen dashboard quick preview)
   if (isDosen) {
-    type DosenWeekItem = { time: string; course: string; cls?: string; room: string; type: 'kuliah' | 'ujian' | 'bimbingan'; day?: string };
-    const scheduleToday: Array<{ time: string; course: string; cls: string; room: string }> = [
-      { time: "08:00–09:40", course: "Pemrograman Web", cls: "A", room: "R-301" },
-      { time: "10:00–11:40", course: "Basis Data", cls: "B", room: "R-205" },
-      { time: "13:30–15:10", course: "Jaringan Komputer", cls: "A", room: "Lab-2" },
-    ];
+    type DosenWeekItem = { day: 'Min' | 'Sen' | 'Sel' | 'Rab' | 'Kam' | 'Jum' | 'Sab'; time: string; course: string; cls?: string; room: string; type: 'kuliah' };
+    // Semua: jadwal kuliah Senin s/d Jumat
     const scheduleWeek: DosenWeekItem[] = [
       { day: 'Sen', time: "08:00–09:40", course: "Pemrograman Web", cls: "A", room: "R-301", type: 'kuliah' },
       { day: 'Sen', time: "10:00–11:40", course: "Basis Data", cls: "B", room: "R-205", type: 'kuliah' },
+      { day: 'Sel', time: "09:00–10:40", course: "Algoritma & Struktur Data", cls: "B", room: "R-204", type: 'kuliah' },
       { day: 'Rab', time: "13:30–15:10", course: "Jaringan Komputer", cls: "A", room: "Lab-2", type: 'kuliah' },
-      { day: 'Jum', time: "10:00", course: "Ujian Basis Data", room: "Aula-1", type: 'ujian' },
-      { day: 'Sab', time: "13:00", course: "Bimbingan TA", room: "R-207", type: 'bimbingan' },
+      { day: 'Kam', time: "08:00–09:40", course: "Sistem Operasi", cls: "A", room: "R-210", type: 'kuliah' },
+      { day: 'Jum', time: "10:00–11:40", course: "Rekayasa Perangkat Lunak", cls: "C", room: "R-110", type: 'kuliah' },
     ];
 
-    const [filter, setFilter] = useState<'all' | 'kuliah' | 'agenda'>('all');
-    const weekFiltered = scheduleWeek.filter((it) =>
-      filter === 'all' ? true : filter === 'kuliah' ? it.type === 'kuliah' : it.type !== 'kuliah'
+    // Helpers: sort by day then start time, and by start time within a day
+    const dayOrder = useMemo<Record<DosenWeekItem['day'], number>>(
+      () => ({ Min: 0, Sen: 1, Sel: 2, Rab: 3, Kam: 4, Jum: 5, Sab: 6 }),
+      []
     );
+    const dayLabel = useMemo<Record<DosenWeekItem['day'], string>>(
+      () => ({ Min: 'Minggu', Sen: 'Senin', Sel: 'Selasa', Rab: 'Rabu', Kam: 'Kamis', Jum: 'Jumat', Sab: 'Sabtu' }),
+      []
+    );
+    const dayColor = useMemo<Record<DosenWeekItem['day'], string>>(
+      () => ({
+        Min: 'bg-pink-500 text-white',
+        Sen: 'bg-blue-500 text-white',
+        Sel: 'bg-green-500 text-white',
+        Rab: 'bg-orange-500 text-white',
+        Kam: 'bg-purple-500 text-white',
+        Jum: 'bg-red-500 text-white',
+        Sab: 'bg-indigo-500 text-white',
+      }),
+      []
+    );
+    const parseStartMinutes = (time: string) => {
+      const start = time.split(/[–-]/)[0]?.trim() ?? '';
+      const [hh, mm] = start.split(':').map((v) => parseInt(v, 10));
+      if (Number.isNaN(hh) || Number.isNaN(mm)) return 0;
+      return hh * 60 + mm;
+    };
+    const weekKuliahSorted = useMemo(
+      () =>
+        scheduleWeek
+          .filter((it) => it.type === 'kuliah')
+          .slice()
+          .sort((a, b) => dayOrder[a.day] - dayOrder[b.day] || parseStartMinutes(a.time) - parseStartMinutes(b.time)),
+      [scheduleWeek, dayOrder]
+    );
+
+    // (Reverted) No grouping headers; list items with aligned day and time
+
+    // Hari Ini: hanya jadwal kuliah pada hari ini
+    // Override: 'Hari Ini' menampilkan jadwal hari Senin sesuai permintaan
+    const todayCode = useMemo<DosenWeekItem['day']>(() => 'Sen', []);
+    const todayKuliah = useMemo(
+      () =>
+        scheduleWeek
+          .filter((it) => it.day === todayCode)
+          .slice()
+          .sort((a, b) => parseStartMinutes(a.time) - parseStartMinutes(b.time)),
+      [scheduleWeek, todayCode]
+    );
+
+    // Week view now always shows all kuliah this week (exclude ujian/agenda)
 
     return (
       <SimpleLayout title="Jadwal Dosen">
@@ -60,45 +104,46 @@ export default function Schedule() {
                 activeTab === 'week' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
               }`}
             >
-              Minggu Ini
+              Semua
             </button>
           </div>
         </div>
 
         {activeTab === 'today' ? (
           <div className="space-y-3">
-            {scheduleToday.map((s, idx) => (
-              <div key={idx} className="p-3 rounded-xl border border-gray-200 bg-white/60">
-                <div className="flex items-center justify-between text-sm">
-                  <div className="font-semibold text-gray-900">{s.course} ({s.cls})</div>
-                  <div className="text-gray-600">{s.time}</div>
+            {todayKuliah.length === 0 ? (
+              <div className="p-4 rounded-xl border border-gray-200 bg-white/60 text-sm text-gray-600">Tidak ada jadwal kuliah hari ini.</div>
+            ) : (
+              todayKuliah.map((s, idx) => (
+                <div key={idx} className="p-4 rounded-xl border border-gray-200 bg-white/60">
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="font-semibold text-gray-900">{s.course}{s.cls ? ` (${s.cls})` : ''}</div>
+                    <div className="w-32 text-right text-gray-600">{s.time}</div>
+                  </div>
+                  <div className="mt-1 text-[12px] text-gray-600">Ruangan: <span className="font-medium text-gray-900">{s.room}</span></div>
                 </div>
-                <div className="mt-1 text-[12px] text-gray-600">Ruangan: <span className="font-medium text-gray-900">{s.room}</span></div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         ) : (
-          <>
-            {/* Filter chips */}
-            <div className="mb-3 flex items-center gap-2">
-              <button onClick={() => setFilter('all')} className={`px-3 py-1.5 rounded-full text-xs border ${filter==='all' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-200'}`}>Semua</button>
-              <button onClick={() => setFilter('kuliah')} className={`px-3 py-1.5 rounded-full text-xs border ${filter==='kuliah' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-200'}`}>Kuliah</button>
-              <button onClick={() => setFilter('agenda')} className={`px-3 py-1.5 rounded-full text-xs border ${filter==='agenda' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-200'}`}>Agenda</button>
-            </div>
-            <div className="space-y-3">
-              {weekFiltered.map((s, idx) => (
-                <div key={idx} className="p-3 rounded-xl border border-gray-200 bg-white/60 text-sm">
+          <div className="space-y-3">
+            {weekKuliahSorted.map((s, idx) => (
+              <div key={idx} className="flex rounded-xl border border-gray-200 bg-white/60 overflow-hidden">
+                <div className={`w-28 px-4 py-4 text-sm font-semibold flex items-center ${dayColor[s.day]}`}>
+                  {dayLabel[s.day]}
+                </div>
+                <div className="flex-1 p-4 text-sm">
                   <div className="flex items-center justify-between">
                     <div className="font-semibold text-gray-900">
                       {s.course}{s.cls ? ` (${s.cls})` : ''}
                     </div>
-                    <div className="text-gray-600">{s.day} {s.time}</div>
+                    <div className="w-32 text-right text-gray-600">{s.time}</div>
                   </div>
                   <div className="mt-1 text-[12px] text-gray-600">Ruang: <span className="font-medium text-gray-900">{s.room}</span></div>
                 </div>
-              ))}
-            </div>
-          </>
+              </div>
+            ))}
+          </div>
         )}
       </SimpleLayout>
     );
