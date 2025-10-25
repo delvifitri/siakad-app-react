@@ -97,9 +97,18 @@ export default function DosenProfile() {
               <div className="font-medium">Web, Basis Data, Jaringan</div>
             </div>
           </div>
-          {/* Ganti tombol aksi menjadi satu tombol Logout */}
-          <div className="mt-4">
-            <button onClick={logout} className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-white bg-red-600 text-sm">
+          {/* Tombol aksi: Edit Profil & Logout */}
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <button
+              onClick={() => navigate('/edit-profile')}
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-white bg-orange-500 hover:bg-orange-600 text-sm"
+            >
+              <PencilSquareIcon className="w-5 h-5"/> Edit Profil
+            </button>
+            <button
+              onClick={logout}
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-white bg-red-600 hover:bg-red-700 text-sm"
+            >
               <ArrowRightOnRectangleIcon className="w-5 h-5"/> Logout
             </button>
           </div>
