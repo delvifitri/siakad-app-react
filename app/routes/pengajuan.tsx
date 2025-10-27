@@ -5,6 +5,10 @@ import { useNavigate } from "react-router";
 export default function Pengajuan() {
   const navigate = useNavigate();
   const [tab, setTab] = useState<"ta" | "cuti">("ta");
+  // Nilai ringkasan (dummy) untuk TA dan Pendadaran
+  const nilaiTaAvg = 81; // rata-rata komponen TA
+  const nilaiPendadaranAvg = 80; // rata-rata nilai pendadaran
+  const hasilAkhir = (nilaiTaAvg + nilaiPendadaranAvg) / 2; // gabungan TA + Pendadaran (desimal)
   // State untuk data Tugas Akhir sederhana
   const [ta, setTa] = useState<{
     judul: string;
@@ -129,9 +133,9 @@ export default function Pengajuan() {
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Hasil Nilai TA</span>
+                  <span className="text-gray-600">Hasil Nilai</span>
                   <span className="flex items-center gap-2">
-                    <span className="font-semibold text-gray-900">80</span>
+                    <span className="font-semibold text-gray-900">{hasilAkhir.toFixed(1)}</span>
                     <button
                       type="button"
                       className="px-2 py-0.5 rounded-full text-white bg-blue-600 hover:bg-blue-700 text-xs"
@@ -392,26 +396,15 @@ export default function Pengajuan() {
             </div>
             <div className="mt-4 text-sm">
               {detailTab === 'ta' ? (
-                <div className="space-y-2">
+                <div className="space-y-3">
+                  {/* Tampilkan langsung hasil akhir tanpa komponen detail */}
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Proposal</span>
-                    <span className="font-medium text-gray-900">80</span>
+                    <span className="text-gray-800 font-semibold">Rata-rata Nilai TA</span>
+                    <span className="font-semibold text-gray-900">{nilaiTaAvg.toFixed(1)}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Metodologi</span>
-                    <span className="font-medium text-gray-900">78</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Implementasi</span>
-                    <span className="font-medium text-gray-900">82</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Presentasi</span>
-                    <span className="font-medium text-gray-900">85</span>
-                  </div>
-                  <div className="pt-2 border-t mt-2 flex items-center justify-between">
-                    <span className="text-gray-800 font-semibold">Rata-rata</span>
-                    <span className="font-semibold text-gray-900">81</span>
+                    <span className="text-gray-600">Status</span>
+                    <span className="px-2 py-0.5 rounded-full text-xs border bg-green-100 text-green-700 border-green-200">Lulus</span>
                   </div>
                 </div>
               ) : (
@@ -430,7 +423,7 @@ export default function Pengajuan() {
                   </div>
                   <div className="pt-2 border-t mt-2 flex items-center justify-between">
                     <span className="text-gray-800 font-semibold">Rata-rata</span>
-                    <span className="font-semibold text-gray-900">80</span>
+                    <span className="font-semibold text-gray-900">{nilaiPendadaranAvg.toFixed(1)}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-gray-600">Status</span>
