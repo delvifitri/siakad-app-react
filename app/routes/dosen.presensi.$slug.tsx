@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import DosenLayout from "../layouts/DosenLayout";
-import { CheckCircleIcon, ExclamationTriangleIcon, XCircleIcon, ClockIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { CheckCircleIcon, ExclamationTriangleIcon, XCircleIcon, ClockIcon, ArrowLeftIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 export function meta() {
   return [{ title: "Detail Presensi - Siakad" }];
@@ -74,12 +74,24 @@ export default function DosenPresensiDetail() {
     setPendingPresensi(pp);
   }, [slug]);
 
+  // search state for filtering the displayed student lists
+  const [searchField, setSearchField] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+
+  const filteredStudents = (() => {
+    const q = (searchQuery || "").toString().trim().toLowerCase();
+    if (!q) return dummyStudents;
+    if (searchField === "name") return dummyStudents.filter((s) => s.name.toLowerCase().includes(q));
+    if (searchField === "nim") return dummyStudents.filter((s) => s.nim.toLowerCase().includes(q));
+    return dummyStudents.filter((s) => s.name.toLowerCase().includes(q) || s.nim.toLowerCase().includes(q));
+  })();
+
   const updatePresensi = (nim: string, status: string) => setPresensi((prev) => ({ ...prev, [nim]: status }));
   const updateKeterangan = (nim: string, text: string) => setKeterangan((prev) => ({ ...prev, [nim]: text }));
   const toggleSelected = (nim: string) => setSelected((prev) => ({ ...prev, [nim]: !prev[nim] }));
 
   const toggleSelectAll = (filled: boolean) => {
-    const list = dummyStudents.filter((s) => ((presensi[s.nim] ?? "") !== "") === filled).map((s) => s.nim);
+    const list = filteredStudents.filter((s) => ((presensi[s.nim] ?? "") !== "") === filled).map((s) => s.nim);
     const allSelected = list.length > 0 && list.every((nim) => !!selected[nim]);
     setSelected((prev) => {
       const next = { ...prev };
@@ -102,7 +114,7 @@ export default function DosenPresensiDetail() {
   };
 
   const approveSelected = () => {
-    const list = dummyStudents.filter((s) => (presensi[s.nim] ?? "") !== "" && selected[s.nim]).map((s) => s.nim);
+    const list = filteredStudents.filter((s) => (presensi[s.nim] ?? "") !== "" && selected[s.nim]).map((s) => s.nim);
     if (list.length === 0) return;
     setApproved((prev) => {
       const next = { ...prev };
@@ -114,7 +126,7 @@ export default function DosenPresensiDetail() {
   };
 
   const cancelApproveSelected = () => {
-    const list = dummyStudents
+    const list = filteredStudents
       .filter((s) => (presensi[s.nim] ?? "") !== "" && selected[s.nim] && approved[s.nim])
       .map((s) => s.nim);
     if (list.length === 0) return;
@@ -130,7 +142,7 @@ export default function DosenPresensiDetail() {
   };
 
   const manualPresensi = () => {
-    const list = dummyStudents
+    const list = filteredStudents
       .filter((s) => (presensi[s.nim] ?? "") === "" && selected[s.nim])
       .map((s) => s.nim);
     if (list.length === 0) return;
@@ -160,12 +172,12 @@ export default function DosenPresensiDetail() {
   };
 
   const allSelectedSudah =
-    dummyStudents.filter((s) => (presensi[s.nim] ?? "") !== "").length > 0 &&
-    dummyStudents.filter((s) => (presensi[s.nim] ?? "") !== "").every((s) => !!selected[s.nim]);
+    filteredStudents.filter((s) => (presensi[s.nim] ?? "") !== "").length > 0 &&
+    filteredStudents.filter((s) => (presensi[s.nim] ?? "") !== "").every((s) => !!selected[s.nim]);
 
   const allSelectedBelum =
-    dummyStudents.filter((s) => (presensi[s.nim] ?? "") === "").length > 0 &&
-    dummyStudents.filter((s) => (presensi[s.nim] ?? "") === "").every((s) => !!selected[s.nim]);
+    filteredStudents.filter((s) => (presensi[s.nim] ?? "") === "").length > 0 &&
+    filteredStudents.filter((s) => (presensi[s.nim] ?? "") === "").every((s) => !!selected[s.nim]);
 
   const savePresensi = () => {
     // no persistence to localStorage — keep presensi in state only
@@ -203,6 +215,37 @@ export default function DosenPresensiDetail() {
           {/* action buttons removed as requested */}
         </div>
 
+        {/* search controls: field selector + query input */}
+        <div className="flex items-center gap-3 mb-4">
+          <div>
+            <label htmlFor="search-field" className="sr-only">Filter</label>
+            <select
+              id="search-field"
+              value={searchField}
+              onChange={(e) => setSearchField(e.target.value)}
+              className="px-3 py-2 border border-transparent bg-white rounded-full text-sm shadow-sm"
+            >
+              <option value="all">Semua</option>
+              <option value="name">Nama</option>
+              <option value="nim">NIM</option>
+            </select>
+          </div>
+
+          <div className="relative flex-1">
+            <span className="absolute inset-y-0 left-3 flex items-center text-gray-400">
+              <MagnifyingGlassIcon className="w-5 h-5" />
+            </span>
+            <label htmlFor="search-query" className="sr-only">Cari mahasiswa</label>
+            <input
+              id="search-query"
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Cari (nama atau NIM)"
+              className="w-full pl-10 pr-3 py-2 border border-transparent bg-white rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm shadow-sm"
+            />
+          </div>
+        </div>
         <div className="space-y-4">
           <section className="bg-white/60 rounded-xl border border-gray-200 p-3">
             <div className="flex items-center justify-between mb-3">
@@ -217,11 +260,11 @@ export default function DosenPresensiDetail() {
             </div>
 
             <div className="space-y-3">
-              {dummyStudents.filter((s) => (presensi[s.nim] ?? "") !== "").length === 0 && (
+              {filteredStudents.filter((s) => (presensi[s.nim] ?? "") !== "").length === 0 && (
                 <div className="text-sm text-gray-600">Belum ada yang dipresensi.</div>
               )}
 
-              {dummyStudents
+              {filteredStudents
                 .filter((s) => (presensi[s.nim] ?? "") !== "")
                 .map((s) => (
                   <div key={s.nim} className="flex items-center justify-between p-3 rounded-lg bg-white shadow-sm">
@@ -298,11 +341,11 @@ export default function DosenPresensiDetail() {
             </div>
 
             <div className="space-y-3">
-              {dummyStudents.filter((s) => (presensi[s.nim] ?? "") === "").length === 0 && (
+              {filteredStudents.filter((s) => (presensi[s.nim] ?? "") === "").length === 0 && (
                 <div className="text-sm text-gray-600">Semua mahasiswa sudah dipresensi.</div>
               )}
 
-              {dummyStudents
+              {filteredStudents
                 .filter((s) => (presensi[s.nim] ?? "") === "")
                 .map((s) => (
                   <div key={s.nim} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 rounded-lg bg-white shadow-sm gap-3">
