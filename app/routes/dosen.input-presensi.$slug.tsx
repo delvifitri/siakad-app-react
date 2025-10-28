@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router";
 import DosenLayout from "../layouts/DosenLayout";
-import { CheckCircleIcon, ExclamationTriangleIcon, XCircleIcon, ClockIcon } from "@heroicons/react/24/outline";
+import { CheckCircleIcon, ExclamationTriangleIcon, XCircleIcon, ClockIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
 
 export function meta() {
   return [{ title: "Input Presensi - Siakad" }];
@@ -81,8 +81,8 @@ export default function DosenInputPresensi() {
     <DosenLayout bgImage="/bg simple.png">
       <section className="px-4 pt-6">
         <div className="flex items-center gap-2 mb-4">
-          <button onClick={() => navigate(-1)} className="p-2 rounded-full bg-white/60 hover:bg-white/80">
-            ←
+          <button onClick={() => navigate(-1)} className="inline-flex items-center gap-2 text-sm text-blue-600 hover:underline">
+            <ArrowLeftIcon className="w-5 h-5" />
           </button>
           <div>
             <h1 className="text-xl font-bold text-gray-900">Input Presensi</h1>
