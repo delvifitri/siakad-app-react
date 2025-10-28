@@ -7,6 +7,8 @@ export default [
 	route("dosen", "routes/dosen.tsx"),
 	// Dosen-scoped sections
 	route("dosen/nilai-presensi", "routes/dosen.nilai-presensi.tsx"),
+	route("dosen/input-presensi/:slug", "routes/dosen.input-presensi.$slug.tsx"),
+	route("dosen/presensi/:slug", "routes/dosen.presensi.$slug.tsx"),
 	route("dosen/bimbingan-akademik", "routes/dosen.bimbingan-akademik.tsx"),
 	route("dosen/ujian", "routes/dosen.ujian.tsx"),
 	route("dosen/bimbingan", "routes/dosen.bimbingan.tsx"),

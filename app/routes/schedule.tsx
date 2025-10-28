@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router";
 import SimpleLayout from "../layouts/SimpleLayout";
 
 interface ScheduleItem {
@@ -11,6 +12,7 @@ interface ScheduleItem {
 
 export default function Schedule() {
   const [activeTab, setActiveTab] = useState<'today' | 'week'>('today');
+  const navigate = useNavigate();
 
   const isDosen = useMemo(() => {
     try {
@@ -22,15 +24,15 @@ export default function Schedule() {
 
   // Dosen-specific view (moved from Dosen dashboard quick preview)
   if (isDosen) {
-    type DosenWeekItem = { day: 'Min' | 'Sen' | 'Sel' | 'Rab' | 'Kam' | 'Jum' | 'Sab'; time: string; course: string; cls?: string; room: string; type: 'kuliah' };
+    type DosenWeekItem = { day: 'Min' | 'Sen' | 'Sel' | 'Rab' | 'Kam' | 'Jum' | 'Sab'; time: string; course: string; cls?: string; room: string; type: 'kuliah'; code: string };
     // Semua: jadwal kuliah Senin s/d Jumat
     const scheduleWeek: DosenWeekItem[] = [
-      { day: 'Sen', time: "08:00–09:40", course: "Pemrograman Web", cls: "A", room: "R-301", type: 'kuliah' },
-      { day: 'Sen', time: "10:00–11:40", course: "Basis Data", cls: "B", room: "R-205", type: 'kuliah' },
-      { day: 'Sel', time: "09:00–10:40", course: "Algoritma & Struktur Data", cls: "B", room: "R-204", type: 'kuliah' },
-      { day: 'Rab', time: "13:30–15:10", course: "Jaringan Komputer", cls: "A", room: "Lab-2", type: 'kuliah' },
-      { day: 'Kam', time: "08:00–09:40", course: "Sistem Operasi", cls: "A", room: "R-210", type: 'kuliah' },
-      { day: 'Jum', time: "10:00–11:40", course: "Rekayasa Perangkat Lunak", cls: "C", room: "R-110", type: 'kuliah' },
+      { day: 'Sen', time: "08:00–09:40", course: "Pemrograman Web", cls: "A", room: "R-301", type: 'kuliah', code: "IF301" },
+      { day: 'Sen', time: "10:00–11:40", course: "Basis Data", cls: "B", room: "R-205", type: 'kuliah', code: "IF205" },
+      { day: 'Sel', time: "09:00–10:40", course: "Algoritma & Struktur Data", cls: "B", room: "R-204", type: 'kuliah', code: "IF102" },
+      { day: 'Rab', time: "13:30–15:10", course: "Jaringan Komputer", cls: "A", room: "Lab-2", type: 'kuliah', code: "IF210" },
+      { day: 'Kam', time: "08:00–09:40", course: "Sistem Operasi", cls: "A", room: "R-210", type: 'kuliah', code: "IF401" },
+      { day: 'Jum', time: "10:00–11:40", course: "Rekayasa Perangkat Lunak", cls: "C", room: "R-110", type: 'kuliah', code: "IF501" },
     ];
 
     // Helpers: sort by day then start time, and by start time within a day
@@ -114,21 +116,26 @@ export default function Schedule() {
             {todayKuliah.length === 0 ? (
               <div className="p-4 rounded-xl border border-gray-200 bg-white/60 text-sm text-gray-600">Tidak ada jadwal kuliah hari ini.</div>
             ) : (
-              todayKuliah.map((s, idx) => (
-                <div key={idx} className="p-4 rounded-xl border border-gray-200 bg-white/60">
+              todayKuliah.map((s, idx) => {
+                const slug = `${s.code}-${s.cls}`.toLowerCase().replace(/\s+/g, '-');
+                return (
+                <button key={idx} onClick={() => navigate(`/dosen/input-presensi/${slug}`, { state: { course: s.course, cls: s.cls, code: s.code, time: s.time, room: s.room } })} className="w-full text-left p-4 rounded-xl border border-gray-200 bg-white/60 hover:bg-white/80 transition-colors">
                   <div className="flex items-center justify-between text-sm">
                     <div className="font-semibold text-gray-900">{s.course}{s.cls ? ` (${s.cls})` : ''}</div>
                     <div className="w-32 text-right text-gray-600">{s.time}</div>
                   </div>
                   <div className="mt-1 text-[12px] text-gray-600">Ruangan: <span className="font-medium text-gray-900">{s.room}</span></div>
-                </div>
-              ))
+                </button>
+                );
+              })
             )}
           </div>
         ) : (
           <div className="space-y-3">
-            {weekKuliahSorted.map((s, idx) => (
-              <div key={idx} className="flex rounded-xl border border-gray-200 bg-white/60 overflow-hidden">
+            {weekKuliahSorted.map((s, idx) => {
+              const slug = `${s.code}-${s.cls}`.toLowerCase().replace(/\s+/g, '-');
+              return (
+              <button key={idx} onClick={() => navigate(`/dosen/input-presensi/${slug}`, { state: { course: s.course, cls: s.cls, code: s.code, time: s.time, room: s.room } })} className="w-full text-left flex rounded-xl border border-gray-200 bg-white/60 hover:bg-white/80 transition-colors overflow-hidden">
                 <div className={`w-28 px-4 py-4 text-sm font-semibold flex items-center ${dayColor[s.day]}`}>
                   {dayLabel[s.day]}
                 </div>
@@ -141,8 +148,9 @@ export default function Schedule() {
                   </div>
                   <div className="mt-1 text-[12px] text-gray-600">Ruang: <span className="font-medium text-gray-900">{s.room}</span></div>
                 </div>
-              </div>
-            ))}
+              </button>
+              );
+            })}
           </div>
         )}
       </SimpleLayout>
