@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import DosenLayout from "../layouts/DosenLayout";
-import { CheckCircleIcon, ExclamationTriangleIcon, XCircleIcon, ClockIcon, ArrowLeftIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { CheckCircleIcon, ExclamationTriangleIcon, XCircleIcon, ClockIcon, ArrowLeftIcon, MagnifyingGlassIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 
 export function meta() {
   return [{ title: "Detail Presensi - Siakad" }];
@@ -201,6 +201,34 @@ export default function DosenPresensiDetail() {
     setTimeout(() => setToast(null), 2000);
   };
 
+  const downloadPresensi = () => {
+    // build CSV from current state
+    const headers = ["NIM", "Nama", "Status", "Keterangan", "Approved"];
+    const rows = dummyStudents.map((s) => {
+      const status = presensi[s.nim] ?? "";
+      const ket = keterangan[s.nim] ?? "";
+      const ap = approved[s.nim] ? "YA" : "";
+      // escape quotes
+      const esc = (v: string) => `"${(v || "").replace(/"/g, '""')}"`;
+      return [esc(s.nim), esc(s.name), esc(status), esc(ket), esc(ap)].join(",");
+    });
+
+    const csv = [headers.join(","), ...rows].join("\r\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    const name = `presensi-${slug || "session"}.csv`;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    setToast(`Presensi diunduh: ${name}`);
+    setTimeout(() => setToast(null), 2500);
+  };
+
   return (
     <DosenLayout bgImage="/bg simple.png">
       <section className="px-4 pt-6">
@@ -212,7 +240,18 @@ export default function DosenPresensiDetail() {
             <h1 className="text-xl font-bold text-gray-900">Detail Presensi</h1>
             <p className="text-sm text-gray-600">{session ? `${session.topik || ""} — ${session.pertemuan || ""}` : "Sesi belum terisi"}</p>
           </div>
-          {/* action buttons removed as requested */}
+          {/* download presensi */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={downloadPresensi}
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-blue-600 text-white text-sm shadow-sm hover:bg-blue-700"
+              title="Unduh presensi"
+              aria-label="Unduh presensi"
+            >
+              <ArrowDownTrayIcon className="w-5 h-5" />
+              <span>Download</span>
+            </button>
+          </div>
         </div>
 
         {/* search controls: field selector + query input */}
