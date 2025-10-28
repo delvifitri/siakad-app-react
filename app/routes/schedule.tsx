@@ -122,7 +122,7 @@ export default function Schedule() {
                 <button key={idx} onClick={() => navigate(`/dosen/input-presensi/${slug}`, { state: { course: s.course, cls: s.cls, code: s.code, time: s.time, room: s.room } })} className="w-full text-left p-4 rounded-xl border border-gray-200 bg-white/60 hover:bg-white/80 transition-colors">
                   <div className="flex items-center justify-between text-sm">
                     <div className="font-semibold text-gray-900">{s.course}{s.cls ? ` (${s.cls})` : ''}</div>
-                    <div className="w-32 text-right text-gray-600">{s.time}</div>
+                    <div className="w-32 flex-shrink-0 text-right text-gray-600">{s.time}</div>
                   </div>
                   <div className="mt-1 text-[12px] text-gray-600">Ruangan: <span className="font-medium text-gray-900">{s.room}</span></div>
                 </button>
@@ -136,7 +136,7 @@ export default function Schedule() {
               const slug = `${s.code}-${s.cls}`.toLowerCase().replace(/\s+/g, '-');
               return (
               <button key={idx} onClick={() => navigate(`/dosen/input-presensi/${slug}`, { state: { course: s.course, cls: s.cls, code: s.code, time: s.time, room: s.room } })} className="w-full text-left flex rounded-xl border border-gray-200 bg-white/60 hover:bg-white/80 transition-colors overflow-hidden">
-                <div className={`w-28 px-4 py-4 text-sm font-semibold flex items-center ${dayColor[s.day]}`}>
+                <div className={`w-24 flex-shrink-0 flex items-start pl-3 py-4 text-sm font-semibold ${dayColor[s.day]}`}>
                   {dayLabel[s.day]}
                 </div>
                 <div className="flex-1 p-4 text-sm">
@@ -266,7 +266,7 @@ export default function Schedule() {
                 </div>
                 <div className="flex">
                   <span className="w-16 font-medium">Jam</span>
-                  <span>: {item.time}</span>
+                  <span className="flex-1 text-right">: {item.time}</span>
                 </div>
                 <div className="flex">
                   <span className="w-16 font-medium">Ruang</span>
@@ -288,7 +288,7 @@ export default function Schedule() {
                   </div>
                   <div className="flex">
                     <span className="w-16 font-medium">Jam</span>
-                    <span>: {item.time}</span>
+                    <span className="flex-1 text-right">: {item.time}</span>
                   </div>
                   <div className="flex">
                     <span className="w-16 font-medium">Ruang</span>

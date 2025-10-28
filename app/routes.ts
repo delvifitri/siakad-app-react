@@ -9,6 +9,7 @@ export default [
 	route("dosen/nilai-presensi", "routes/dosen.nilai-presensi.tsx"),
 	route("dosen/input-presensi/:slug", "routes/dosen.input-presensi.$slug.tsx"),
 	route("dosen/input-nilai/:code", "routes/dosen.input-nilai.$code.tsx"),
+	route("dosen/set-komponen-nilai/:code", "routes/dosen.set-komponen-nilai.$code.tsx"),
 	route("dosen/presensi/:slug", "routes/dosen.presensi.$slug.tsx"),
 	route("dosen/bimbingan-akademik", "routes/dosen.bimbingan-akademik.tsx"),
 	route("dosen/ujian", "routes/dosen.ujian.tsx"),
