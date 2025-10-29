@@ -1,5 +1,6 @@
 import DosenLayout from "../layouts/DosenLayout";
 import { useEffect, useMemo } from "react";
+import { useKrsContext } from "../context/KrsContext";
 import { useNavigate } from "react-router";
 import HeaderIcons from "../components/HeaderIcons";
 import QuickAction from "../components/QuickAction";
@@ -52,6 +53,11 @@ export default function DosenDashboard() {
     }
   }, []);
   const classesToday = scheduleToday.length;
+  const { submission } = useKrsContext();
+  const approvedCount = submission.items.filter((i) => i.status === "disetujui").length;
+  const totalKrs = submission.items.length;
+  const krsSummary = `${approvedCount}/${totalKrs}`;
+  // legacy single-number placeholder kept for compatibility where needed
   const krsPending = 3; // ringkas sesuai kartu
   const bimbinganCount = 12; // dummy
   const activeCourses = 5; // dummy mata kuliah aktif semester ini
@@ -74,8 +80,8 @@ export default function DosenDashboard() {
           <a href="/dosen/bimbingan-akademik" className="block" aria-label="Bimbingan Akademik">
           <StatCard variant="small" wrapTitle icon={<UserGroupIcon className="w-6 h-6 text-green-600" />} title="Bimbingan Akademik" value={bimbinganCount} />
           </a>
-          <a href="/status-krs" className="block" aria-label="Approve KRS">
-          <StatCard variant="small" wrapTitle icon={<DocumentCheckIcon className="w-6 h-6 text-purple-600" />} title="Approve KRS" value={krsPending} />
+          <a href="/dosen/approve-krs" className="block" aria-label="Approve KRS">
+          <StatCard variant="small" wrapTitle icon={<DocumentCheckIcon className="w-6 h-6 text-purple-600" />} title="Approve KRS" value={krsSummary} />
           </a>
           <div className="block">
           <StatCard variant="small" wrapTitle icon={<AcademicCapIcon className="w-6 h-6 text-orange-500" />} title="Ujian Pendadaran" value={examsThisWeek} />

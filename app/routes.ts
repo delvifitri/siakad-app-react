@@ -7,6 +7,9 @@ export default [
 	route("dosen", "routes/dosen.tsx"),
 	// Dosen-scoped sections
 	route("dosen/nilai-presensi", "routes/dosen.nilai-presensi.tsx"),
+	// Dosen: approve KRS pages
+	route("dosen/approve-krs", "routes/dosen.approve-krs.tsx"),
+	route("dosen/approve-krs/:nim", "routes/dosen.approve-krs.$nim.tsx"),
 	route("dosen/input-presensi/:slug", "routes/dosen.input-presensi.$slug.tsx"),
 	route("dosen/input-nilai/:code", "routes/dosen.input-nilai.$code.tsx"),
 	route("dosen/set-komponen-nilai/:code", "routes/dosen.set-komponen-nilai.$code.tsx"),
