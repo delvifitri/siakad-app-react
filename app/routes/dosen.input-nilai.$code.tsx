@@ -397,34 +397,39 @@ export default function DosenInputNilai() {
               const g = gradeFromScore(row.akhir ?? 0);
               return (
                 <div key={s.nim} className="bg-white rounded-xl p-3 border border-gray-200">
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-start justify-between mb-2">
                     <div>
                       <div className="font-medium">{s.name}</div>
                       <div className="text-xs text-gray-600">{s.nim}</div>
                     </div>
-                    {/* overall score display removed from card header per request */}
+                    <div className="text-right">
+                      <div className="text-sm font-semibold">{(g?.index ?? 0).toFixed(2)}</div>
+                      <div className="text-xs text-gray-600">{g?.letter ?? "-"}</div>
+                    </div>
                   </div>
 
                   <div className="space-y-2">
                     {komponen.map((k) => (
-                      <div key={k.key} className="grid grid-cols-3 gap-2 items-center">
-                        <div className="col-span-2">
-                          <label className="block text-xs text-gray-600 mb-1">
-                            {k.label} <span className="text-xs text-gray-500">({k.bobot}%)</span>
-                          </label>
-                          <input
-                            type="number"
-                            min={0}
-                            max={100}
-                            value={row[k.key] ?? 0}
-                            onChange={(e) => update(s.nim, k.key, e.target.value)}
-                            className="w-full px-3 py-2 border rounded-md"
-                          />
-                        </div>
-                        <div className="col-span-1 text-right">
-                          <div className="text-sm font-semibold">{(g?.index ?? 0).toFixed(2)}</div>
-                          <div className="text-xs text-gray-600">{g?.letter ?? "-"}</div>
-                        </div>
+                      <div key={k.key} className="">
+                        <label className="block text-xs text-gray-600 mb-1">
+                          {k.label} <span className="text-xs text-gray-500">({k.bobot}%)</span>
+                        </label>
+                        <input
+                          type="number"
+                          min={0}
+                          max={100}
+                          value={row[k.key] ?? 0}
+                          onChange={(e) => update(s.nim, k.key, e.target.value)}
+                          className="w-full px-3 py-2 border rounded-md"
+                        />
+
+                        {/* If this component is UAS, show final score below it on mobile */}
+                        {k.key === "uas" && (
+                          <div className="mt-2 p-2 bg-gray-50 border rounded text-right">
+                            <div className="text-sm font-semibold">{(row.akhir ?? 0).toFixed(2)}</div>
+                            <div className="text-xs text-gray-500">Nilai Akhir</div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>

@@ -26,7 +26,7 @@ export default function DosenNilaiPresensi() {
     <DosenLayout bgImage="/bg simple.png">
       <section className="px-4 pt-6">
         <h1 className="text-xl font-bold text-gray-900">Nilai & Presensi</h1>
-        <p className="text-sm text-gray-600 mt-1">Kelola nilai dan presensi untuk mata kuliah yang Anda ampuh.</p>
+        <p className="text-sm text-gray-600 mt-1">Kelola nilai dan presensi untuk mata kuliah yang Anda ampu.</p>
 
         <div className="mt-4 space-y-3">
           {courses.map((c) => {
