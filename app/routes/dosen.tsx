@@ -90,8 +90,8 @@ export default function DosenDashboard() {
 
         {/* Shortcut Aksi Cepat */}
   <div className="grid grid-cols-3 gap-3 mt-6">
-  <QuickAction size="lg" centered icon={<AcademicCapIcon className="w-7 h-7 mb-2 text-white" />} label="Input Nilai" className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white" to="/dosen/nilai-presensi" />
-  <QuickAction size="lg" centered icon={<ClipboardDocumentCheckIcon className="w-7 h-7 mb-2 text-white" />} label="Input Presensi" className="bg-gradient-to-br from-sky-500 to-blue-600 text-white" to="/dosen/input-presensi" />
+  <QuickAction size="lg" centered icon={<AcademicCapIcon className="w-7 h-7 mb-2 text-white" />} label="Lihat Nilai" className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white" to="/dosen/nilai-presensi" />
+  <QuickAction size="lg" centered icon={<CalendarDaysIcon className="w-7 h-7 mb-2 text-white" />} label="Input Presensi" className="bg-gradient-to-br from-sky-500 to-blue-600 text-white" to="/schedule" />
   <QuickAction size="lg" centered icon={<DocumentTextIcon className="w-7 h-7 mb-2 text-white" />} label="Kelola RPS" className="bg-gradient-to-br from-emerald-500 to-green-600 text-white" to="/dosen/kelola-rps" />
     </div>
 
@@ -107,7 +107,7 @@ export default function DosenDashboard() {
           </div>
         </div>
 
-        {/* Jadwal dipindahkan ke halaman Lihat Jadwal */}
+        {/* Jadwal dipindahkan ke halaman Input Presensi */}
       </section>
     </DosenLayout>
   );
