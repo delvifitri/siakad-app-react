@@ -8,9 +8,9 @@ export function meta() {
 }
 
 const courses = [
-  { code: "IF301", name: "Pemrograman Web", cls: "A", mahasiswa: 32 },
-  { code: "IF205", name: "Basis Data", cls: "B", mahasiswa: 28 },
-  { code: "IF210", name: "Jaringan Komputer", cls: "A", mahasiswa: 30 },
+  { code: "IF301", name: "Pemrograman Web", cls: "A", mahasiswa: 32, time: "08:00–09:40", room: "R-301" },
+  { code: "IF205", name: "Basis Data", cls: "B", mahasiswa: 28, time: "10:00–11:40", room: "R-205" },
+  { code: "IF210", name: "Jaringan Komputer", cls: "A", mahasiswa: 30, time: "13:30–15:10", room: "Lab-2" },
 ];
 
 export default function DosenNilaiPresensi() {
@@ -40,11 +40,11 @@ export default function DosenNilaiPresensi() {
                 </div>
                 <div className="w-full sm:w-[20rem]">
                   <div className="grid grid-cols-2 gap-2">
-                    <button onClick={() => navigate(`/dosen/input-nilai/${c.code}`, { state: { course: c.name, cls: c.cls, code: c.code, mahasiswa: c.mahasiswa } })} className="inline-flex items-center justify-center gap-1 px-3 h-10 rounded-full text-xs text-white bg-blue-600 hover:bg-blue-700 w-full">
-                      <AcademicCapIcon className="w-4 h-4"/> Input Nilai
+                    <button onClick={() => navigate(`/dosen/input-nilai/${c.code}`, { state: { course: c.name, cls: c.cls, code: c.code, mahasiswa: c.mahasiswa, time: c.time, room: c.room } })} className="inline-flex items-center justify-center gap-1 px-3 h-10 rounded-full text-xs text-white bg-blue-600 hover:bg-blue-700 w-full">
+                      <AcademicCapIcon className="w-4 h-4"/> Lihat Nilai
                     </button>
-                    <button onClick={() => navigate(`/dosen/input-presensi/${slug}`, { state: { course: c.name, cls: c.cls, code: c.code, mahasiswa: c.mahasiswa } })} className="inline-flex items-center justify-center gap-1 px-3 h-10 rounded-full text-xs text-white bg-orange-500 hover:bg-orange-600 w-full">
-                      <ClipboardDocumentCheckIcon className="w-4 h-4"/> Input Presensi
+                    <button onClick={() => navigate(`/dosen/input-presensi/${slug}`, { state: { course: c.name, cls: c.cls, code: c.code, mahasiswa: c.mahasiswa, time: c.time, room: c.room } })} className="inline-flex items-center justify-center gap-1 px-3 h-10 rounded-full text-xs text-white bg-orange-500 hover:bg-orange-600 w-full">
+                      <ClipboardDocumentCheckIcon className="w-4 h-4"/> Lihat Presensi
                     </button>
                   </div>
                 </div>

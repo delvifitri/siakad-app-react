@@ -74,24 +74,48 @@ export default function DosenPresensiDetail() {
     setPendingPresensi(pp);
   }, [slug]);
 
-  // search state for filtering the displayed student lists
-  const [searchField, setSearchField] = useState<string>("all");
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  // separate search states for Sudah Presensi and Belum Presensi sections
+  const [searchFieldSudah, setSearchFieldSudah] = useState<string>("all");
+  const [searchQuerySudah, setSearchQuerySudah] = useState<string>("");
+  const [searchFieldBelum, setSearchFieldBelum] = useState<string>("all");
+  const [searchQueryBelum, setSearchQueryBelum] = useState<string>("");
 
-  const filteredStudents = (() => {
-    const q = (searchQuery || "").toString().trim().toLowerCase();
-    if (!q) return dummyStudents;
-    if (searchField === "name") return dummyStudents.filter((s) => s.name.toLowerCase().includes(q));
-    if (searchField === "nim") return dummyStudents.filter((s) => s.nim.toLowerCase().includes(q));
-    return dummyStudents.filter((s) => s.name.toLowerCase().includes(q) || s.nim.toLowerCase().includes(q));
+  const filteredSudahStudents = (() => {
+    const base = dummyStudents.filter((s) => (presensi[s.nim] ?? "") !== "");
+    const q = (searchQuerySudah || "").toString().trim().toLowerCase();
+    if (!q || (searchFieldSudah === "all" && q === "")) return base;
+    if (searchFieldSudah === "name") return base.filter((s) => s.name.toLowerCase().includes(q));
+    if (searchFieldSudah === "nim") return base.filter((s) => s.nim.toLowerCase().includes(q));
+    return base.filter((s) => s.name.toLowerCase().includes(q) || s.nim.toLowerCase().includes(q));
+  })();
+
+  const filteredBelumStudents = (() => {
+    const base = dummyStudents.filter((s) => (presensi[s.nim] ?? "") === "");
+    const q = (searchQueryBelum || "").toString().trim().toLowerCase();
+    if (!q || (searchFieldBelum === "all" && q === "")) return base;
+    if (searchFieldBelum === "name") return base.filter((s) => s.name.toLowerCase().includes(q));
+    if (searchFieldBelum === "nim") return base.filter((s) => s.nim.toLowerCase().includes(q));
+    return base.filter((s) => s.name.toLowerCase().includes(q) || s.nim.toLowerCase().includes(q));
   })();
 
   const updatePresensi = (nim: string, status: string) => setPresensi((prev) => ({ ...prev, [nim]: status }));
   const updateKeterangan = (nim: string, text: string) => setKeterangan((prev) => ({ ...prev, [nim]: text }));
   const toggleSelected = (nim: string) => setSelected((prev) => ({ ...prev, [nim]: !prev[nim] }));
 
-  const toggleSelectAll = (filled: boolean) => {
-    const list = filteredStudents.filter((s) => ((presensi[s.nim] ?? "") !== "") === filled).map((s) => s.nim);
+  const toggleSelectAllSudah = () => {
+    const list = filteredSudahStudents.map((s) => s.nim);
+    const allSelected = list.length > 0 && list.every((nim) => !!selected[nim]);
+    setSelected((prev) => {
+      const next = { ...prev };
+      list.forEach((nim) => {
+        next[nim] = !allSelected;
+      });
+      return next;
+    });
+  };
+
+  const toggleSelectAllBelum = () => {
+    const list = filteredBelumStudents.map((s) => s.nim);
     const allSelected = list.length > 0 && list.every((nim) => !!selected[nim]);
     setSelected((prev) => {
       const next = { ...prev };
@@ -114,7 +138,7 @@ export default function DosenPresensiDetail() {
   };
 
   const approveSelected = () => {
-    const list = filteredStudents.filter((s) => (presensi[s.nim] ?? "") !== "" && selected[s.nim]).map((s) => s.nim);
+  const list = filteredSudahStudents.filter((s) => (presensi[s.nim] ?? "") !== "" && selected[s.nim]).map((s) => s.nim);
     if (list.length === 0) return;
     setApproved((prev) => {
       const next = { ...prev };
@@ -126,7 +150,7 @@ export default function DosenPresensiDetail() {
   };
 
   const cancelApproveSelected = () => {
-    const list = filteredStudents
+    const list = filteredSudahStudents
       .filter((s) => (presensi[s.nim] ?? "") !== "" && selected[s.nim] && approved[s.nim])
       .map((s) => s.nim);
     if (list.length === 0) return;
@@ -142,7 +166,7 @@ export default function DosenPresensiDetail() {
   };
 
   const manualPresensi = () => {
-    const list = filteredStudents
+    const list = filteredBelumStudents
       .filter((s) => (presensi[s.nim] ?? "") === "" && selected[s.nim])
       .map((s) => s.nim);
     if (list.length === 0) return;
@@ -171,13 +195,9 @@ export default function DosenPresensiDetail() {
     setTimeout(() => setToast(null), 2500);
   };
 
-  const allSelectedSudah =
-    filteredStudents.filter((s) => (presensi[s.nim] ?? "") !== "").length > 0 &&
-    filteredStudents.filter((s) => (presensi[s.nim] ?? "") !== "").every((s) => !!selected[s.nim]);
+  const allSelectedSudah = filteredSudahStudents.length > 0 && filteredSudahStudents.every((s) => !!selected[s.nim]);
 
-  const allSelectedBelum =
-    filteredStudents.filter((s) => (presensi[s.nim] ?? "") === "").length > 0 &&
-    filteredStudents.filter((s) => (presensi[s.nim] ?? "") === "").every((s) => !!selected[s.nim]);
+  const allSelectedBelum = filteredBelumStudents.length > 0 && filteredBelumStudents.every((s) => !!selected[s.nim]);
 
   const savePresensi = () => {
     // no persistence to localStorage — keep presensi in state only
@@ -254,58 +274,51 @@ export default function DosenPresensiDetail() {
           </div>
         </div>
 
-        {/* search controls: field selector + query input */}
-        <div className="flex items-center gap-3 mb-4">
-          <div>
-            <label htmlFor="search-field" className="sr-only">Filter</label>
-            <select
-              id="search-field"
-              value={searchField}
-              onChange={(e) => setSearchField(e.target.value)}
-              className="px-3 py-2 border border-transparent bg-white rounded-full text-sm shadow-sm"
-            >
-              <option value="all">Semua</option>
-              <option value="name">Nama</option>
-              <option value="nim">NIM</option>
-            </select>
-          </div>
-
-          <div className="relative flex-1">
-            <span className="absolute inset-y-0 left-3 flex items-center text-gray-400">
-              <MagnifyingGlassIcon className="w-5 h-5" />
-            </span>
-            <label htmlFor="search-query" className="sr-only">Cari mahasiswa</label>
-            <input
-              id="search-query"
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Cari (nama atau NIM)"
-              className="w-full pl-10 pr-3 py-2 border border-transparent bg-white rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm shadow-sm"
-            />
-          </div>
-        </div>
         <div className="space-y-4">
           <section className="bg-white/60 rounded-xl border border-gray-200 p-3">
-            <div className="flex items-center justify-between mb-3">
+            <div className="mb-3">
               <h3 className="text-base font-semibold text-gray-900">Sudah Presensi</h3>
-              <button
-                onClick={() => toggleSelectAll(true)}
-                className="text-sm text-blue-600 hover:underline"
-                aria-pressed={allSelectedSudah}
-              >
-                {allSelectedSudah ? "Bersihkan" : "Pilih Semua"}
-              </button>
+              <div className="mt-2 flex items-center gap-2">
+                <select
+                  value={searchFieldSudah}
+                  onChange={(e) => setSearchFieldSudah(e.target.value)}
+                  className="px-2 py-1 border border-transparent bg-white rounded-full text-xs shadow-sm"
+                >
+                  <option value="all">Semua</option>
+                  <option value="name">Nama</option>
+                  <option value="nim">NIM</option>
+                </select>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-3 flex items-center text-gray-400">
+                    <MagnifyingGlassIcon className="w-4 h-4" />
+                  </span>
+                  <input
+                    type="text"
+                    value={searchQuerySudah}
+                    onChange={(e) => setSearchQuerySudah(e.target.value)}
+                    placeholder="Cari (nama atau NIM)"
+                    className="pl-10 pr-3 py-1.5 rounded-full bg-white text-sm w-56 border border-transparent"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-2">
+                <button
+                  onClick={toggleSelectAllSudah}
+                  className="text-sm text-blue-600 hover:underline"
+                  aria-pressed={allSelectedSudah}
+                >
+                  {allSelectedSudah ? "Bersihkan" : "Pilih Semua"}
+                </button>
+              </div>
             </div>
 
             <div className="space-y-3">
-              {filteredStudents.filter((s) => (presensi[s.nim] ?? "") !== "").length === 0 && (
+              {filteredSudahStudents.length === 0 && (
                 <div className="text-sm text-gray-600">Belum ada yang dipresensi.</div>
               )}
 
-              {filteredStudents
-                .filter((s) => (presensi[s.nim] ?? "") !== "")
-                .map((s) => (
+              {filteredSudahStudents.map((s) => (
                   <div key={s.nim} className="flex items-center justify-between p-3 rounded-lg bg-white shadow-sm">
                     <div className="flex items-center gap-3">
                       <input
@@ -346,9 +359,7 @@ export default function DosenPresensiDetail() {
               <div className="pt-3 flex items-center gap-2">
                 <button
                   onClick={approveSelected}
-                  disabled={
-                    dummyStudents.filter((s) => (presensi[s.nim] ?? "") !== "" && selected[s.nim]).length === 0
-                  }
+                  disabled={filteredSudahStudents.filter((s) => selected[s.nim]).length === 0}
                   className="px-3 py-2 rounded-full bg-green-600 text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Approve Selected
@@ -356,9 +367,7 @@ export default function DosenPresensiDetail() {
 
                 <button
                   onClick={cancelApproveSelected}
-                  disabled={
-                    dummyStudents.filter((s) => (presensi[s.nim] ?? "") !== "" && selected[s.nim] && approved[s.nim]).length === 0
-                  }
+                  disabled={filteredSudahStudents.filter((s) => selected[s.nim] && approved[s.nim]).length === 0}
                   className="px-3 py-2 rounded-full bg-red-600 text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Cancel Approve
@@ -368,25 +377,49 @@ export default function DosenPresensiDetail() {
           </section>
 
           <section className="bg-white/60 rounded-xl border border-gray-200 p-3">
-            <div className="flex items-center justify-between mb-3">
+            <div className="mb-3">
               <h3 className="text-base font-semibold text-gray-900">Belum Presensi</h3>
-              <button
-                onClick={() => toggleSelectAll(false)}
-                className="text-sm text-blue-600 hover:underline"
-                aria-pressed={allSelectedBelum}
-              >
-                {allSelectedBelum ? "Bersihkan" : "Pilih Semua"}
-              </button>
+              <div className="mt-2 flex items-center gap-2">
+                <select
+                  value={searchFieldBelum}
+                  onChange={(e) => setSearchFieldBelum(e.target.value)}
+                  className="px-2 py-1 border border-transparent bg-white rounded-full text-xs shadow-sm"
+                >
+                  <option value="all">Semua</option>
+                  <option value="name">Nama</option>
+                  <option value="nim">NIM</option>
+                </select>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-3 flex items-center text-gray-400">
+                    <MagnifyingGlassIcon className="w-4 h-4" />
+                  </span>
+                  <input
+                    type="text"
+                    value={searchQueryBelum}
+                    onChange={(e) => setSearchQueryBelum(e.target.value)}
+                    placeholder="Cari (nama atau NIM)"
+                    className="pl-10 pr-3 py-1.5 rounded-full bg-white text-sm w-56 border border-transparent"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-2">
+                <button
+                  onClick={toggleSelectAllBelum}
+                  className="text-sm text-blue-600 hover:underline"
+                  aria-pressed={allSelectedBelum}
+                >
+                  {allSelectedBelum ? "Bersihkan" : "Pilih Semua"}
+                </button>
+              </div>
             </div>
 
             <div className="space-y-3">
-              {filteredStudents.filter((s) => (presensi[s.nim] ?? "") === "").length === 0 && (
+              {filteredBelumStudents.length === 0 && (
                 <div className="text-sm text-gray-600">Semua mahasiswa sudah dipresensi.</div>
               )}
 
-              {filteredStudents
-                .filter((s) => (presensi[s.nim] ?? "") === "")
-                .map((s) => (
+              {filteredBelumStudents.map((s) => (
                   <div key={s.nim} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 rounded-lg bg-white shadow-sm gap-3">
                     <div className="flex items-center gap-3">
                       <input
