@@ -1,10 +1,10 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router";
 import DosenLayout from "../layouts/DosenLayout";
-import { ArrowDownTrayIcon, Cog6ToothIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { ArrowDownTrayIcon, Cog6ToothIcon, ArrowLeftIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 export function meta() {
-  return [{ title: "Input Nilai - Siakad" }];
+  return [{ title: "LIhat Nilai - Siakad" }];
 }
 
 const dummyStudents = [
@@ -54,6 +54,7 @@ export default function DosenInputNilai() {
 
   const [data, setData] = useState<Record<string, any>>({});
   const [toast, setToast] = useState<string | null>(null);
+  const [search, setSearch] = useState<string>("");
 
   useEffect(() => {
     const init: Record<string, any> = {};
@@ -179,68 +180,7 @@ export default function DosenInputNilai() {
     return { headers, rows };
   };
 
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [showExcelMenu, setShowExcelMenu] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [selectedFileName, setSelectedFileName] = useState("");
-
-  const onFileSelect = (e: any) => {
-    const f = e.target.files?.[0] ?? null;
-    setSelectedFile(f);
-    setSelectedFileName(f ? f.name : "");
-  };
-
-  const processSelectedFile = async () => {
-    if (!selectedFile) {
-      setToast("Pilih file CSV terlebih dahulu");
-      setTimeout(() => setToast(null), 1600);
-      return;
-    }
-    const text = await selectedFile.text();
-    const parsed = parseCsv(text);
-    if (!parsed.headers.length) {
-      setToast("File tidak valid");
-      setTimeout(() => setToast(null), 1800);
-      return;
-    }
-
-    // Expect header to contain at least nim
-    const hLower = parsed.headers.map((h) => h.toLowerCase());
-    const nimIdx = hLower.indexOf("nim");
-    if (nimIdx === -1) {
-      setToast("Header harus mengandung kolom 'nim'");
-      setTimeout(() => setToast(null), 2200);
-      return;
-    }
-
-    // update data state for matching nims
-    setData((prev) => {
-      const next = { ...prev };
-      for (const r of parsed.rows) {
-        const nim = r[parsed.headers[nimIdx]]?.trim();
-        if (!nim) continue;
-        const existing = { ...(next[nim] || {}) };
-        // for each komponen key, try to read by key or by label
-        komponen.forEach((k) => {
-          const valStr = r[k.key] ?? r[k.label] ?? "";
-          if (valStr !== undefined && valStr !== "") {
-            const v = Number(String(valStr).replace(/[^0-9.\-]/g, ""));
-            if (!Number.isNaN(v)) existing[k.key] = v;
-          }
-        });
-        existing.akhir = computeFinalFromValues(existing, komponen);
-        next[nim] = existing;
-      }
-      return next;
-    });
-
-    setToast("Data nilai diimpor dari CSV");
-    setTimeout(() => setToast(null), 1800);
-    // reset selection and close menu
-    setSelectedFile(null);
-    setSelectedFileName("");
-    setShowExcelMenu(false);
-  };
+  // (Removed upload flow) The page is view-only and provides CSV download only.
 
   const setKomponen = () => {
     setToast("Fitur set komponen nilai belum diimplementasikan");
@@ -255,7 +195,7 @@ export default function DosenInputNilai() {
             <ArrowLeftIcon className="w-5 h-5" />
           </button>
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-gray-900">Input Nilai</h1>
+            <h1 className="text-xl font-bold text-gray-900">Lihat Nilai</h1>
               <p className="text-sm text-gray-600">{course} — {code}</p>
 
               {/* komponen pills removed — percentages shown per-column / per-input instead */}
@@ -267,72 +207,31 @@ export default function DosenInputNilai() {
           <div className="flex items-center gap-2 relative">
             <div className="relative">
               <button
-                onClick={() => setShowExcelMenu((v) => !v)}
+                onClick={() => downloadCsv()}
                 className="inline-flex items-center gap-2 p-2 rounded-full bg-blue-600 text-white text-xs hover:bg-blue-700"
               >
                 <ArrowDownTrayIcon className="w-4 h-4" />
-                Input Nilai dengan Excel
+                Download Nilai
               </button>
-
-              {showExcelMenu && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center">
-                  {/* overlay */}
-                  <div className="absolute inset-0 bg-black/30" onClick={() => setShowExcelMenu(false)} />
-
-                  <div className="relative bg-white w-[min(96%,720px)] max-w-xl rounded shadow p-4 z-10">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="text-sm text-gray-700">Silahkan Download File Form Excel dibawah ini</div>
-                      <button onClick={() => setShowExcelMenu(false)} className="text-gray-500 hover:text-gray-700">✕</button>
-                    </div>
-
-                    <div className="mb-3">
-                      <button
-                        onClick={() => {
-                          downloadCsv();
-                        }}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500 text-white text-sm hover:bg-green-600"
-                      >
-                        <ArrowDownTrayIcon className="w-4 h-4" />
-                        Download Form Nilai Excel
-                      </button>
-                    </div>
-
-                    <div className="text-xs text-gray-600 mb-2">Setelah file form excel berhasil anda download, Silahkan isi nilainya di kolom komponen nilai di excel tersebut. Setelah selesai mengisi, lalu upload kembali file excel tersebut ke form dibawah ini :</div>
-
-                    <div className="grid grid-cols-3 gap-2 items-center mt-2">
-                      <div className="col-span-2 flex items-center gap-2">
-                        {/* hidden file input; opened by the Choose File button */}
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          accept=".csv,text/csv"
-                          onChange={onFileSelect}
-                          className="hidden"
-                        />
-
-                        <button
-                          onClick={() => fileInputRef.current?.click()}
-                          className="px-3 py-2 bg-white border rounded text-sm hover:bg-gray-50"
-                        >
-                          Choose File
-                        </button>
-
-                        <div className="text-xs text-gray-500">{selectedFileName || "No file chosen"}</div>
-                      </div>
-
-                      <div className="col-span-1">
-                        <button onClick={processSelectedFile} className="px-3 py-2 bg-blue-600 text-white rounded border text-sm hover:bg-blue-700">Upload</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
 
             <button onClick={() => navigate(`/dosen/set-komponen-nilai/${code}`)} className="inline-flex items-center gap-2 p-2 rounded-full bg-red-600 text-white text-xs hover:bg-red-700">
               <Cog6ToothIcon className="w-4 h-4" />
               Set Komponen Nilai
             </button>
+          </div>
+        </div>
+
+        {/* search - placed directly below the Download / Set Komponen buttons */}
+        <div className="mb-4">
+          <div className="relative max-w-md">
+            <MagnifyingGlassIcon className="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Cari nama atau NIM"
+              className="pl-12 pr-4 py-2 border rounded-full w-full text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+            />
           </div>
         </div>
 
@@ -344,7 +243,7 @@ export default function DosenInputNilai() {
                 <tr>
                   <th className="p-3 w-12">#</th>
                   <th className="p-3">NIM / Nama</th>
-                  {komponen.map((k) => (
+                      {komponen.map((k) => (
                     <th key={k.key} className="p-3 w-28">
                       <div className="flex items-center justify-between">
                         <span>{k.label}</span>
@@ -370,14 +269,7 @@ export default function DosenInputNilai() {
                       </td>
                       {komponen.map((k) => (
                         <td key={k.key} className="p-3 align-top">
-                          <input
-                            type="number"
-                            min={0}
-                            max={100}
-                            value={row[k.key] ?? 0}
-                            onChange={(e) => update(s.nim, k.key, e.target.value)}
-                            className="w-full px-2 py-1 border rounded-md"
-                          />
+                          <div className="px-2 py-1">{row[k.key] ?? "-"}</div>
                         </td>
                       ))}
                       <td className="p-3 align-top">{(row.akhir ?? 0).toFixed(2)}</td>
@@ -414,14 +306,7 @@ export default function DosenInputNilai() {
                         <label className="block text-xs text-gray-600 mb-1">
                           {k.label} <span className="text-xs text-gray-500">({k.bobot}%)</span>
                         </label>
-                        <input
-                          type="number"
-                          min={0}
-                          max={100}
-                          value={row[k.key] ?? 0}
-                          onChange={(e) => update(s.nim, k.key, e.target.value)}
-                          className="w-full px-3 py-2 border rounded-md"
-                        />
+                        <div className="w-full px-3 py-2 border rounded-md bg-gray-50">{row[k.key] ?? "-"}</div>
 
                         {/* If this component is UAS, show final score below it on mobile */}
                         {k.key === "uas" && (
@@ -439,10 +324,7 @@ export default function DosenInputNilai() {
           </div>
         </div>
 
-        {/* save action placed below the data list */}
-        <div className="mt-4">
-          <button onClick={saveAll} className="w-full md:w-auto p-4 rounded-full bg-blue-600 text-white text-xs">Simpan</button>
-        </div>
+        {/* read-only view: editing and saving disabled */}
 
         {toast && <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-full shadow-lg">{toast}</div>}
       </section>
