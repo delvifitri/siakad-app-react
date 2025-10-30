@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import SimpleLayout from "../layouts/SimpleLayout";
 
 interface ScheduleItem {
@@ -87,6 +88,24 @@ export default function Schedule() {
 
     // Week view now always shows all kuliah this week (exclude ujian/agenda)
 
+    // per-tab search UI state
+    const [queryToday, setQueryToday] = useState('');
+    const [queryWeek, setQueryWeek] = useState('');
+    const [showSearchToday, setShowSearchToday] = useState(false);
+    const [showSearchWeek, setShowSearchWeek] = useState(false);
+
+    const filteredToday = useMemo(() => {
+      const q = queryToday.trim().toLowerCase();
+      if (!q) return todayKuliah;
+      return todayKuliah.filter((s) => (`${s.course} ${s.cls ?? ''} ${s.room} ${s.time}`).toLowerCase().includes(q));
+    }, [todayKuliah, queryToday]);
+
+    const filteredWeek = useMemo(() => {
+      const q = queryWeek.trim().toLowerCase();
+      if (!q) return weekKuliahSorted;
+      return weekKuliahSorted.filter((s) => (`${s.course} ${s.cls ?? ''} ${s.room} ${s.time}`).toLowerCase().includes(q));
+    }, [weekKuliahSorted, queryWeek]);
+
     return (
       <SimpleLayout title="Jadwal Dosen">
         {/* Tabs */}
@@ -113,29 +132,59 @@ export default function Schedule() {
 
         {activeTab === 'today' ? (
           <div className="space-y-3">
-            {todayKuliah.length === 0 ? (
+            <div className="flex items-center">
+              <div className="relative w-full max-w-md">
+                <MagnifyingGlassIcon className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+                <input
+                  value={queryToday}
+                  onChange={(e) => setQueryToday(e.target.value)}
+                  placeholder="Cari mata kuliah atau ruangan..."
+                  className="w-full pl-10 pr-3 py-1 border rounded-md text-sm"
+                />
+              </div>
+            </div>
+            {filteredToday.length === 0 ? (
               <div className="p-4 rounded-xl border border-gray-200 bg-white/60 text-sm text-gray-600">Tidak ada jadwal kuliah hari ini.</div>
             ) : (
-              todayKuliah.map((s, idx) => {
+              filteredToday.map((s, idx) => {
                 const slug = `${s.code}-${s.cls}`.toLowerCase().replace(/\s+/g, '-');
                 return (
-                <button key={idx} onClick={() => navigate(`/dosen/input-presensi/${slug}`, { state: { course: s.course, cls: s.cls, code: s.code, time: s.time, room: s.room } })} className="w-full text-left p-4 rounded-xl border border-gray-200 bg-white/60 hover:bg-white/80 transition-colors">
+                <div key={idx} className="w-full text-left p-4 rounded-xl border border-gray-200 bg-white/60 hover:bg-white/80 transition-colors">
                   <div className="flex items-center justify-between text-sm">
                     <div className="font-semibold text-gray-900">{s.course}{s.cls ? ` (${s.cls})` : ''}</div>
                     <div className="w-32 flex-shrink-0 text-right text-gray-600">{s.time}</div>
                   </div>
                   <div className="mt-1 text-[12px] text-gray-600">Ruangan: <span className="font-medium text-gray-900">{s.room}</span></div>
-                </button>
+                  <div className="mt-3">
+                    <button
+                      onClick={() => navigate(`/dosen/input-presensi/${slug}`, { state: { course: s.course, cls: s.cls, code: s.code, time: s.time, room: s.room } })}
+                      className="inline-flex items-center px-3 py-1.5 bg-blue-500 text-white text-sm font-medium rounded-full hover:bg-blue-600 transition-colors"
+                    >
+                      Input Presensi
+                    </button>
+                  </div>
+                </div>
                 );
               })
             )}
           </div>
         ) : (
           <div className="space-y-3">
-            {weekKuliahSorted.map((s, idx) => {
+            <div className="flex items-center">
+              <div className="relative w-full max-w-md">
+                <MagnifyingGlassIcon className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+                <input
+                  value={queryWeek}
+                  onChange={(e) => setQueryWeek(e.target.value)}
+                  placeholder="Cari mata kuliah atau ruangan..."
+                  className="w-full pl-10 pr-3 py-1 border rounded-md text-sm"
+                />
+              </div>
+            </div>
+            {filteredWeek.map((s, idx) => {
               const slug = `${s.code}-${s.cls}`.toLowerCase().replace(/\s+/g, '-');
               return (
-              <button key={idx} onClick={() => navigate(`/dosen/input-presensi/${slug}`, { state: { course: s.course, cls: s.cls, code: s.code, time: s.time, room: s.room } })} className="w-full text-left flex rounded-xl border border-gray-200 bg-white/60 hover:bg-white/80 transition-colors overflow-hidden">
+              <div key={idx} className="w-full text-left flex rounded-xl border border-gray-200 bg-white/60 hover:bg-white/80 transition-colors overflow-hidden">
                 <div className={`w-24 flex-shrink-0 flex items-start pl-3 py-4 text-sm font-semibold ${dayColor[s.day]}`}>
                   {dayLabel[s.day]}
                 </div>
@@ -147,8 +196,16 @@ export default function Schedule() {
                     <div className="w-32 text-right text-gray-600">{s.time}</div>
                   </div>
                   <div className="mt-1 text-[12px] text-gray-600">Ruang: <span className="font-medium text-gray-900">{s.room}</span></div>
+                  <div className="mt-3">
+                    <button
+                      onClick={() => navigate(`/dosen/input-presensi/${slug}`, { state: { course: s.course, cls: s.cls, code: s.code, time: s.time, room: s.room } })}
+                      className="inline-flex items-center px-3 py-1.5 bg-blue-500 text-white text-sm font-medium rounded-full hover:bg-blue-600 transition-colors"
+                    >
+                      Input Presensi
+                    </button>
+                  </div>
                 </div>
-              </button>
+              </div>
               );
             })}
           </div>
