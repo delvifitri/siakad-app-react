@@ -97,13 +97,13 @@ export default function Schedule() {
     const filteredToday = useMemo(() => {
       const q = queryToday.trim().toLowerCase();
       if (!q) return todayKuliah;
-      return todayKuliah.filter((s) => (`${s.course} ${s.cls ?? ''} ${s.room} ${s.time}`).toLowerCase().includes(q));
+      return todayKuliah.filter((s) => (`${s.course} ${s.code} ${s.cls ?? ''} ${s.room} ${s.time}`).toLowerCase().includes(q));
     }, [todayKuliah, queryToday]);
 
     const filteredWeek = useMemo(() => {
       const q = queryWeek.trim().toLowerCase();
       if (!q) return weekKuliahSorted;
-      return weekKuliahSorted.filter((s) => (`${s.course} ${s.cls ?? ''} ${s.room} ${s.time}`).toLowerCase().includes(q));
+      return weekKuliahSorted.filter((s) => (`${s.course} ${s.code} ${s.cls ?? ''} ${s.room} ${s.time}`).toLowerCase().includes(q));
     }, [weekKuliahSorted, queryWeek]);
 
     return (
@@ -151,7 +151,9 @@ export default function Schedule() {
                 return (
                 <div key={idx} className="w-full text-left p-4 rounded-xl border border-gray-200 bg-white/60 hover:bg-white/80 transition-colors">
                   <div className="flex items-center justify-between text-sm">
-                    <div className="font-semibold text-gray-900">{s.course}{s.cls ? ` (${s.cls})` : ''}</div>
+                    <div className="font-semibold text-gray-900">
+                      {s.course}{s.cls ? ` (${s.cls})` : ''}{s.code ? ` - ${s.code}` : ''}
+                    </div>
                     <div className="w-32 flex-shrink-0 text-right text-gray-600">{s.time}</div>
                   </div>
                   <div className="mt-1 text-[12px] text-gray-600">Ruangan: <span className="font-medium text-gray-900">{s.room}</span></div>
@@ -184,14 +186,14 @@ export default function Schedule() {
             {filteredWeek.map((s, idx) => {
               const slug = `${s.code}-${s.cls}`.toLowerCase().replace(/\s+/g, '-');
               return (
-              <div key={idx} className="w-full text-left flex rounded-xl border border-gray-200 bg-white/60 hover:bg-white/80 transition-colors overflow-hidden">
+                <div key={idx} className="w-full text-left flex rounded-xl border border-gray-200 bg-white/60 hover:bg-white/80 transition-colors overflow-hidden">
                 <div className={`w-24 flex-shrink-0 flex items-start pl-3 py-4 text-sm font-semibold ${dayColor[s.day]}`}>
                   {dayLabel[s.day]}
                 </div>
-                <div className="flex-1 p-4 text-sm">
+                <div className="flex-1 p-4 text-sm flex flex-col justify-between">
                   <div className="flex items-center justify-between">
                     <div className="font-semibold text-gray-900">
-                      {s.course}{s.cls ? ` (${s.cls})` : ''}
+                      {s.course}{s.cls ? ` (${s.cls})` : ''}{s.code ? ` - ${s.code}` : ''}
                     </div>
                     <div className="w-32 text-right text-gray-600">{s.time}</div>
                   </div>
