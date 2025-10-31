@@ -267,8 +267,8 @@ export default function EditProfile() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              disabled
-              className="w-full px-3 py-2 border border-gray-300  rounded-lg bg-gray-100  text-gray-500  cursor-not-allowed"
+              disabled={isDosen}
+              className={`w-full px-3 py-2 border rounded-lg ${isDosen ? 'border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed' : 'border-orange-500 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-200'}`}
             />
           </div>
 
@@ -278,8 +278,8 @@ export default function EditProfile() {
               type="text"
               value={nim}
               onChange={(e) => setNim(e.target.value)}
-              disabled
-              className="w-full px-3 py-2 border border-gray-300  rounded-lg bg-gray-100  text-gray-500  cursor-not-allowed"
+              disabled={isDosen}
+              className={`w-full px-3 py-2 border rounded-lg ${isDosen ? 'border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed' : 'border-orange-500 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-200'}`}
             />
           </div>
 
@@ -289,8 +289,8 @@ export default function EditProfile() {
               type="text"
               value={major}
               onChange={(e) => setMajor(e.target.value)}
-              disabled
-              className="w-full px-3 py-2 border border-gray-300  rounded-lg bg-gray-100  text-gray-500  cursor-not-allowed"
+              disabled={isDosen}
+              className={`w-full px-3 py-2 border rounded-lg ${isDosen ? 'border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed' : 'border-orange-500 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-200'}`}
             />
           </div>
 
@@ -301,8 +301,7 @@ export default function EditProfile() {
                 type="number"
                 value={semester}
                 onChange={(e) => setSemester(e.target.value)}
-                disabled
-                className="w-full px-3 py-2 border border-gray-300  rounded-lg bg-gray-100  text-gray-500  cursor-not-allowed"
+                className="w-full px-3 py-2 border border-orange-500 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-200"
               />
             </div>
           )}
