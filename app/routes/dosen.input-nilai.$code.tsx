@@ -236,54 +236,63 @@ export default function DosenInputNilai() {
         </div>
 
         <div className="space-y-3">
-          {/* desktop table */}
-          <div className="hidden md:block bg-white rounded-xl border border-gray-200">
-            <table className="w-full table-fixed text-sm">
-              <thead className="text-left text-xs text-gray-600">
-                <tr>
-                  <th className="p-3 w-12">#</th>
-                  <th className="p-3">NIM / Nama</th>
+          {/* desktop table (horizontally scrollable on small screens) */}
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            {/* no negative margins here to avoid visual bleeding outside rounded corners */}
+            <div className="overflow-x-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
+              {/* add padding inside the scroll area so content doesn't touch the card edges */}
+              <div className="min-w-max px-4 sm:px-6">
+                <table className="w-full table-auto text-sm">
+                  <thead className="text-left text-xs text-gray-600">
+                    <tr>
+                      <th className="p-3 whitespace-nowrap">#</th>
+                      <th className="p-3 whitespace-nowrap">NIM / Nama</th>
                       {komponen.map((k) => (
-                    <th key={k.key} className="p-3 w-28">
-                      <div className="flex items-center justify-between">
-                        <span>{k.label}</span>
-                        <span className="text-xs text-gray-500">{k.bobot}%</span>
-                      </div>
-                    </th>
-                  ))}
-                  <th className="p-3 w-32">Nilai Akhir</th>
-                  <th className="p-3 w-28">Nilai Index</th>
-                  <th className="p-3 w-28">Nilai Huruf</th>
-                </tr>
-              </thead>
-              <tbody>
-                {dummyStudents.map((s, i) => {
-                  const row = data[s.nim] || { uas: 0, presensi: 0, akhir: 0, keterangan: "" };
-                  const g = gradeFromScore(row.akhir ?? 0);
-                  return (
-                    <tr key={s.nim} className="border-t">
-                      <td className="p-3 align-top">{i + 1}</td>
-                      <td className="p-3 align-top">
-                        <div className="font-medium">{s.name}</div>
-                        <div className="text-xs text-gray-600">{s.nim}</div>
-                      </td>
-                      {komponen.map((k) => (
-                        <td key={k.key} className="p-3 align-top">
-                          <div className="px-2 py-1">{row[k.key] ?? "-"}</div>
-                        </td>
+                        <th key={k.key} className="p-3 whitespace-nowrap">
+                          <div className="hidden md:block flex items-center justify-between">
+                            <span>{k.label}</span>
+                            <span className="text-xs text-gray-500">{k.bobot}%</span>
+                          </div>
+                          <div className="md:hidden">
+                            <span>{k.label} ({k.bobot}%)</span>
+                          </div>
+                        </th>
                       ))}
-                      <td className="p-3 align-top">{(row.akhir ?? 0).toFixed(2)}</td>
-                      <td className="p-3 align-top">{(g?.index ?? 0).toFixed(2)}</td>
-                      <td className="p-3 align-top">{g?.letter ?? "-"}</td>
+                      <th className="p-3 whitespace-nowrap">Nilai Akhir</th>
+                      <th className="p-3 whitespace-nowrap">Nilai Index</th>
+                      <th className="p-3 whitespace-nowrap">Nilai Huruf</th>
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                  </thead>
+                  <tbody>
+                    {dummyStudents.filter((s) => s.name.toLowerCase().includes(search.toLowerCase()) || s.nim.includes(search)).map((s, i) => {
+                      const row = data[s.nim] || { uas: 0, presensi: 0, akhir: 0, keterangan: "" };
+                      const g = gradeFromScore(row.akhir ?? 0);
+                      return (
+                        <tr key={s.nim} className="border-t">
+                          <td className="p-3 align-top whitespace-nowrap">{i + 1}</td>
+                          <td className="p-3 align-top whitespace-nowrap">
+                            <div className="font-medium">{s.name}</div>
+                            <div className="text-xs text-gray-600">{s.nim}</div>
+                          </td>
+                          {komponen.map((k) => (
+                            <td key={k.key} className="p-3 align-top whitespace-nowrap">
+                              <div className="px-2 py-1">{row[k.key] ?? "-"}</div>
+                            </td>
+                          ))}
+                          <td className="p-3 align-top whitespace-nowrap">{(row.akhir ?? 0).toFixed(2)}</td>
+                          <td className="p-3 align-top whitespace-nowrap">{(g?.index ?? 0).toFixed(2)}</td>
+                          <td className="p-3 align-top whitespace-nowrap">{g?.letter ?? "-"}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
 
           {/* mobile cards */}
-          <div className="md:hidden space-y-3">
+          <div className="hidden space-y-3">
             {dummyStudents.map((s, i) => {
               const row = data[s.nim] || { uas: 0, presensi: 0, akhir: 0, keterangan: "" };
               const g = gradeFromScore(row.akhir ?? 0);
