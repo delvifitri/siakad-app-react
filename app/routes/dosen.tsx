@@ -56,7 +56,10 @@ export default function DosenDashboard() {
   const { submission } = useKrsContext();
   const approvedCount = submission.items.filter((i) => i.status === "disetujui").length;
   const totalKrs = submission.items.length;
-  const krsSummary = `${approvedCount}/${totalKrs}`;
+  // show demo values when there are no submissions yet (avoid 0/0)
+  const displayApproved = totalKrs === 0 ? 12 : approvedCount;
+  const displayTotal = totalKrs === 0 ? 20 : totalKrs;
+  const krsSummary = `${displayApproved}/${displayTotal}`;
   // legacy single-number placeholder kept for compatibility where needed
   const krsPending = 3; // ringkas sesuai kartu
   const bimbinganCount = 12; // dummy
