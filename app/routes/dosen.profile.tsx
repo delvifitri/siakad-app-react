@@ -113,20 +113,20 @@ export default function DosenProfile() {
               </div>
             </div>
           </div>
-          <div className="mt-4 grid grid-cols-2 gap-2 text-sm text-gray-700">
-            <div className="bg-gray-50 rounded-xl p-3">
+          <div className="mt-4 space-y-2 text-sm text-gray-700">
+            <div className="bg-gray-50 rounded-xl p-3 w-full break-words">
               <div className="text-xs text-gray-500">Email</div>
-              <div className="font-medium">{email}</div>
+              <div className="font-medium break-words">{email}</div>
             </div>
-            <div className="bg-gray-50 rounded-xl p-3">
+            <div className="bg-gray-50 rounded-xl p-3 w-full">
               <div className="text-xs text-gray-500">NIDN</div>
               <div className="font-medium">{nidn}</div>
             </div>
-            <div className="bg-gray-50 rounded-xl p-3">
+            <div className="bg-gray-50 rounded-xl p-3 w-full">
               <div className="text-xs text-gray-500">NUPTK</div>
               <div className="font-medium">{nuptk}</div>
             </div>
-            <div className="bg-gray-50 rounded-xl p-3">
+            <div className="bg-gray-50 rounded-xl p-3 w-full">
               <div className="text-xs text-gray-500">Keahlian</div>
               <div className="font-medium">Web, Basis Data, Jaringan</div>
             </div>
