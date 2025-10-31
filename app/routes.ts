@@ -18,6 +18,7 @@ export default [
 	route("dosen/ujian", "routes/dosen.ujian.tsx"),
 	route("dosen/bimbingan", "routes/dosen.bimbingan.tsx"),
 	route("dosen/profile", "routes/dosen.profile.tsx"),
+	route("dosen/edit-profile", "routes/dosen.edit-profile.tsx"),
 	route("nilai-presensi", "routes/nilai-presensi.tsx"),
 	route("ujian", "routes/ujian.tsx"),
 	route("presensi", "routes/presensi.tsx"),

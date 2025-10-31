@@ -42,7 +42,7 @@ export default function HeaderIcons() {
         </Link>
       </div>
       <Link
-        to="/edit-profile"
+        to={isDosen ? "/dosen/edit-profile" : "/edit-profile"}
         aria-label="profile"
         className="p-1 rounded-full bg-white/20 backdrop-blur-md ring-2 ring-white/30 shadow-md overflow-hidden"
       >

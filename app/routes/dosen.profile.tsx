@@ -142,7 +142,7 @@ export default function DosenProfile() {
           {/* Tombol aksi: Edit Profil & Logout */}
           <div className="mt-4 grid grid-cols-2 gap-2">
             <button
-              onClick={() => navigate('/edit-profile')}
+              onClick={() => navigate('/dosen/edit-profile')}
               className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-white bg-orange-500 hover:bg-orange-600 text-sm"
             >
               <PencilSquareIcon className="w-5 h-5"/> Edit Profil
