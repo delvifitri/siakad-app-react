@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState } from "react";
 import SimpleLayout from "../layouts/SimpleLayout";
 import { CameraIcon } from "@heroicons/react/24/outline";
 
@@ -14,6 +14,7 @@ export default function DosenEditProfile() {
 
   // Signature related
   const signatureRef = useRef<HTMLCanvasElement | null>(null);
+  const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const drawingRef = useRef(false);
   const lastPosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const [signatureDataUrl, setSignatureDataUrl] = useState<string | null>(null);
@@ -59,7 +60,6 @@ export default function DosenEditProfile() {
 
   useEffect(() => {
     setEmail((prev) => {
-      // only auto-set if empty or looks like placeholder
       if (!prev || prev.includes("@kampus") || prev.includes("@kampus.ac.id")) {
         return toEmailFromName(name);
       }
@@ -87,25 +87,31 @@ export default function DosenEditProfile() {
     } catch {}
   };
 
-  // signature canvas helpers (simple)
-  const getCanvasContext = () => {
+  // Setup canvas context SEKALI saja
+  const setupCanvas = () => {
     const c = signatureRef.current;
-    if (!c) return null;
+    if (!c) return;
     const ctx = c.getContext('2d');
-    if (!ctx) return null;
+    if (!ctx) return;
+    
     const ratio = window.devicePixelRatio || 1;
     const w = c.clientWidth;
     const h = c.clientHeight;
-    if (c.width !== w * ratio || c.height !== h * ratio) {
-      c.width = Math.floor(w * ratio);
-      c.height = Math.floor(h * ratio);
-      ctx.scale(ratio, ratio);
-    }
+    
+    c.width = Math.floor(w * ratio);
+    c.height = Math.floor(h * ratio);
+    ctx.scale(ratio, ratio);
+    
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.strokeStyle = '#000';
     ctx.lineWidth = 3;
-    return ctx;
+    
+    // White background
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, w, h);
+    
+    ctxRef.current = ctx;
   };
 
   const startDraw = (clientX: number, clientY: number) => {
@@ -118,7 +124,7 @@ export default function DosenEditProfile() {
 
   const drawMove = (clientX: number, clientY: number) => {
     if (!drawingRef.current) return;
-    const ctx = getCanvasContext();
+    const ctx = ctxRef.current;
     const c = signatureRef.current;
     if (!ctx || !c) return;
     const rect = c.getBoundingClientRect();
@@ -136,11 +142,7 @@ export default function DosenEditProfile() {
   };
 
   const clearSignature = () => {
-    const c = signatureRef.current;
-    if (!c) return;
-    const ctx = getCanvasContext();
-    if (!ctx) return;
-    ctx.clearRect(0, 0, c.width, c.height);
+    setupCanvas();
     setSignatureDataUrl(null);
     try { localStorage.removeItem('profileSignature'); } catch {}
   };
@@ -154,22 +156,16 @@ export default function DosenEditProfile() {
   };
 
   useEffect(() => {
+    setupCanvas();
     const c = signatureRef.current;
-    const ctx = getCanvasContext();
+    const ctx = ctxRef.current;
     if (!c || !ctx) return;
-    // white background
-    ctx.save();
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, c.clientWidth, c.clientHeight);
-    ctx.restore();
+    
     if (signatureDataUrl) {
       const img = new Image();
       img.onload = () => {
         try {
-          const ratio = window.devicePixelRatio || 1;
-          const drawW = c.width / ratio;
-          const drawH = c.height / ratio;
-          ctx.drawImage(img, 0, 0, drawW, drawH);
+          ctx.drawImage(img, 0, 0, c.clientWidth, c.clientHeight);
         } catch {}
       };
       img.src = signatureDataUrl;
@@ -184,7 +180,6 @@ export default function DosenEditProfile() {
       localStorage.setItem('profileNidn', nidn);
       localStorage.setItem('profileNuptk', nuptk);
     } catch {}
-    // small UX: keep silent or could show toast (left simple)
   };
 
   return (

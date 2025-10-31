@@ -8,12 +8,8 @@ import { useEffect, useState } from "react";
 export default function HeaderIcons() {
   const [isDosen, setIsDosen] = useState(false);
   useEffect(() => {
-    try {
-      const role = localStorage.getItem("userRole");
-      setIsDosen(role === "dosen");
-    } catch {
-      setIsDosen(false);
-    }
+    const path = window.location.pathname;
+    setIsDosen(path.startsWith("/dosen"));
   }, []);
   return (
     <div className="flex items-center justify-between px-4 pt-4">
