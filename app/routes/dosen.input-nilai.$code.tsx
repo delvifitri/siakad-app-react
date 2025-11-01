@@ -237,18 +237,18 @@ export default function DosenInputNilai() {
 
         <div className="space-y-3">
           {/* desktop table (horizontally scrollable on small screens) */}
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
             {/* no negative margins here to avoid visual bleeding outside rounded corners */}
             <div className="overflow-x-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
               {/* add padding inside the scroll area so content doesn't touch the card edges */}
               <div className="min-w-max px-4 sm:px-6">
-                <table className="w-full table-auto text-sm">
+                <table className="w-full table-auto text-sm bg-gray-50">
                   <thead className="text-left text-xs text-gray-600">
                     <tr>
-                      <th className="p-3 whitespace-nowrap">#</th>
-                      <th className="p-3 whitespace-nowrap">NIM / Nama</th>
+                      <th className="p-3 whitespace-nowrap bg-gray-50">#</th>
+                      <th className="p-3 whitespace-nowrap bg-gray-50">NIM / Nama</th>
                       {komponen.map((k) => (
-                        <th key={k.key} className="p-3 whitespace-nowrap">
+                        <th key={k.key} className="p-3 whitespace-nowrap bg-gray-50">
                           <div className="hidden md:block flex items-center justify-between">
                             <span>{k.label}</span>
                             <span className="text-xs text-gray-500">{k.bobot}%</span>
@@ -258,9 +258,9 @@ export default function DosenInputNilai() {
                           </div>
                         </th>
                       ))}
-                      <th className="p-3 whitespace-nowrap">Nilai Akhir</th>
-                      <th className="p-3 whitespace-nowrap">Nilai Index</th>
-                      <th className="p-3 whitespace-nowrap">Nilai Huruf</th>
+                      <th className="p-3 whitespace-nowrap bg-gray-50">Nilai Akhir</th>
+                      <th className="p-3 whitespace-nowrap bg-gray-50">Nilai Index</th>
+                      <th className="p-3 whitespace-nowrap bg-gray-50">Nilai Huruf</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -269,19 +269,19 @@ export default function DosenInputNilai() {
                       const g = gradeFromScore(row.akhir ?? 0);
                       return (
                         <tr key={s.nim} className="border-t">
-                          <td className="p-3 align-top whitespace-nowrap">{i + 1}</td>
-                          <td className="p-3 align-top whitespace-nowrap">
+                          <td className="p-3 align-top whitespace-nowrap bg-gray-50">{i + 1}</td>
+                          <td className="p-3 align-top whitespace-nowrap bg-gray-50">
                             <div className="font-medium">{s.name}</div>
                             <div className="text-xs text-gray-600">{s.nim}</div>
                           </td>
                           {komponen.map((k) => (
-                            <td key={k.key} className="p-3 align-top whitespace-nowrap">
+                            <td key={k.key} className="p-3 align-top whitespace-nowrap bg-gray-50">
                               <div className="px-2 py-1">{row[k.key] ?? "-"}</div>
                             </td>
                           ))}
-                          <td className="p-3 align-top whitespace-nowrap">{(row.akhir ?? 0).toFixed(2)}</td>
-                          <td className="p-3 align-top whitespace-nowrap">{(g?.index ?? 0).toFixed(2)}</td>
-                          <td className="p-3 align-top whitespace-nowrap">{g?.letter ?? "-"}</td>
+                          <td className="p-3 align-top whitespace-nowrap bg-gray-50">{(row.akhir ?? 0).toFixed(2)}</td>
+                          <td className="p-3 align-top whitespace-nowrap bg-gray-50">{(g?.index ?? 0).toFixed(2)}</td>
+                          <td className="p-3 align-top whitespace-nowrap bg-gray-50">{g?.letter ?? "-"}</td>
                         </tr>
                       );
                     })}
@@ -297,7 +297,7 @@ export default function DosenInputNilai() {
               const row = data[s.nim] || { uas: 0, presensi: 0, akhir: 0, keterangan: "" };
               const g = gradeFromScore(row.akhir ?? 0);
               return (
-                <div key={s.nim} className="bg-white rounded-xl p-3 border border-gray-200">
+                <div key={s.nim} className="bg-gray-50 rounded-xl p-3 border border-gray-200">
                   <div className="flex items-start justify-between mb-2">
                     <div>
                       <div className="font-medium">{s.name}</div>

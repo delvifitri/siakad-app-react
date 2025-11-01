@@ -13,7 +13,7 @@ const requests = [
   { name: "Citra Rahma", nim: "202101236", topic: "Analisis Data", status: "proses" },
 ];
 
-export default function DosenBimbingan() {
+export default function DosenKelolaRpsBimbinganCopy() {
   const navigate = useNavigate();
   const [showLog, setShowLog] = useState(false);
   const [currentStudent, setCurrentStudent] = useState<{ name: string; nim: string } | null>(null);
