@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import SimpleLayout from "../layouts/SimpleLayout";
+import BottomNavDosen from "../components/BottomNavDosen";
 
 interface ScheduleItem {
   course: string;
@@ -107,7 +108,7 @@ export default function Schedule() {
     }, [weekKuliahSorted, queryWeek]);
 
     return (
-      <SimpleLayout title="Jadwal Dosen">
+      <SimpleLayout title="Jadwal Dosen" footer={<BottomNavDosen />}>
         {/* Tabs */}
         <div className="mb-4">
           <div className="flex bg-gray-100 rounded-lg p-1">

@@ -203,12 +203,13 @@ export default function DosenInputPresensi() {
                   <div className="flex flex-col items-start gap-2">
                     <button
                       type="button"
+                      disabled
                       onClick={() => (photoKeluarRef.current as HTMLInputElement | null)?.click()}
-                      className="px-4 py-2 rounded-full bg-orange-500 text-white text-sm shadow-md hover:bg-orange-600 transition"
+                      className="px-4 py-2 rounded-full bg-gray-300 text-white text-sm shadow-none cursor-not-allowed"
                     >
                       Ambil Foto Keluar
                     </button>
-                    <input ref={photoKeluarRef} id="photo-keluar-input" type="file" accept="image/*" capture="environment" onChange={(e) => handlePhotoKeluarChange(e as any)} style={{ display: 'none' }} />
+                    <input ref={photoKeluarRef} id="photo-keluar-input" type="file" accept="image/*" capture="environment" onChange={(e) => handlePhotoKeluarChange(e as any)} style={{ display: 'none' }} disabled />
                     {photoKeluarPreview && (
                       <div className="mt-2">
                         <img src={photoKeluarPreview} alt="Keluar" className="w-32 h-20 object-cover rounded-md border" />
