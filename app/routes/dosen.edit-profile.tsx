@@ -283,26 +283,45 @@ export default function DosenEditProfile() {
                     />
                   </div>
                 ) : (
-                  <div className="w-full h-36 border border-dashed rounded-md overflow-hidden flex items-center justify-center bg-gray-50">
+                  <div className="space-y-4">
                     <div className="text-center">
-                      <p className="text-sm text-gray-600 mb-2">Pilih gambar tanda tangan dari galeri</p>
-                      <div className="flex items-center justify-center gap-2">
-                        <button type="button" onClick={handleSignatureImageClick} className="px-3 py-1 bg-blue-600 text-white rounded-full text-sm">Pilih Gambar</button>
-                        <input ref={signatureImageInputRef} type="file" accept="image/*" className="hidden" onChange={handleSignatureImageChange} />
-                      </div>
+                      <p className="text-sm text-gray-600 mb-4">Pilih gambar tanda tangan dari galeri</p>
+                      
+                      {signatureImageDataUrl ? (
+                        <div className="flex items-center justify-center gap-4">
+                          <img src={signatureImageDataUrl} alt="ttd-img-preview" className="h-16 w-16 object-contain border rounded" />
+                          <button type="button" onClick={handleSignatureImageClick} className="px-4 py-2 bg-blue-600 text-white rounded-full text-sm">Pilih Gambar</button>
+                          <input ref={signatureImageInputRef} type="file" accept="image/*" className="hidden" onChange={handleSignatureImageChange} />
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center">
+                          <button type="button" onClick={handleSignatureImageClick} className="px-4 py-2 bg-blue-600 text-white rounded-full text-sm">Pilih Gambar</button>
+                          <input ref={signatureImageInputRef} type="file" accept="image/*" className="hidden" onChange={handleSignatureImageChange} />
+                        </div>
+                      )}
+                      
                       {signatureImageDataUrl && (
-                        <img src={signatureImageDataUrl} alt="ttd-img-preview" className="h-20 mt-3 mx-auto object-contain border rounded" />
+                        <div className="flex items-center justify-center gap-2 mt-4">
+                          <button onClick={() => { try { localStorage.setItem('profileSignatureImage', signatureImageDataUrl); } catch {} }} type="button" className="px-3 py-1 bg-green-600 text-white rounded-full text-sm">Simpan</button>
+                          <button onClick={() => { setSignatureImageDataUrl(null); try { localStorage.removeItem('profileSignatureImage'); } catch {} }} type="button" className="px-3 py-1 bg-red-600 text-white rounded-full text-sm">Hapus</button>
+                        </div>
                       )}
                     </div>
                   </div>
                 )}
               </div>
-              <div className="flex items-center gap-2">
-                <button onClick={saveSignature} type="button" className="px-3 py-1 bg-blue-600 text-white rounded-full text-sm">Simpan TTD</button>
-                <button onClick={clearSignature} type="button" className="px-3 py-1 bg-gray-200 rounded-full text-sm">Bersihkan</button>
-                {signatureDataUrl && signatureMode === 'digital' && (<img src={signatureDataUrl} alt="ttd-preview" className="h-16 ml-3 object-contain border rounded" />)}
-                {signatureImageDataUrl && signatureMode === 'image' && (<img src={signatureImageDataUrl} alt="ttd-preview-img" className="h-16 ml-3 object-contain border rounded" />)}
-              </div>
+              {signatureMode === 'digital' && (
+                <div className="flex items-center gap-2">
+                  <button onClick={saveSignature} type="button" className="px-3 py-1 bg-blue-600 text-white rounded-full text-sm">Simpan TTD</button>
+                  <button onClick={clearSignature} type="button" className="px-3 py-1 bg-gray-200 rounded-full text-sm">Bersihkan</button>
+                  {signatureDataUrl && (<img src={signatureDataUrl} alt="ttd-preview" className="h-16 ml-3 object-contain border rounded" />)}
+                </div>
+              )}
+              {/* {signatureMode === 'image' && signatureImageDataUrl && (
+                <div className="flex items-center justify-center mt-2">
+                  <img src={signatureImageDataUrl} alt="ttd-preview-img" className="h-16 object-contain border rounded" />
+                </div>
+              )} */}
             </div>
           </div>
         </div>
