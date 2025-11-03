@@ -150,7 +150,7 @@ export default function DosenInputPresensi() {
                 type="number"
                 value={session.pertemuan}
                 disabled
-                className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50"
+                className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-100"
               />
             </div>
 
@@ -166,12 +166,12 @@ export default function DosenInputPresensi() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Mulai</label>
-              <input value={session.mulai} disabled className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50" />
+              <input value={session.mulai} disabled className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-100" />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Selesai</label>
-              <input value={session.selesai} disabled className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50" />
+              <input value={session.selesai} disabled className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-100" />
             </div>
 
             <div className="md:col-span-2">

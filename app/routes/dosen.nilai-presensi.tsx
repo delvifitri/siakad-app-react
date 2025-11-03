@@ -40,7 +40,7 @@ export default function DosenNilaiPresensi() {
                 </div>
                 <div className="w-full sm:w-[20rem]">
                   <div className="grid grid-cols-2 gap-2">
-                    <button onClick={() => navigate(`/dosen/input-nilai/${c.code}`, { state: { course: c.name, cls: c.cls, code: c.code, mahasiswa: c.mahasiswa, time: c.time, room: c.room } })} className="inline-flex items-center justify-center gap-1 px-3 h-10 rounded-full text-xs text-white bg-blue-600 hover:bg-blue-700 w-full">
+                    <button onClick={() => navigate(`/dosen/lihat-nilai/${c.code}`, { state: { course: c.name, cls: c.cls, code: c.code, mahasiswa: c.mahasiswa, time: c.time, room: c.room } })} className="inline-flex items-center justify-center gap-1 px-3 h-10 rounded-full text-xs text-white bg-blue-600 hover:bg-blue-700 w-full">
                       <AcademicCapIcon className="w-4 h-4"/> Lihat Nilai
                     </button>
                     <button onClick={() => navigate(`/dosen/list-presensi/${slug}`, { state: { course: c.name, cls: c.cls, code: c.code, mahasiswa: c.mahasiswa, time: c.time, room: c.room } })} className="inline-flex items-center justify-center gap-1 px-3 h-10 rounded-full text-xs text-white bg-orange-500 hover:bg-orange-600 w-full">
