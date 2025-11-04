@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router";
-import { HomeIcon, ClipboardDocumentListIcon, ChatBubbleLeftRightIcon, ClipboardDocumentCheckIcon, UserIcon } from "@heroicons/react/24/outline";
+import { HomeIcon, ClipboardDocumentListIcon, ChatBubbleLeftRightIcon, ClipboardDocumentCheckIcon, UserIcon, DocumentTextIcon } from "@heroicons/react/24/outline";
 
 export default function BottomNavDosen() {
   const { pathname } = useLocation();
@@ -8,7 +8,7 @@ export default function BottomNavDosen() {
     { to: "/dosen", label: "Dashboard", icon: <HomeIcon className="w-6 h-6" /> },
     { to: "/dosen/nilai-presensi", label: "Nilai & Presensi", icon: <ClipboardDocumentListIcon className="w-6 h-6" /> },
     { to: "/dosen/ujian", label: "Ujian", icon: <ClipboardDocumentCheckIcon className="w-6 h-6" /> },
-  { to: "/dosen/bimbingan", label: "Bimbingan TA", icon: <ChatBubbleLeftRightIcon className="w-6 h-6" /> },
+    { to: "/dosen/kelola-rps", label: "Kelola RPS", icon: <DocumentTextIcon className="w-6 h-6" /> },
     { to: "/dosen/profile", label: "Profil", icon: <UserIcon className="w-6 h-6" /> },
   ];
 

@@ -18,6 +18,7 @@ export default [
 	route("dosen/bimbingan-akademik", "routes/dosen.bimbingan-akademik.tsx"),
 	route("dosen/ujian", "routes/dosen.ujian.tsx"),
 	route("dosen/bimbingan", "routes/dosen.bimbingan.tsx"),
+	route("dosen/kelola-rps", "routes/dosen.kelola-rps.tsx"),
 	route("dosen/profile", "routes/dosen.profile.tsx"),
 	route("dosen/edit-profile", "routes/dosen.edit-profile.tsx"),
 	route("nilai-presensi", "routes/nilai-presensi.tsx"),
