@@ -104,8 +104,8 @@ export default function DosenInputPresensi() {
   };
 
   const proceedToDetail = () => {
-    if (!session.photoMasuk || !session.photoKeluar) {
-      setToast("Foto bukti masuk dan keluar harus diisi sebelum memulai sesi");
+    if (!session.photoMasuk) {
+      setToast("Foto bukti masuk harus diisi sebelum memulai sesi");
       setTimeout(() => setToast(null), 3000);
       return;
     }
@@ -205,12 +205,12 @@ export default function DosenInputPresensi() {
                   <div className="flex flex-col items-start gap-2">
                     <button
                       type="button"
-                      onClick={() => (photoKeluarRef.current as HTMLInputElement | null)?.click()}
-                      className="px-4 py-2 rounded-full bg-orange-500 text-white text-sm shadow-md hover:bg-orange-600 transition"
+                      disabled
+                      className="px-4 py-2 rounded-full bg-gray-400 text-white text-sm shadow-md cursor-not-allowed"
                     >
                       Ambil Foto Keluar
                     </button>
-                    <input ref={photoKeluarRef} id="photo-keluar-input" type="file" accept="image/*" capture="environment" onChange={(e) => handlePhotoKeluarChange(e as any)} style={{ display: 'none' }} />
+                    <input ref={photoKeluarRef} id="photo-keluar-input" type="file" accept="image/*" capture="environment" onChange={(e) => handlePhotoKeluarChange(e as any)} style={{ display: 'none' }} disabled />
                     {photoKeluarPreview && (
                       <div className="mt-2">
                         <img src={photoKeluarPreview} alt="Keluar" className="w-32 h-20 object-cover rounded-md border" />
