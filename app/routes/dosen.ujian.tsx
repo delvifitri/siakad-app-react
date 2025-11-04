@@ -227,7 +227,7 @@ export default function DosenUjian() {
                     onClick={() => {
                       const courseSlug = e.course.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
                       const yearSlug = selectedAcademicYearSemester.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
-                      navigate(`/dosen/presensi-pengawas/${courseSlug}-${yearSlug}`, {
+                      navigate(`/dosen/detail-presensi-ujian/${courseSlug}-${yearSlug}`, {
                         state: {
                           course: e.course,
                           time: e.date,
@@ -238,13 +238,13 @@ export default function DosenUjian() {
                     }}
                     className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-white text-xs bg-emerald-600 hover:bg-emerald-700"
                   >
-                    <ClipboardDocumentCheckIcon className="w-4 h-4"/> Presensi Pengawas
+                    <ClipboardDocumentCheckIcon className="w-4 h-4"/> Mulai Ujian
                   </button>
                   <button 
                     onClick={() => {
                       const courseSlug = e.course.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
                       const yearSlug = selectedAcademicYearSemester.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
-                      navigate(`/dosen/detail-presensi-ujian/${courseSlug}-${yearSlug}`, {
+                      navigate(`/dosen/presensi-pengawas/${courseSlug}-${yearSlug}`, {
                         state: {
                           course: e.course,
                           time: e.date,
@@ -255,7 +255,7 @@ export default function DosenUjian() {
                     }}
                     className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-gray-700 text-xs bg-gray-100 hover:bg-gray-200"
                   >
-                    <InformationCircleIcon className="w-4 h-4"/> Detail Presensi
+                    <InformationCircleIcon className="w-4 h-4"/> Presensi Pengawas
                   </button>
                 </div>
               </div>
