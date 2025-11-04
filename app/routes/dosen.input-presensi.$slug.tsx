@@ -31,6 +31,8 @@ export default function DosenInputPresensi() {
   const cls = (location as any).state?.cls || "Kelas";
   const code = (location as any).state?.code || "Kode";
   const time = (location as any).state?.time || "";
+  const room = (location as any).state?.room || "";
+  const academicYear = (location as any).state?.academicYear || "";
 
   useEffect(() => {
     try {
@@ -127,7 +129,7 @@ export default function DosenInputPresensi() {
           </button>
           <div>
             <h1 className="text-xl font-bold text-gray-900">Input Presensi</h1>
-            <p className="text-sm text-gray-600">{course} ({cls}) - {code}</p>
+            <p className="text-sm text-gray-600">{course} • {room} • {academicYear}</p>
           </div>
         </div>
 
@@ -203,13 +205,12 @@ export default function DosenInputPresensi() {
                   <div className="flex flex-col items-start gap-2">
                     <button
                       type="button"
-                      disabled
                       onClick={() => (photoKeluarRef.current as HTMLInputElement | null)?.click()}
-                      className="px-4 py-2 rounded-full bg-gray-300 text-white text-sm shadow-none cursor-not-allowed"
+                      className="px-4 py-2 rounded-full bg-orange-500 text-white text-sm shadow-md hover:bg-orange-600 transition"
                     >
                       Ambil Foto Keluar
                     </button>
-                    <input ref={photoKeluarRef} id="photo-keluar-input" type="file" accept="image/*" capture="environment" onChange={(e) => handlePhotoKeluarChange(e as any)} style={{ display: 'none' }} disabled />
+                    <input ref={photoKeluarRef} id="photo-keluar-input" type="file" accept="image/*" capture="environment" onChange={(e) => handlePhotoKeluarChange(e as any)} style={{ display: 'none' }} />
                     {photoKeluarPreview && (
                       <div className="mt-2">
                         <img src={photoKeluarPreview} alt="Keluar" className="w-32 h-20 object-cover rounded-md border" />

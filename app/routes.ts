@@ -11,6 +11,8 @@ export default [
 	route("dosen/approve-krs", "routes/dosen.approve-krs.tsx"),
 	route("dosen/approve-krs/:nim", "routes/dosen.approve-krs.$nim.tsx"),
 	route("dosen/input-presensi/:slug", "routes/dosen.input-presensi.$slug.tsx"),
+	route("dosen/detail-presensi-ujian/:slug", "routes/dosen.detail-presensi-ujian.$slug.tsx"),
+	route("dosen/presensi-pengawas/:slug", "routes/dosen.presensi-pengawas.$slug.tsx"),
 	route("dosen/lihat-nilai/:code", "routes/dosen.lihat-nilai.$code.tsx"),
 	route("dosen/set-komponen-nilai/:code", "routes/dosen.set-komponen-nilai.$code.tsx"),
 	route("dosen/presensi/:slug", "routes/dosen.presensi.$slug.tsx"),
