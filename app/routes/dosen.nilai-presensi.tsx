@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router";
 import DosenLayout from "../layouts/DosenLayout";
-import { AcademicCapIcon, ClipboardDocumentCheckIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { AcademicCapIcon, ClipboardDocumentCheckIcon, MagnifyingGlassIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 
 export function meta() {
   return [{ title: "Nilai & Presensi (Dosen) - Siakad" }];
@@ -63,6 +63,8 @@ export default function DosenNilaiPresensi() {
     }
   }
   const [selectedOffering, setSelectedOffering] = useState<string>(offeringOptions[0]?.value ?? "");
+  const [offeringDropdownOpen, setOfferingDropdownOpen] = useState(false);
+  const [offeringSearch, setOfferingSearch] = useState('');
 
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
@@ -70,6 +72,10 @@ export default function DosenNilaiPresensi() {
 
   const [selectedYear, selectedSemester] = (selectedOffering || "").split("|");
   const currentCourses: Array<any> = (offerings[selectedYear] && offerings[selectedYear][selectedSemester]) || defaultCourses;
+
+  const filteredOfferingOptions = offeringOptions.filter(option =>
+    option.label.toLowerCase().includes(offeringSearch.toLowerCase())
+  );
   useEffect(() => {
     try {
       const role = localStorage.getItem("userRole");
@@ -77,84 +83,63 @@ export default function DosenNilaiPresensi() {
     } catch {}
   }, [navigate]);
 
-  const OfferingSelect = () => {
-    const [open, setOpen] = useState(false);
-    const [query, setQuery] = useState(
-      offeringOptions.find((o) => o.value === selectedOffering)?.label ?? ""
-    );
-    const [highlight, setHighlight] = useState(0);
-    const rootRef = useRef<HTMLDivElement | null>(null);
-
-    useEffect(() => {
-      setQuery(offeringOptions.find((o) => o.value === selectedOffering)?.label ?? "");
-    }, [selectedOffering, offeringOptions]);
-
-    useEffect(() => {
-      function onDoc(e: MouseEvent) {
-        if (!rootRef.current) return;
-        if (!rootRef.current.contains(e.target as Node)) setOpen(false);
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      const dropdown = document.querySelector('[data-dropdown="offering"]');
+      if (offeringDropdownOpen && dropdown && !dropdown.contains(target)) {
+        setOfferingDropdownOpen(false);
+        setOfferingSearch('');
       }
-      document.addEventListener("mousedown", onDoc);
-      return () => document.removeEventListener("mousedown", onDoc);
-    }, []);
+    };
 
-    const options = offeringOptions.filter((o) =>
-      o.label.toLowerCase().includes(query.toLowerCase())
-    );
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [offeringDropdownOpen]);
 
+  const OfferingSelect = () => {
+    const selectedOption = offeringOptions.find(o => o.value === selectedOffering);
     return (
-      <div className="relative w-full sm:w-auto" ref={rootRef}>
-        <input
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setOpen(true);
-            setHighlight(0);
-          }}
-          onFocus={() => setOpen(true)}
-          onKeyDown={(e) => {
-            if (!open && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
-              setOpen(true);
-              return;
-            }
-            if (e.key === "ArrowDown") {
-              e.preventDefault();
-              setHighlight((h) => Math.min(h + 1, Math.max(0, options.length - 1)));
-            } else if (e.key === "ArrowUp") {
-              e.preventDefault();
-              setHighlight((h) => Math.max(0, h - 1));
-            } else if (e.key === "Enter") {
-              e.preventDefault();
-              const sel = options[highlight];
-              if (sel) {
-                setSelectedOffering(sel.value);
-                setQuery(sel.label);
-                setOpen(false);
-              }
-            }
-          }}
-          className="px-3 py-2 rounded-full border text-sm bg-white/80 w-full"
-          placeholder="Pilih tahun ajaran"
-        />
-        {open && options.length > 0 && (
-          <div className="absolute top-full mt-1 w-full bg-white border rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto">
-            {options.map((o, i) => (
-              <div
-                key={o.value}
-                className={`px-3 py-2 cursor-pointer ${
-                  i === highlight ? "bg-blue-100" : "hover:bg-gray-100"
-                }`}
-                onMouseDown={() => {
-                  setSelectedOffering(o.value);
-                  setQuery(o.label);
-                  setOpen(false);
-                }}
-              >
-                {o.label}
+      <div className="mt-4">
+        <label className="block text-sm font-medium text-gray-700 mb-1">Tahun Ajaran & Semester</label>
+        <div className="relative">
+          <button
+            onClick={() => setOfferingDropdownOpen(!offeringDropdownOpen)}
+            className="w-full px-3 py-2 border rounded-full bg-white shadow-sm text-sm text-left flex items-center justify-between hover:bg-gray-50"
+          >
+            <span>{selectedOption?.label || "Pilih tahun ajaran"}</span>
+            <ChevronDownIcon className="w-4 h-4 text-gray-400" />
+          </button>
+          {offeringDropdownOpen && (
+            <div data-dropdown="offering" className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg">
+              <div className="p-2">
+                <input
+                  type="text"
+                  placeholder="Cari tahun ajaran & semester..."
+                  value={offeringSearch}
+                  onChange={(e) => setOfferingSearch(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+                />
               </div>
-            ))}
-          </div>
-        )}
+              <div className="max-h-48 overflow-y-auto">
+                {filteredOfferingOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => {
+                      setSelectedOffering(option.value);
+                      setOfferingDropdownOpen(false);
+                      setOfferingSearch('');
+                    }}
+                    className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100"
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     );
   };
@@ -170,22 +155,17 @@ export default function DosenNilaiPresensi() {
         </div>
 
         <div className="mt-4 space-y-3">
-          <div className="justify-end flex">
-            <OfferingSelect />
-          </div>
-          <div className="mb-4 flex flex-col-reverse">
-            <div className="flex-1">
-              <div className="relative">
-                <MagnifyingGlassIcon className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  value={search}
-                  onChange={handleSearchChange}
-                  placeholder="Cari mata kuliah atau kode MK"
-                  className="w-full pl-10 pr-3 py-2 border rounded-full text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
-                />
-              </div>
+          <OfferingSelect />
+          <div className="max-w-md">
+            <div className="relative">
+              <MagnifyingGlassIcon className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                value={search}
+                onChange={handleSearchChange}
+                placeholder="Cari mata kuliah atau kode MK"
+                className="pl-10 pr-3 py-2 border rounded-full w-full text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+              />
             </div>
-
           </div>
           {currentCourses.filter((c: any) => {
             const q = search.trim().toLowerCase();

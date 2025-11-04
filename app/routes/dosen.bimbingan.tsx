@@ -1,17 +1,38 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import DosenLayout from "../layouts/DosenLayout";
-import { ChatBubbleLeftRightIcon, CheckCircleIcon, ClockIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
+import { ChatBubbleLeftRightIcon, CheckCircleIcon, ClockIcon, ArrowDownTrayIcon, UserIcon, EyeIcon, MagnifyingGlassIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 
 export function meta() {
   return [{ title: "Bimbingan TA (Dosen) - Siakad" }];
 }
 
-const requests = [
-  { name: "Ani Lestari", nim: "202101234", topic: "Bab 2 Tinjauan Pustaka", status: "menunggu" },
-  { name: "Budi Santoso", nim: "202101235", topic: "Metodologi Penelitian", status: "disetujui" },
-  { name: "Citra Rahma", nim: "202101236", topic: "Analisis Data", status: "proses" },
-];
+const angkatanYears = [2020, 2021, 2022, 2023, 2024, 2025];
+
+const requestsByAngkatan: Record<number, Array<{ name: string; nim: string; topic: string; status: string }>> = {
+  2020: [
+    { name: "Siti Aminah", nim: "202001234", topic: "Sistem Informasi Akademik", status: "disetujui" },
+    { name: "Ahmad Rahman", nim: "202001235", topic: "Aplikasi Mobile E-Learning", status: "proses" },
+  ],
+  2021: [
+    { name: "Maya Sari", nim: "202101234", topic: "Bab 2 Tinjauan Pustaka", status: "menunggu" },
+    { name: "Rudi Hartono", nim: "202101235", topic: "Metodologi Penelitian", status: "disetujui" },
+  ],
+  2022: [
+    { name: "Nina Kusuma", nim: "202201234", topic: "Analisis Data Big Data", status: "proses" },
+  ],
+  2023: [
+    { name: "Budi Santoso", nim: "202301234", topic: "Machine Learning untuk Prediksi", status: "menunggu" },
+    { name: "Citra Rahma", nim: "202301235", topic: "Sistem Rekomendasi", status: "disetujui" },
+  ],
+  2024: [
+    { name: "Ani Lestari", nim: "202401234", topic: "Bab 2 Tinjauan Pustaka", status: "menunggu" },
+    { name: "Dedi Kurniawan", nim: "202401235", topic: "Pengembangan Web App", status: "proses" },
+  ],
+  2025: [
+    { name: "Fajar Setiawan", nim: "202501234", topic: "IoT untuk Monitoring", status: "menunggu" },
+  ],
+};
 
 export default function DosenBimbingan() {
   const navigate = useNavigate();
@@ -21,6 +42,10 @@ export default function DosenBimbingan() {
   const [visibleCount, setVisibleCount] = useState<number>(5);
   const [showProposal, setShowProposal] = useState(false);
   const [proposal, setProposal] = useState<null | { title?: string; fileName?: string; dataUrl?: string }> (null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedAngkatan, setSelectedAngkatan] = useState(2024);
+  const [angkatanDropdownOpen, setAngkatanDropdownOpen] = useState(false);
+  const [angkatanSearch, setAngkatanSearch] = useState('');
 
   useEffect(() => {
     try {
@@ -28,6 +53,21 @@ export default function DosenBimbingan() {
       if (role !== "dosen") navigate("/", { replace: true });
     } catch {}
   }, [navigate]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      const dropdown = document.querySelector('[data-dropdown="angkatan"]');
+      if (angkatanDropdownOpen && dropdown && !dropdown.contains(target)) {
+        setAngkatanDropdownOpen(false);
+        setAngkatanSearch('');
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [angkatanDropdownOpen]);
 
   // Load log data when modal opens
   useEffect(() => {
@@ -145,49 +185,120 @@ export default function DosenBimbingan() {
     }
   }
 
+  const filteredAngkatanOptions = angkatanYears.filter(year =>
+    year.toString().includes(angkatanSearch)
+  );
+
+  const requestsForSelectedAngkatan = requestsByAngkatan[selectedAngkatan] ?? [];
+  const filteredRequests = requestsForSelectedAngkatan.filter((r) =>
+    r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    r.nim.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    r.topic.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <DosenLayout bgImage="/bg simple.png">
-      <section className="px-4 pt-6">
+      <section className="px-4 pt-6 pb-24">
   <h1 className="text-xl font-bold text-gray-900">Bimbingan TA</h1>
   <p className="text-sm text-gray-600 mt-1">Kelola bimbingan tugas akhir mahasiswa.</p>
 
-        <div className="mt-4 space-y-3">
-          {requests.map((r, idx) => (
-            <div key={idx} className="bg-white/60 rounded-xl border border-gray-200 p-3">
-              <div className="flex items-start justify-between text-sm">
-                <div>
-                  <div className="font-semibold text-gray-900">{r.name} <span className="text-xs text-gray-500">({r.nim})</span></div>
-                  <div className="text-xs text-gray-600">Topik: {r.topic}</div>
+        {/* Angkatan Selection */}
+        <div className="mt-4">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Angkatan</label>
+          <div className="relative">
+            <button
+              onClick={() => setAngkatanDropdownOpen(!angkatanDropdownOpen)}
+              className="w-full px-3 py-2 border rounded-full bg-white shadow-sm text-sm text-left flex items-center justify-between hover:bg-gray-50"
+            >
+              <span>{selectedAngkatan}</span>
+              <ChevronDownIcon className="w-4 h-4 text-gray-400" />
+            </button>
+            {angkatanDropdownOpen && (
+              <div data-dropdown="angkatan" className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg">
+                <div className="p-2">
+                  <input
+                    type="text"
+                    placeholder="Cari angkatan..."
+                    value={angkatanSearch}
+                    onChange={(e) => setAngkatanSearch(e.target.value)}
+                    className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  />
                 </div>
-                <div className="flex items-center gap-2">
-                  {r.status === "disetujui" ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs bg-emerald-100 text-emerald-700"><CheckCircleIcon className="w-4 h-4"/> Disetujui</span>
-                  ) : r.status === "proses" ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs bg-blue-100 text-blue-700"><ClockIcon className="w-4 h-4"/> Proses</span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs bg-amber-100 text-amber-700"><ClockIcon className="w-4 h-4"/> Menunggu</span>
-                  )}
-                  <div className="flex items-center gap-2">
+                <div className="max-h-48 overflow-y-auto">
+                  {filteredAngkatanOptions.map((year) => (
                     <button
-                      className="inline-flex items-center justify-center gap-1 w-24 py-1.5 rounded-lg text-white text-xs bg-blue-600"
+                      key={year}
                       onClick={() => {
-                        setCurrentStudent({ name: r.name, nim: r.nim });
-                        setShowLog(true);
+                        setSelectedAngkatan(year);
+                        setAngkatanDropdownOpen(false);
+                        setAngkatanSearch('');
                       }}
+                      className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100"
                     >
-                      <ChatBubbleLeftRightIcon className="w-4 h-4"/> Lihat Log
+                      {year}
                     </button>
-                    <button
-                      className="inline-flex items-center justify-center gap-1 w-20 py-1 rounded-full text-sm border border-gray-300 bg-white"
-                      onClick={() => {
-                        setCurrentStudent({ name: r.name, nim: r.nim });
-                        loadProposalFor(r.nim);
-                        setShowProposal(true);
-                      }}
-                    >
-                      Detail
-                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Search input */}
+        <div className="mt-4 max-w-md">
+          <div className="relative">
+            <MagnifyingGlassIcon className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Cari mahasiswa — nama, NIM, atau topik"
+              className="pl-10 pr-3 py-2 border rounded-full w-full text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+            />
+          </div>
+        </div>
+
+        <div className="mt-4 space-y-3">
+          {filteredRequests.map((r, idx) => (
+            <div key={idx} className="bg-white/60 rounded-xl border border-gray-200 p-3">
+              <div className="flex items-start justify-between">
+                <div className="flex items-start gap-3 flex-1">
+                  <div className="w-9 h-9 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center flex-shrink-0"><UserIcon className="w-5 h-5"/></div>
+                  <div className="min-w-0 flex-1">
+                    <div className="font-semibold text-gray-900">{r.name} <span className="text-xs text-gray-500">({r.nim})</span></div>
+                    <div className="text-xs text-gray-600">Topik: {r.topic}</div>
+                    <div className="mt-2">
+                      {r.status === "disetujui" ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs bg-emerald-100 text-emerald-700"><CheckCircleIcon className="w-4 h-4"/> Disetujui</span>
+                      ) : r.status === "proses" ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs bg-blue-100 text-blue-700"><ClockIcon className="w-4 h-4"/> Proses</span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs bg-amber-100 text-amber-700"><ClockIcon className="w-4 h-4"/> Menunggu</span>
+                      )}
+                    </div>
                   </div>
+                </div>
+                <div className="flex flex-col gap-2 ml-3 flex-shrink-0">
+                  <button
+                    className="inline-flex items-center gap-1 px-2 py-1.5 rounded-md text-xs bg-blue-600 text-white hover:bg-blue-700 whitespace-nowrap"
+                    onClick={() => {
+                      setCurrentStudent({ name: r.name, nim: r.nim });
+                      setShowLog(true);
+                    }}
+                  >
+                    <ChatBubbleLeftRightIcon className="w-4 h-4" />
+                    Lihat Log
+                  </button>
+                  <button
+                    className="inline-flex items-center gap-1 px-2 py-1.5 rounded-md text-xs bg-green-600 text-white hover:bg-green-700 whitespace-nowrap"
+                    onClick={() => {
+                      setCurrentStudent({ name: r.name, nim: r.nim });
+                      loadProposalFor(r.nim);
+                      setShowProposal(true);
+                    }}
+                  >
+                    <EyeIcon className="w-4 h-4" />
+                    Detail
+                  </button>
                 </div>
               </div>
             </div>
