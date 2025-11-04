@@ -34,8 +34,47 @@ export default function DosenBimbingan() {
     if (!showLog) return;
     try {
       const raw = localStorage.getItem("logBimbinganData");
-      if (raw) setLogs(JSON.parse(raw));
-      else setLogs([]);
+      if (raw) {
+        setLogs(JSON.parse(raw));
+      } else {
+        // Initialize with sample data if no logs exist
+        const sampleLogs = [
+          {
+            id: "log-001",
+            pembimbing: "1",
+            tanggalBimbingan: "2025-10-15",
+            isi: "Mahasiswa telah menyelesaikan bab 1 dengan baik. Perlu diperbaiki bagian metodologi penelitian agar lebih detail.",
+            approve: "Disetujui",
+            tanggalInput: "2025-10-15T10:30:00Z"
+          },
+          {
+            id: "log-002",
+            pembimbing: "2",
+            tanggalBimbingan: "2025-10-20",
+            isi: "Presentasi bab 2 sudah cukup baik. Mahasiswa diminta untuk menambahkan referensi lebih banyak pada tinjauan pustaka.",
+            approve: "Disetujui",
+            tanggalInput: "2025-10-20T14:15:00Z"
+          },
+          {
+            id: "log-003",
+            pembimbing: "1",
+            tanggalBimbingan: "2025-10-25",
+            isi: "Bab 3 masih perlu diperbaiki. Diagram alur aplikasi kurang jelas dan perlu ditambahkan penjelasan lebih detail.",
+            approve: "Menunggu",
+            tanggalInput: "2025-10-25T09:45:00Z"
+          },
+          {
+            id: "log-004",
+            pembimbing: "2",
+            tanggalBimbingan: "2025-11-01",
+            isi: "Proposal sudah cukup lengkap. Mahasiswa akan segera mengumpulkan proposal final setelah revisi kecil pada bagian kesimpulan.",
+            approve: "Disetujui",
+            tanggalInput: "2025-11-01T16:20:00Z"
+          }
+        ];
+        localStorage.setItem("logBimbinganData", JSON.stringify(sampleLogs));
+        setLogs(sampleLogs);
+      }
     } catch {
       setLogs([]);
     }
