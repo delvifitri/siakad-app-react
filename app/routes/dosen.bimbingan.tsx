@@ -45,6 +45,7 @@ export default function DosenBimbingan() {
   const [visibleCount, setVisibleCount] = useState<number>(5);
   const [showProposal, setShowProposal] = useState(false);
   const [proposal, setProposal] = useState<null | { title?: string; fileName?: string; dataUrl?: string }> (null);
+  const [documentType, setDocumentType] = useState<'proposal' | 'proposal-revisi' | 'laporan-ta'>('proposal');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedAngkatan, setSelectedAngkatan] = useState(2024);
   const [selectedExamType, setSelectedExamType] = useState<'semua' | 'sempro' | 'semhas'>('semua');
@@ -64,6 +65,103 @@ export default function DosenBimbingan() {
         setSelectedExamType(savedExamType as 'semua' | 'sempro' | 'semhas');
       }
     } catch {}
+  }, []);
+
+  // Initialize dummy documents for all students
+  useEffect(() => {
+    try {
+      // Create dummy documents for all students
+      const allStudents = Object.values(requestsByAngkatan).flat();
+
+      allStudents.forEach(student => {
+        const baseDocument = {
+          title: student.title || `Tugas Akhir ${student.name}`,
+          fileName: `${student.examType === 'sempro' ? 'proposal-revisi' : student.examType === 'semhas' ? 'laporan-ta' : 'proposal'}-${student.nim}.pdf`,
+          dataUrl: `data:text/html;base64,${btoa(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>${student.examType === 'sempro' ? 'Proposal Revisi' : student.examType === 'semhas' ? 'Laporan TA' : 'Proposal'} - ${student.name}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+                    h1 { color: #2563eb; border-bottom: 2px solid #2563eb; padding-bottom: 10px; }
+                    .info { background: #f3f4f6; padding: 15px; border-radius: 5px; margin: 20px 0; }
+                    .content { margin-top: 30px; }
+                </style>
+            </head>
+            <body>
+                <h1>${student.examType === 'sempro' ? 'Proposal Revisi' : student.examType === 'semhas' ? 'Laporan TA' : 'Proposal'}</h1>
+                <div class="info">
+                    <strong>Nama Mahasiswa:</strong> ${student.name}<br>
+                    <strong>NIM:</strong> ${student.nim}<br>
+                    <strong>Judul:</strong> ${student.title || `Tugas Akhir ${student.name}`}<br>
+                    <strong>Tanggal:</strong> ${new Date().toLocaleDateString('id-ID')}
+                </div>
+                <div class="content">
+                    <h2>Abstrak</h2>
+                    <p>Dokumen ini merupakan ${student.examType === 'sempro' ? 'proposal revisi' : student.examType === 'semhas' ? 'laporan tugas akhir' : 'proposal'} yang dibuat sebagai bagian dari proses akademik mahasiswa.</p>
+                    
+                    <h2>Bab 1 - Pendahuluan</h2>
+                    <p>Latar belakang penelitian ini berkaitan dengan topik: ${student.topic}</p>
+                    
+                    <h2>Bab 2 - Tinjauan Pustaka</h2>
+                    <p>Kajian literatur yang relevan dengan penelitian ini...</p>
+                    
+                    <h2>Bab 3 - Metodologi</h2>
+                    <p>Metode penelitian yang digunakan dalam penelitian ini...</p>
+                    
+                    <h2>Kesimpulan</h2>
+                    <p>Kesimpulan dari penelitian ini akan dibahas pada bagian akhir dokumen.</p>
+                    
+                    <hr style="margin: 40px 0;">
+                    <p style="text-align: center; color: #666; font-size: 12px;">
+                        Dokumen Demo - ${new Date().toLocaleString('id-ID')}
+                    </p>
+                </div>
+            </body>
+            </html>
+          `)}`
+        };
+
+        // Create proposal for pendadaran students
+        if (student.examType === 'pendadaran') {
+          const proposalKey = `proposal-${student.nim}`;
+          if (!localStorage.getItem(proposalKey)) {
+            localStorage.setItem(proposalKey, JSON.stringify({
+              ...baseDocument,
+              title: `Proposal ${student.title || `Tugas Akhir ${student.name}`}`,
+              fileName: `proposal-${student.nim}.pdf`
+            }));
+          }
+        }
+
+        // Create proposal revisi for sempro students
+        if (student.examType === 'sempro') {
+          const proposalRevisiKey = `proposal-revisi-${student.nim}`;
+          if (!localStorage.getItem(proposalRevisiKey)) {
+            localStorage.setItem(proposalRevisiKey, JSON.stringify({
+              ...baseDocument,
+              title: `Proposal Revisi ${student.title || `Tugas Akhir ${student.name}`}`,
+              fileName: `proposal-revisi-${student.nim}.pdf`
+            }));
+          }
+        }
+
+        // Create laporan TA for semhas students
+        if (student.examType === 'semhas') {
+          const laporanTaKey = `laporan-ta-${student.nim}`;
+          if (!localStorage.getItem(laporanTaKey)) {
+            localStorage.setItem(laporanTaKey, JSON.stringify({
+              ...baseDocument,
+              title: `Laporan TA ${student.title || `Tugas Akhir ${student.name}`}`,
+              fileName: `laporan-ta-${student.nim}.pdf`
+            }));
+          }
+        }
+      });
+    } catch (error) {
+      console.log('Error initializing dummy documents:', error);
+    }
   }, []);
 
   // Load log data when modal opens
@@ -128,17 +226,51 @@ export default function DosenBimbingan() {
     });
   }
 
-  function loadProposalFor(nim: string) {
+  function loadDocumentFor(nim: string, examType: 'sempro' | 'semhas' | 'pendadaran') {
     try {
-      const rawSpecific = localStorage.getItem(`proposal-${nim}`);
+      let documentKey = '';
+      let documentTypeLabel = '';
+
+      if (examType === 'sempro') {
+        documentKey = `proposal-revisi-${nim}`;
+        documentTypeLabel = 'proposal-revisi';
+      } else if (examType === 'semhas') {
+        documentKey = `laporan-ta-${nim}`;
+        documentTypeLabel = 'laporan-ta';
+      } else {
+        documentKey = `proposal-${nim}`;
+        documentTypeLabel = 'proposal';
+      }
+
+      setDocumentType(documentTypeLabel as 'proposal' | 'proposal-revisi' | 'laporan-ta');
+
+      // Try to load specific document first
+      const rawSpecific = localStorage.getItem(documentKey);
       if (rawSpecific) {
         const parsed = JSON.parse(rawSpecific);
         setProposal(parsed);
         return;
       }
-      const raw = localStorage.getItem("proposalData");
+
+      // Fallback to general data
+      const fallbackKey = examType === 'sempro' ? 'proposalRevisiData' :
+                         examType === 'semhas' ? 'laporanTaData' : 'proposalData';
+
+      const raw = localStorage.getItem(fallbackKey);
       if (raw) {
         const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          const found = parsed.find((p: any) => p.nim === nim || p.nim === String(nim));
+          if (found) { setProposal(found); return; }
+        } else if (parsed && (parsed.nim === nim || parsed.nim === String(nim))) {
+          setProposal(parsed); return;
+        }
+      }
+
+      // Final fallback to general proposal data
+      const rawGeneral = localStorage.getItem("proposalData");
+      if (rawGeneral) {
+        const parsed = JSON.parse(rawGeneral);
         if (Array.isArray(parsed)) {
           const found = parsed.find((p: any) => p.nim === nim || p.nim === String(nim));
           if (found) { setProposal(found); return; }
@@ -299,7 +431,7 @@ export default function DosenBimbingan() {
                     className="inline-flex items-center gap-1 px-2 py-1.5 rounded-md text-xs bg-purple-600 text-white hover:bg-purple-700 whitespace-nowrap"
                     onClick={() => {
                       setCurrentStudent({ name: r.name, nim: r.nim });
-                      loadProposalFor(r.nim);
+                      loadDocumentFor(r.nim, r.examType);
                       setShowProposal(true);
                     }}
                   >
@@ -412,14 +544,22 @@ export default function DosenBimbingan() {
           <div className="relative bg-white rounded-2xl w-full sm:max-w-lg mx-4 p-4 shadow-lg">
             <div className="flex items-center justify-between">
               <div>
-                <div className="font-semibold text-gray-900">Detail Proposal — {currentStudent.name}</div>
+                <div className="font-semibold text-gray-900">
+                  {documentType === 'proposal' ? 'Detail Proposal' :
+                   documentType === 'proposal-revisi' ? 'Detail Proposal Revisi' :
+                   'Detail Laporan TA'} — {currentStudent.name}
+                </div>
                 <div className="text-xs text-gray-600">NIM: {currentStudent.nim}</div>
               </div>
               <button className="text-sm text-gray-600" onClick={() => setShowProposal(false)}>Tutup</button>
             </div>
             <div className="mt-3 text-sm">
               {!proposal ? (
-                <div className="text-gray-600">Belum ada proposal yang diunggah oleh mahasiswa ini.</div>
+                <div className="text-gray-600">
+                  Belum ada {documentType === 'proposal' ? 'proposal' :
+                             documentType === 'proposal-revisi' ? 'proposal revisi' :
+                             'laporan TA'} yang diunggah oleh mahasiswa ini.
+                </div>
               ) : (
                 <div className="space-y-3">
                   {proposal.title && (<div><div className="text-xs text-gray-600">Judul</div><div className="font-medium">{proposal.title}</div></div>)}
@@ -428,10 +568,10 @@ export default function DosenBimbingan() {
                     <div>
                       <div className="text-xs text-gray-600 mb-1">Preview</div>
                       <div className="border rounded-md overflow-hidden">
-                        <iframe src={proposal.dataUrl} title="proposal-preview" className="w-full h-64" />
+                        <iframe src={proposal.dataUrl} title={`${documentType === 'proposal' ? 'Proposal' : documentType === 'proposal-revisi' ? 'Proposal Revisi' : 'Laporan TA'} Preview`} className="w-full h-64" />
                       </div>
                       <div className="mt-2">
-                        <a href={proposal.dataUrl} download={proposal.fileName || `proposal-${currentStudent.nim}.pdf`} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-600 text-white">Download</a>
+                        <a href={proposal.dataUrl} download={proposal.fileName || `${documentType === 'proposal' ? 'proposal' : documentType === 'proposal-revisi' ? 'proposal-revisi' : 'laporan-ta'}-${currentStudent.nim}.pdf`} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-600 text-white">Download</a>
                       </div>
                     </div>
                   ) : null}
