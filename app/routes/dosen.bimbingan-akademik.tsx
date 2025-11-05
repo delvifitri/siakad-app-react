@@ -165,7 +165,7 @@ export default function DosenBimbinganAkademik() {
                   </button>
                   <button
                     onClick={() => navigate(`/krs-khs?nim=${mhs.nim}&from=dosen&disableKrs=true&tab=ipk`)}
-                    className="inline-flex items-center gap-1 px-2 py-1.5 rounded-md text-xs bg-green-600 text-white hover:bg-green-700 whitespace-nowrap"
+                    className="inline-flex items-center gap-1 px-2 py-1.5 rounded-md text-xs bg-orange-600 text-white hover:bg-orange-700 whitespace-nowrap"
                     aria-label={`Lihat detail akademik ${mhs.name}`}
                   >
                     <EyeIcon className="w-4 h-4" />
