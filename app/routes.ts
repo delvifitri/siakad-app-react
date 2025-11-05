@@ -19,6 +19,7 @@ export default [
 	route("dosen/list-presensi/:slug", "routes/dosen.list-presensi.$slug.tsx"),
 	route("dosen/bimbingan-akademik", "routes/dosen.bimbingan-akademik.tsx"),
 	route("dosen/ujian", "routes/dosen.ujian.tsx"),
+	route("dosen/ujian-pendadaran", "routes/dosen.ujian-pendadaran.tsx"),
 	route("dosen/bimbingan", "routes/dosen.bimbingan.tsx"),
 	route("dosen/kelola-rps", "routes/dosen.kelola-rps.tsx"),
 	route("dosen/profile", "routes/dosen.profile.tsx"),

@@ -86,9 +86,9 @@ export default function DosenDashboard() {
           <a href="/dosen/approve-krs" className="block" aria-label="Approve KRS">
           <StatCard variant="small" wrapTitle icon={<DocumentCheckIcon className="w-6 h-6 text-purple-600" />} title="Approve KRS" value={krsSummary} />
           </a>
-          <div className="block">
+          <a href="/dosen/ujian-pendadaran" className="block" aria-label="Ujian Pendadaran">
           <StatCard variant="small" wrapTitle icon={<AcademicCapIcon className="w-6 h-6 text-orange-500" />} title="Ujian Pendadaran" value={examsThisWeek} />
-          </div>
+          </a>
         </div>
 
         {/* Shortcut Aksi Cepat */}
