@@ -39,13 +39,10 @@ const requestsByAngkatan: Record<number, Array<{ name: string; nim: string; topi
 
 export default function DosenBimbingan() {
   const navigate = useNavigate();
-  const [showLog, setShowLog] = useState(false);
-  const [currentStudent, setCurrentStudent] = useState<{ name: string; nim: string } | null>(null);
-  const [logs, setLogs] = useState<Array<any>>([]);
-  const [visibleCount, setVisibleCount] = useState<number>(5);
   const [showProposal, setShowProposal] = useState(false);
   const [proposal, setProposal] = useState<null | { title?: string; fileName?: string; dataUrl?: string }> (null);
   const [documentType, setDocumentType] = useState<'proposal' | 'proposal-revisi' | 'laporan-ta'>('proposal');
+  const [currentProposalStudent, setCurrentProposalStudent] = useState<{ name: string; nim: string } | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedAngkatan, setSelectedAngkatan] = useState(2024);
   const [selectedExamType, setSelectedExamType] = useState<'semua' | 'sempro' | 'semhas'>('semua');
@@ -164,67 +161,15 @@ export default function DosenBimbingan() {
     }
   }, []);
 
-  // Load log data when modal opens
+    // Load selected exam type
   useEffect(() => {
-    if (!showLog) return;
     try {
-      const raw = localStorage.getItem("logBimbinganData");
-      if (raw) {
-        setLogs(JSON.parse(raw));
-      } else {
-        // Initialize with sample data if no logs exist
-        const sampleLogs = [
-          {
-            id: "log-001",
-            pembimbing: "1",
-            tanggalBimbingan: "2025-10-15",
-            isi: "Mahasiswa telah menyelesaikan bab 1 dengan baik. Perlu diperbaiki bagian metodologi penelitian agar lebih detail.",
-            approve: "Disetujui",
-            tanggalInput: "2025-10-15T10:30:00Z"
-          },
-          {
-            id: "log-002",
-            pembimbing: "2",
-            tanggalBimbingan: "2025-10-20",
-            isi: "Presentasi bab 2 sudah cukup baik. Mahasiswa diminta untuk menambahkan referensi lebih banyak pada tinjauan pustaka.",
-            approve: "Disetujui",
-            tanggalInput: "2025-10-20T14:15:00Z"
-          },
-          {
-            id: "log-003",
-            pembimbing: "1",
-            tanggalBimbingan: "2025-10-25",
-            isi: "Bab 3 masih perlu diperbaiki. Diagram alur aplikasi kurang jelas dan perlu ditambahkan penjelasan lebih detail.",
-            approve: "Menunggu",
-            tanggalInput: "2025-10-25T09:45:00Z"
-          },
-          {
-            id: "log-004",
-            pembimbing: "2",
-            tanggalBimbingan: "2025-11-01",
-            isi: "Proposal sudah cukup lengkap. Mahasiswa akan segera mengumpulkan proposal final setelah revisi kecil pada bagian kesimpulan.",
-            approve: "Disetujui",
-            tanggalInput: "2025-11-01T16:20:00Z"
-          }
-        ];
-        localStorage.setItem("logBimbinganData", JSON.stringify(sampleLogs));
-        setLogs(sampleLogs);
+      const savedExamType = localStorage.getItem("selectedExamType");
+      if (savedExamType && ['semua', 'sempro', 'semhas'].includes(savedExamType)) {
+        setSelectedExamType(savedExamType as 'semua' | 'sempro' | 'semhas');
       }
-    } catch {
-      setLogs([]);
-    }
-    setVisibleCount(5);
-  }, [showLog]);
-
-  function updateLogStatus(id: string, status: "Disetujui" | "Ditolak" | "Menunggu") {
-    setLogs((prev) => {
-      const next = prev.map((x: any) => (x.id === id ? { ...x, approve: status } : x));
-      try {
-        localStorage.setItem("logBimbinganData", JSON.stringify(next));
-      } catch {}
-      return next;
-    });
-  }
+    } catch {}
+  }, []);
 
   function loadDocumentFor(nim: string, examType: 'sempro' | 'semhas' | 'pendadaran') {
     try {
@@ -410,8 +355,7 @@ export default function DosenBimbingan() {
                   <button
                     className="inline-flex items-center gap-1 px-2 py-1.5 rounded-md text-xs bg-orange-600 text-white hover:bg-orange-700 whitespace-nowrap"
                     onClick={() => {
-                      setCurrentStudent({ name: r.name, nim: r.nim });
-                      setShowLog(true);
+                      navigate(`/dosen/log-bimbingan/${r.nim}`);
                     }}
                   >
                     <ChatBubbleLeftRightIcon className="w-4 h-4" />
@@ -430,7 +374,7 @@ export default function DosenBimbingan() {
                   <button
                     className="inline-flex items-center gap-1 px-2 py-1.5 rounded-md text-xs bg-purple-600 text-white hover:bg-purple-700 whitespace-nowrap"
                     onClick={() => {
-                      setCurrentStudent({ name: r.name, nim: r.nim });
+                      setCurrentProposalStudent({ name: r.name, nim: r.nim });
                       loadDocumentFor(r.nim, r.examType);
                       setShowProposal(true);
                     }}
@@ -444,101 +388,8 @@ export default function DosenBimbingan() {
           ))}
         </div>
       </section>
-      {/* Log modal for selected mahasiswa */}
-      {showLog && currentStudent && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setShowLog(false)} />
-          <div className="relative bg-white rounded-2xl w-full sm:max-w-2xl mx-4 p-4 shadow-lg">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <div className="font-semibold text-gray-900">Log Bimbingan — {currentStudent.name}</div>
-                <div className="text-xs text-gray-600">NIM: {currentStudent.nim}</div>
-                <div className="mt-2">
-                  <button
-                    className="inline-flex items-center gap-2 px-2 py-1 rounded-full text-sm bg-blue-600 text-white hover:bg-blue-700 shadow-sm"
-                    onClick={downloadCsv}
-                  >
-                    <ArrowDownTrayIcon className="w-4 h-4" />
-                    <span className="sr-only">Download CSV</span>
-                    <span className="ml-1">Download</span>
-                  </button>
-                </div>
-              </div>
-              <div className="ml-auto flex items-center gap-2">
-                <button className="text-sm text-gray-600" onClick={() => setShowLog(false)}>Tutup</button>
-              </div>
-            </div>
-            <div className="mt-3 space-y-3">
-              {logs.length === 0 ? (
-                <div className="text-sm text-gray-600">Belum ada catatan bimbingan.</div>
-              ) : (
-                <>
-                  <div
-                    className="space-y-3"
-                    style={{
-                      maxHeight: "60vh",
-                      overflow: "auto",
-                      WebkitOverflowScrolling: "touch",
-                      paddingRight: 6,
-                    }}
-                  >
-                    {logs.slice(0, visibleCount).map((item: any) => (
-                  <div key={item.id} className="p-3 rounded-xl border border-gray-200 bg-white/80 shadow-sm">
-                    <div className="flex items-start justify-between">
-                      <div className="flex flex-col gap-1">
-                        <span className="px-2 py-0.5 rounded-full text-xs border bg-blue-50 text-blue-700 border-blue-200">Pembimbing {item.pembimbing}</span>
-                        <div className="inline-flex items-center gap-1 text-xs text-gray-600">{new Date(item.tanggalBimbingan).toLocaleDateString("id-ID")}</div>
-                      </div>
-                      <span className={`h-fit px-2 py-0.5 rounded-full text-xs border ${
-                        item.approve === "Disetujui"
-                          ? "bg-green-100 text-green-700 border-green-200"
-                          : item.approve === "Ditolak"
-                          ? "bg-red-100 text-red-700 border-red-200"
-                          : "bg-yellow-100 text-yellow-700 border-yellow-200"
-                      }`}>{item.approve}</span>
-                    </div>
-                    <div className="mt-2 text-sm text-gray-800 whitespace-pre-wrap">{item.isi}</div>
-                    <div className="mt-3 flex items-center gap-2 text-xs">
-                      <button
-                        className="px-2 py-1 rounded-full text-white bg-emerald-600 hover:bg-emerald-700"
-                        onClick={() => updateLogStatus(item.id, "Disetujui")}
-                      >
-                        Approve
-                      </button>
-                      <button
-                        className="px-2 py-1 rounded-full text-white bg-red-600 hover:bg-red-700"
-                        onClick={() => updateLogStatus(item.id, "Ditolak")}
-                      >
-                        Tolak
-                      </button>
-                      <button
-                        className="px-2 py-1 rounded-full border border-gray-300 text-gray-700"
-                        onClick={() => updateLogStatus(item.id, "Menunggu")}
-                      >
-                        Reset
-                      </button>
-                    </div>
-                  </div>
-                    ))}
-                  </div>
-                  {visibleCount < logs.length && (
-                    <div className="mt-3 flex justify-center">
-                      <button
-                        className="px-3 py-1 rounded-full border border-gray-300 text-sm bg-white"
-                        onClick={() => setVisibleCount((c) => Math.min(c + 5, logs.length))}
-                      >
-                        Muat lagi ({Math.min(visibleCount + 5, logs.length)}/{logs.length})
-                      </button>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
       {/* Proposal modal */}
-      {showProposal && currentStudent && (
+      {showProposal && currentProposalStudent && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
           <div className="absolute inset-0 bg-black/40" onClick={() => setShowProposal(false)} />
           <div className="relative bg-white rounded-2xl w-full sm:max-w-lg mx-4 p-4 shadow-lg">
@@ -547,9 +398,9 @@ export default function DosenBimbingan() {
                 <div className="font-semibold text-gray-900">
                   {documentType === 'proposal' ? 'Detail Proposal' :
                    documentType === 'proposal-revisi' ? 'Detail Proposal Revisi' :
-                   'Detail Laporan TA'} — {currentStudent.name}
+                   'Detail Laporan TA'} — {currentProposalStudent.name}
                 </div>
-                <div className="text-xs text-gray-600">NIM: {currentStudent.nim}</div>
+                <div className="text-xs text-gray-600">NIM: {currentProposalStudent.nim}</div>
               </div>
               <button className="text-sm text-gray-600" onClick={() => setShowProposal(false)}>Tutup</button>
             </div>
@@ -571,7 +422,7 @@ export default function DosenBimbingan() {
                         <iframe src={proposal.dataUrl} title={`${documentType === 'proposal' ? 'Proposal' : documentType === 'proposal-revisi' ? 'Proposal Revisi' : 'Laporan TA'} Preview`} className="w-full h-64" />
                       </div>
                       <div className="mt-2">
-                        <a href={proposal.dataUrl} download={proposal.fileName || `${documentType === 'proposal' ? 'proposal' : documentType === 'proposal-revisi' ? 'proposal-revisi' : 'laporan-ta'}-${currentStudent.nim}.pdf`} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-600 text-white">Download</a>
+                        <a href={proposal.dataUrl} download={proposal.fileName || `${documentType === 'proposal' ? 'proposal' : documentType === 'proposal-revisi' ? 'proposal-revisi' : 'laporan-ta'}-${currentProposalStudent.nim}.pdf`} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-600 text-white">Download</a>
                       </div>
                     </div>
                   ) : null}
