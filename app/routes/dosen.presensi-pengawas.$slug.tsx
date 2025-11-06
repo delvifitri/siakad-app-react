@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import DosenLayout from "../layouts/DosenLayout";
-import { ArrowLeftIcon, CameraIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftIcon, CameraIcon, PaperClipIcon } from "@heroicons/react/24/outline";
 
 export function meta() {
   return [{ title: "Presensi Pengawas - Siakad" }];
@@ -166,21 +166,31 @@ export default function DosenPresensiPengawas() {
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Foto Bukti Presensi</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Bukti Presensi</label>
               <div className="flex flex-col items-start gap-2">
-                <button
-                  type="button"
-                  onClick={() => (photoMasukRef.current as HTMLInputElement | null)?.click()}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500 text-white text-sm shadow-md hover:bg-orange-600 transition"
-                >
-                  <CameraIcon className="w-4 h-4" />
-                  Ambil Foto
-                </button>
+                <div className="flex flex-col gap-2">
+                  <button
+                    type="button"
+                    onClick={() => (photoMasukRef.current as HTMLInputElement | null)?.click()}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500 text-white text-sm shadow-md hover:bg-blue-600 transition"
+                  >
+                    <PaperClipIcon className="w-4 h-4" />
+                    Pilih File
+                  </button>
+                  <button
+                    type="button"
+                    disabled
+                    onClick={() => (photoMasukRef.current as HTMLInputElement | null)?.click()}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-400 text-white text-sm shadow-md cursor-not-allowed"
+                  >
+                    <CameraIcon className="w-4 h-4" />
+                    Ambil Foto
+                  </button>
+                </div>
                 <input
                   ref={photoMasukRef}
                   type="file"
                   accept="image/*"
-                  capture="environment"
                   onChange={(e) => handlePhotoMasukChange(e as any)}
                   style={{ display: 'none' }}
                 />
