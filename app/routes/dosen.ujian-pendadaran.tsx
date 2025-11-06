@@ -156,6 +156,7 @@ const thesisDefenseData: Record<number, Array<{
 export default function DosenUjianPendadaran() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const [gradingFilter, setGradingFilter] = useState<'all' | 'belum_dinilai' | 'sudah_dinilai'>('all');
 
   useEffect(() => {
     try {
@@ -173,11 +174,15 @@ export default function DosenUjianPendadaran() {
     // If grading status is the same, sort by date (earliest first)
     return new Date(a.date).getTime() - new Date(b.date).getTime();
   });
-  const filteredThesisDefenses = allThesisDefenses.filter((exam) =>
-    exam.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    exam.nim.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    exam.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredThesisDefenses = allThesisDefenses.filter((exam) => {
+    const matchesSearch = exam.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      exam.nim.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      exam.title.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesGradingFilter = gradingFilter === 'all' || exam.gradingStatus === gradingFilter;
+    
+    return matchesSearch && matchesGradingFilter;
+  });
 
   const getGradingStatusColor = (gradingStatus: string) => {
     switch (gradingStatus) {
@@ -201,7 +206,39 @@ export default function DosenUjianPendadaran() {
         <h1 className="text-xl font-bold text-gray-900">Ujian Pendadaran</h1>
         <p className="text-sm text-gray-600 mt-1">Kelola jadwal ujian pendadaran mahasiswa.</p>
 
-        {/* Search input */}
+        {/* Filter buttons */}
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button
+            onClick={() => setGradingFilter('all')}
+            className={`px-3 py-2 rounded-full text-sm font-medium transition-colors ${
+              gradingFilter === 'all'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            Semua ({allThesisDefenses.length})
+          </button>
+          <button
+            onClick={() => setGradingFilter('belum_dinilai')}
+            className={`px-3 py-2 rounded-full text-sm font-medium transition-colors ${
+              gradingFilter === 'belum_dinilai'
+                ? 'bg-orange-600 text-white'
+                : 'bg-orange-100 text-orange-700 hover:bg-orange-200'
+            }`}
+          >
+            Belum Dinilai ({allThesisDefenses.filter(exam => exam.gradingStatus === 'belum_dinilai').length})
+          </button>
+          <button
+            onClick={() => setGradingFilter('sudah_dinilai')}
+            className={`px-3 py-2 rounded-full text-sm font-medium transition-colors ${
+              gradingFilter === 'sudah_dinilai'
+                ? 'bg-green-600 text-white'
+                : 'bg-green-100 text-green-700 hover:bg-green-200'
+            }`}
+          >
+            Sudah Dinilai ({allThesisDefenses.filter(exam => exam.gradingStatus === 'sudah_dinilai').length})
+          </button>
+        </div>        {/* Search input */}
         <div className="mt-4 max-w-md">
           <div className="relative">
             <MagnifyingGlassIcon className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />

@@ -77,9 +77,9 @@ export default function DosenDashboard() {
 
         {/* Kartu Ringkasan Cepat */}
         <div className="grid grid-cols-2 gap-3 mt-6">
-          <div className="block">
+          <a href="/schedule" className="block" aria-label="Lihat Jadwal">
           <StatCard variant="small" wrapTitle icon={<CalendarDaysIcon className="w-6 h-6 text-blue-600" />} title="Mata Kuliah Aktif" value={activeCourses} />
-          </div>
+          </a>
           <a href="/dosen/bimbingan-akademik" className="block" aria-label="Bimbingan Akademik">
           <StatCard variant="small" wrapTitle icon={<UserGroupIcon className="w-6 h-6 text-green-600" />} title="Bimbingan Akademik" value={bimbinganCount} />
           </a>
