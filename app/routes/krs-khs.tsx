@@ -367,28 +367,9 @@ export default function KrsKhs() {
   const totalSksMemo = useMemo(() => selectedCoursesMemo.reduce((sum, c) => sum + c.sks, 0), [selectedCoursesMemo]);
 
   function validateBeforeSubmit() {
-    const errs: string[] = [];
-    const selectedCourses = selectedCoursesMemo;
-    const totalSks = totalSksMemo;
-
-    if (selectedCourses.length === 0) errs.push("Pilih minimal satu mata kuliah.");
-    if (totalSks < 12) errs.push("Minimal 12 SKS untuk pengajuan KRS.");
-    if (totalSks > 24) errs.push("Maksimal 24 SKS per semester.");
-
-    const allSelected = [...krsCourses, ...otherSemesterCourses].filter((c) => selectedMap[c.id]);
-    for (const c of allSelected as (Course | OtherCourse)[]) {
-      const clsKey = selectedClasses[c.id] ?? "A";
-      const cls = c.classes[clsKey];
-      const day = selectedDays[c.id] || cls.day;
-      const time = selectedTimes[c.id] || cls.time;
-      const lecturer = selectedLecturers[c.id] || cls.lecturer;
-      if (!day || !time) errs.push(`Jadwal belum dipilih lengkap untuk ${c.name}.`);
-      if (!lecturer) errs.push(`Dosen belum dipilih untuk ${c.name}.`);
-      if (cls.remaining === 0) errs.push(`${c.name} kelas ${clsKey} kuota habis.`);
-    }
-
-    setSubmitErrors(errs);
-    return errs.length === 0;
+    // Validasi dihapus sesuai permintaan
+    setSubmitErrors([]);
+    return true;
   }
 
   async function confirmSubmit() {
