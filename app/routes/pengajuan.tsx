@@ -1,10 +1,12 @@
 import MobileLayout from "../layouts/MobileLayout";
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { ClockIcon, CheckCircleIcon, AcademicCapIcon } from "@heroicons/react/24/outline";
 
 export default function Pengajuan() {
   const navigate = useNavigate();
   const [tab, setTab] = useState<"ta" | "cuti">("ta");
+  const [selectedTASection, setSelectedTASection] = useState<'data-ta' | 'seminar-proposal' | 'seminar-hasil' | 'pendadaran'>('data-ta');
   // Nilai ringkasan (dummy) untuk TA dan Pendadaran
   const nilaiTaAvg = 81; // rata-rata komponen TA
   const nilaiPendadaranAvg = 80; // rata-rata nilai pendadaran
@@ -106,117 +108,317 @@ export default function Pengajuan() {
 
         {tab === "ta" ? (
           <div className="space-y-3">
-            {/* Data Tugas Akhir */}
-            <div className="bg-white/70 backdrop-blur-md rounded-2xl ring-1 ring-white/30 p-4 shadow-sm">
-              <div className="text-lg font-semibold text-gray-900">Data Tugas Akhir</div>
-              <div className="mt-2 grid grid-cols-1 gap-2 text-sm">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Nama MK</span>
-                  <span className="font-medium text-gray-900">Tugas Akhir</span>
-                </div>
-                <div className="flex items-start justify-between gap-3">
-                  <span className="text-gray-600">Judul Proposal</span>
-                  <span className="font-medium text-gray-900 text-right flex-1 break-words">{ta.judul || "-"}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Status</span>
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-xs border ${
-                      ta.status === "Disetujui"
-                        ? "bg-green-100 text-green-700 border-green-200"
-                        : ta.status === "Ditolak"
-                        ? "bg-red-100 text-red-700 border-red-200"
-                        : "bg-yellow-100 text-yellow-700 border-yellow-200"
-                    }`}
-                  >
-                    {ta.status}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Hasil Nilai</span>
-                  <span className="flex items-center gap-2">
-                    <span className="font-semibold text-gray-900">{hasilAkhir.toFixed(1)}</span>
-                    <button
-                      type="button"
-                      className="px-2 py-0.5 rounded-full text-white bg-blue-600 hover:bg-blue-700 text-xs"
-                      onClick={() => { setDetailTab('ta'); setShowDetailNilai(true); }}
-                    >
-                      Detail
-                    </button>
-                  </span>
-                </div>
-              </div>
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                <button
-                  className="py-2 rounded-full text-white bg-orange-500 hover:bg-orange-600"
-                  onClick={() => setShowAjukan(true)}
-                >
-                  Ajukan Proposal
-                </button>
-                <button
-                  className="py-2 rounded-full text-white bg-blue-600 hover:bg-blue-700"
-                  onClick={() => navigate("/chat/4")}
-                >
-                  Lihat Pesan
-                </button>
-              </div>
+            {/* Dropdown Data Tugas Akhir */}
+            <div className="flex items-center justify-end">
+              <select
+                className="px-3 py-2 rounded-full border border-gray-300 bg-white text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={selectedTASection}
+                onChange={(e) => setSelectedTASection(e.target.value as any)}
+              >
+                <option value="data-ta">Data Tugas Akhir</option>
+                <option value="seminar-proposal">Seminar Proposal</option>
+                <option value="seminar-hasil">Seminar Hasil</option>
+                <option value="pendadaran">Pendadaran</option>
+              </select>
             </div>
 
-            {/* Data Pembimbing */}
-            <div className="bg-white/70 backdrop-blur-md rounded-2xl ring-1 ring-white/30 p-4 shadow-sm">
-              <div className="flex items-center justify-between">
-                <div className="text-lg font-semibold text-gray-900">Data Pembimbing</div>
-                <button
-                  type="button"
-                  onClick={() => navigate("/log-bimbingan")}
-                  className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-white bg-orange-500 hover:bg-orange-600 text-[12px]"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                    <path d="M9 2a1 1 0 0 0-1 1H6.5A2.5 2.5 0 0 0 4 5.5v13A2.5 2.5 0 0 0 6.5 21h11a2.5 2.5 0 0 0 2.5-2.5v-13A2.5 2.5 0 0 0 17.5 3H16a1 1 0 0 0-1-1H9Zm0 2h6v1H9V4ZM8 9.75A.75.75 0 0 1 8.75 9h6.5a.75.75 0 0 1 0 1.5h-6.5A.75.75 0 0 1 8 9.75ZM8.75 12a.75.75 0 0 0 0 1.5h6.5a.75.75 0 0 0 0-1.5h-6.5ZM8 15.75a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 0 1.5h-3.5a.75.75 0 0 1-.75-.75Z" />
-                  </svg>
-                  <span>Log Bimbingan</span>
-                </button>
-              </div>
-              <div className="mt-2 grid grid-cols-1 gap-2 text-sm">
-                {pembimbing.map((p, idx) => (
-                  <div key={idx} className="flex items-center justify-between gap-3 p-2 rounded-lg bg-gray-50 border border-gray-200">
-                    <div>
-                      <div className="font-medium text-gray-900">{p.nama}</div>
-                      <div className="text-[11px] text-gray-600">Pembimbing ke {p.ke}</div>
+            {/* Conditional rendering based on selected TA section */}
+            {selectedTASection === 'data-ta' && (
+              <>
+                {/* Data Tugas Akhir */}
+                <div className="bg-white/70 backdrop-blur-md rounded-2xl ring-1 ring-white/30 p-4 shadow-sm">
+                  <div className="text-lg font-semibold text-gray-900">Data Tugas Akhir</div>
+                  <div className="mt-2 grid grid-cols-1 gap-2 text-sm">
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-600">Nama MK</span>
+                      <span className="font-medium text-gray-900">Tugas Akhir</span>
                     </div>
+                    <div className="flex items-start justify-between gap-3">
+                      <span className="text-gray-600">Judul Proposal</span>
+                      <span className="font-medium text-gray-900 text-right flex-1 break-words">{ta.judul || "-"}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-600">Status</span>
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-xs border ${
+                          ta.status === "Disetujui"
+                            ? "bg-green-100 text-green-700 border-green-200"
+                            : ta.status === "Ditolak"
+                            ? "bg-red-100 text-red-700 border-red-200"
+                            : "bg-yellow-100 text-yellow-700 border-yellow-200"
+                        }`}
+                      >
+                        {ta.status}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-600">Hasil Nilai</span>
+                      <span className="flex items-center gap-2">
+                        <span className="font-semibold text-gray-900">{hasilAkhir.toFixed(1)}</span>
+                        <button
+                          type="button"
+                          className="px-2 py-0.5 rounded-full text-white bg-blue-600 hover:bg-blue-700 text-xs"
+                          onClick={() => { setDetailTab('ta'); setShowDetailNilai(true); }}
+                        >
+                          Detail
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mt-3 grid grid-cols-2 gap-2">
                     <button
-                      type="button"
-                      className="px-2 py-1 rounded-full text-white bg-blue-600 hover:bg-blue-700 text-[11px]"
-                      onClick={() => navigate(`/chat/${p.ke === 1 ? 5 : 6}`)}
+                      className="py-2 rounded-full text-white bg-orange-500 hover:bg-orange-600"
+                      onClick={() => setShowAjukan(true)}
+                    >
+                      Ajukan Proposal
+                    </button>
+                    <button
+                      className="py-2 rounded-full text-white bg-blue-600 hover:bg-blue-700"
+                      onClick={() => navigate("/chat/4")}
                     >
                       Lihat Pesan
                     </button>
                   </div>
-                ))}
-              </div>
-            </div>
+                </div>
 
-            {/* Data Penguji */}
-            <div className="bg-white/70 backdrop-blur-md rounded-2xl ring-1 ring-white/30 p-4 shadow-sm">
-              <div className="text-lg font-semibold text-gray-900">Data Penguji</div>
-              <div className="mt-2 grid grid-cols-1 gap-2 text-sm">
-                {penguji.map((p, idx) => (
-                  <div key={idx} className="flex items-center justify-between gap-3 p-2 rounded-lg bg-gray-50 border border-gray-200">
-                    <div>
-                      <div className="font-medium text-gray-900">{p.nama}</div>
-                      <div className="text-[11px] text-gray-600">Penguji ke {p.ke}</div>
-                    </div>
+                {/* Data Pembimbing */}
+                <div className="bg-white/70 backdrop-blur-md rounded-2xl ring-1 ring-white/30 p-4 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <div className="text-lg font-semibold text-gray-900">Data Pembimbing</div>
                     <button
                       type="button"
-                      className="px-2 py-1 rounded-full text-white bg-blue-600 hover:bg-blue-700 text-[11px]"
-                      onClick={() => navigate(`/chat/${p.ke === 1 ? 7 : 8}`)}
+                      onClick={() => navigate("/log-bimbingan")}
+                      className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-white bg-orange-500 hover:bg-orange-600 text-[12px]"
                     >
-                      Lihat Pesan
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                        <path d="M9 2a1 1 0 0 0-1 1H6.5A2.5 2.5 0 0 0 4 5.5v13A2.5 2.5 0 0 0 6.5 21h11a2.5 2.5 0 0 0 2.5-2.5v-13A2.5 2.5 0 0 0 17.5 3H16a1 1 0 0 0-1-1H9Zm0 2h6v1H9V4ZM8 9.75A.75.75 0 0 1 8.75 9h6.5a.75.75 0 0 1 0 1.5h-6.5A.75.75 0 0 1 8 9.75ZM8.75 12a.75.75 0 0 0 0 1.5h6.5a.75.75 0 0 0 0-1.5h-6.5ZM8 15.75a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 0 1.5h-3.5a.75.75 0 0 1-.75-.75Z" />
+                      </svg>
+                      <span>Log Bimbingan</span>
                     </button>
                   </div>
-                ))}
+                  <div className="mt-2 grid grid-cols-1 gap-2 text-sm">
+                    {pembimbing.map((p, idx) => (
+                      <div key={idx} className="flex items-center justify-between gap-3 p-2 rounded-lg bg-gray-50 border border-gray-200">
+                        <div>
+                          <div className="font-medium text-gray-900">{p.nama}</div>
+                          <div className="text-[11px] text-gray-600">Pembimbing ke {p.ke}</div>
+                        </div>
+                        <button
+                          type="button"
+                          className="px-2 py-1 rounded-full text-white bg-blue-600 hover:bg-blue-700 text-[11px]"
+                          onClick={() => navigate(`/chat/${p.ke === 1 ? 5 : 6}`)}
+                        >
+                          Lihat Pesan
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Data Penguji */}
+                <div className="bg-white/70 backdrop-blur-md rounded-2xl ring-1 ring-white/30 p-4 shadow-sm">
+                  <div className="text-lg font-semibold text-gray-900">Data Penguji</div>
+                  <div className="mt-2 grid grid-cols-1 gap-2 text-sm">
+                    {penguji.map((p, idx) => (
+                      <div key={idx} className="flex items-center justify-between gap-3 p-2 rounded-lg bg-gray-50 border border-gray-200">
+                        <div>
+                          <div className="font-medium text-gray-900">{p.nama}</div>
+                          <div className="text-[11px] text-gray-600">Penguji ke {p.ke}</div>
+                        </div>
+                        <button
+                          type="button"
+                          className="px-2 py-1 rounded-full text-white bg-blue-600 hover:bg-blue-700 text-[11px]"
+                          onClick={() => navigate(`/chat/${p.ke === 1 ? 7 : 8}`)}
+                        >
+                          Lihat Pesan
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {selectedTASection === 'seminar-proposal' && (
+              <div className="bg-white/70 backdrop-blur-md rounded-2xl ring-1 ring-white/30 p-4 shadow-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="text-lg font-semibold text-gray-900">Seminar Proposal</div>
+                  <div className="flex items-center gap-2 px-3 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800 border border-yellow-200">
+                    <ClockIcon className="h-4 w-4" />
+                    <span>Menunggu Persetujuan</span>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Judul Proposal</label>
+                      <input
+                        type="text"
+                        value={ta.judul}
+                        readOnly
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal Seminar</label>
+                      <input
+                        type="date"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Penguji</label>
+                    <div className="space-y-2">
+                      {pembimbing.map((p, idx) => (
+                        <div key={idx} className="flex items-center p-3 bg-gray-50 rounded-md">
+                          <span className="text-sm">{p.nama} (Pembimbing {p.ke})</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Upload File Proposal</label>
+                    <input
+                      type="file"
+                      accept=".pdf"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div className="flex justify-end space-x-2">
+                    <button className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                      Batal
+                    </button>
+                    <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      Ajukan Seminar
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
+
+            {selectedTASection === 'seminar-hasil' && (
+              <div className="bg-white/70 backdrop-blur-md rounded-2xl ring-1 ring-white/30 p-4 shadow-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="text-lg font-semibold text-gray-900">Seminar Hasil</div>
+                  <div className="flex items-center gap-2 px-3 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800 border border-yellow-200">
+                    <ClockIcon className="h-4 w-4" />
+                    <span>Menunggu Persetujuan</span>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Judul Hasil</label>
+                      <input
+                        type="text"
+                        value={ta.judul}
+                        readOnly
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal Seminar</label>
+                      <input
+                        type="date"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Penguji</label>
+                    <div className="space-y-2">
+                      {pembimbing.map((p, idx) => (
+                        <div key={idx} className="flex items-center p-3 bg-gray-50 rounded-md">
+                          <span className="text-sm">{p.nama} (Pembimbing {p.ke})</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Upload File Hasil</label>
+                    <input
+                      type="file"
+                      accept=".pdf"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div className="flex justify-end space-x-2">
+                    <button className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                      Batal
+                    </button>
+                    <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      Ajukan Seminar Hasil
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {selectedTASection === 'pendadaran' && (
+              <div className="bg-white/70 backdrop-blur-md rounded-2xl ring-1 ring-white/30 p-4 shadow-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="text-lg font-semibold text-gray-900">Pendadaran</div>
+                  <div className="flex items-center gap-2 px-3 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800 border border-yellow-200">
+                    <ClockIcon className="h-4 w-4" />
+                    <span>Menunggu Persetujuan</span>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Judul Skripsi</label>
+                      <input
+                        type="text"
+                        value={ta.judul}
+                        readOnly
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal Pendadaran</label>
+                      <input
+                        type="date"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Penguji</label>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+                        <span className="text-sm">Dr. Ahmad Surya, M.Kom (Ketua)</span>
+                        <span className="text-xs text-yellow-600 bg-yellow-100 px-2 py-1 rounded">Menunggu</span>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+                        <span className="text-sm">Prof. Budi Santoso, Ph.D (Sekretaris)</span>
+                        <span className="text-xs text-yellow-600 bg-yellow-100 px-2 py-1 rounded">Menunggu</span>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+                        <span className="text-sm">Dr. Citra Dewi, M.T (Anggota)</span>
+                        <span className="text-xs text-yellow-600 bg-yellow-100 px-2 py-1 rounded">Menunggu</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Upload Draft Skripsi</label>
+                    <input
+                      type="file"
+                      accept=".pdf"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div className="flex justify-end space-x-2">
+                    <button className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                      Batal
+                    </button>
+                    <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      Ajukan Pendadaran
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <div className="space-y-3">
