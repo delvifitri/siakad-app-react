@@ -12,9 +12,13 @@ export default function Pengajuan() {
   const nilaiPendadaranAvg = 80; // rata-rata nilai pendadaran
   const hasilAkhir = (nilaiTaAvg + nilaiPendadaranAvg) / 2; // gabungan TA + Pendadaran (desimal)
   // State untuk daftar pengajuan seminar
-  const [pengajuanProposal, setPengajuanProposal] = useState<Array<{judul: string, tanggal: string, status: string}>>([]);
-  const [pengajuanHasil, setPengajuanHasil] = useState<Array<{judul: string, tanggal: string, status: string}>>([]);
-  const [pengajuanPendadaran, setPengajuanPendadaran] = useState<Array<{judul: string, tanggal: string, status: string}>>([]);
+  const [pengajuanProposal, setPengajuanProposal] = useState<Array<{judul: string, tanggal: string, status: string, fileName?: string}>>([]);
+  const [pengajuanHasil, setPengajuanHasil] = useState<Array<{judul: string, tanggal: string, status: string, fileName?: string}>>([]);
+  const [pengajuanPendadaran, setPengajuanPendadaran] = useState<Array<{judul: string, tanggal: string, status: string, fileName?: string}>>([]);
+  // State untuk form pengajuan seminar
+  const [proposalForm, setProposalForm] = useState<{ fileName?: string; fileError?: string }>({});
+  const [hasilForm, setHasilForm] = useState<{ fileName?: string; fileError?: string }>({});
+  const [pendadaranForm, setPendadaranForm] = useState<{ fileName?: string; fileError?: string }>({});
   // State untuk data Tugas Akhir sederhana
   const [ta, setTa] = useState<{
     judul: string;
@@ -284,23 +288,56 @@ export default function Pengajuan() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Upload File Proposal</label>
                     <input
+                      id="proposal-file-main"
                       type="file"
-                      accept=".pdf"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      accept=".pdf,application/pdf"
+                      onChange={(e) => {
+                        const file = e.target.files && e.target.files[0];
+                        if (!file) {
+                          setProposalForm({ fileName: undefined, fileError: undefined });
+                          return;
+                        }
+                        const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
+                        if (!isPdf) {
+                          setProposalForm({ fileName: undefined, fileError: "Hanya file PDF yang diizinkan." });
+                          e.currentTarget.value = "";
+                          return;
+                        }
+                        setProposalForm({ fileName: file.name, fileError: undefined });
+                      }}
+                      className="sr-only"
                     />
+                    <div className="rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 p-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="min-w-0">
+                          <div className="text-sm text-gray-800 truncate">
+                            {proposalForm.fileName ? `Dipilih: ${proposalForm.fileName}` : "Belum ada file yang dipilih"}
+                          </div>
+                          <div className="text-[11px] text-gray-500">Format yang diizinkan: PDF</div>
+                        </div>
+                        <label htmlFor="proposal-file-main" className="shrink-0 inline-flex items-center px-3 py-1.5 rounded-full text-white bg-orange-600 hover:bg-orange-700 text-xs cursor-pointer">
+                          Pilih File
+                        </label>
+                      </div>
+                      {proposalForm.fileError ? (
+                        <div className="mt-2 text-xs text-red-600">{proposalForm.fileError}</div>
+                      ) : null}
+                    </div>
                   </div>
                   <div className="flex justify-end space-x-2">
-                    <button className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                    <button className="px-4 py-2 bg-gray-600 text-white rounded-full hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
                       Batal
                     </button>
-                    <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    <button className="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       onClick={() => {
                         const newPengajuan = {
                           judul: ta.judul,
                           tanggal: new Date().toLocaleDateString(),
-                          status: 'Menunggu Persetujuan'
+                          status: 'Menunggu Persetujuan',
+                          fileName: proposalForm.fileName,
                         };
                         setPengajuanProposal(prev => [...prev, newPengajuan]);
+                        setProposalForm({});
                       }}>
                       Ajukan Seminar
                     </button>
@@ -373,23 +410,56 @@ export default function Pengajuan() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Upload File Hasil</label>
                     <input
+                      id="hasil-file-main"
                       type="file"
-                      accept=".pdf"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      accept=".pdf,application/pdf"
+                      onChange={(e) => {
+                        const file = e.target.files && e.target.files[0];
+                        if (!file) {
+                          setHasilForm({ fileName: undefined, fileError: undefined });
+                          return;
+                        }
+                        const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
+                        if (!isPdf) {
+                          setHasilForm({ fileName: undefined, fileError: "Hanya file PDF yang diizinkan." });
+                          e.currentTarget.value = "";
+                          return;
+                        }
+                        setHasilForm({ fileName: file.name, fileError: undefined });
+                      }}
+                      className="sr-only"
                     />
+                    <div className="rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 p-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="min-w-0">
+                          <div className="text-sm text-gray-800 truncate">
+                            {hasilForm.fileName ? `Dipilih: ${hasilForm.fileName}` : "Belum ada file yang dipilih"}
+                          </div>
+                          <div className="text-[11px] text-gray-500">Format yang diizinkan: PDF</div>
+                        </div>
+                        <label htmlFor="hasil-file-main" className="shrink-0 inline-flex items-center px-3 py-1.5 rounded-full text-white bg-orange-600 hover:bg-orange-700 text-xs cursor-pointer">
+                          Pilih File
+                        </label>
+                      </div>
+                      {hasilForm.fileError ? (
+                        <div className="mt-2 text-xs text-red-600">{hasilForm.fileError}</div>
+                      ) : null}
+                    </div>
                   </div>
                   <div className="flex justify-end space-x-2">
-                    <button className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                    <button className="px-4 py-2 bg-gray-600 text-white rounded-full hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
                       Batal
                     </button>
-                    <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    <button className="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       onClick={() => {
                         const newPengajuan = {
                           judul: ta.judul,
                           tanggal: new Date().toLocaleDateString(),
-                          status: 'Menunggu Persetujuan'
+                          status: 'Menunggu Persetujuan',
+                          fileName: hasilForm.fileName,
                         };
                         setPengajuanHasil(prev => [...prev, newPengajuan]);
+                        setHasilForm({});
                       }}>
                       Ajukan Seminar Hasil
                     </button>
@@ -469,23 +539,56 @@ export default function Pengajuan() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Upload Draft Skripsi</label>
                     <input
+                      id="pendadaran-file-main"
                       type="file"
-                      accept=".pdf"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      accept=".pdf,application/pdf"
+                      onChange={(e) => {
+                        const file = e.target.files && e.target.files[0];
+                        if (!file) {
+                          setPendadaranForm({ fileName: undefined, fileError: undefined });
+                          return;
+                        }
+                        const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
+                        if (!isPdf) {
+                          setPendadaranForm({ fileName: undefined, fileError: "Hanya file PDF yang diizinkan." });
+                          e.currentTarget.value = "";
+                          return;
+                        }
+                        setPendadaranForm({ fileName: file.name, fileError: undefined });
+                      }}
+                      className="sr-only"
                     />
+                    <div className="rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 p-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="min-w-0">
+                          <div className="text-sm text-gray-800 truncate">
+                            {pendadaranForm.fileName ? `Dipilih: ${pendadaranForm.fileName}` : "Belum ada file yang dipilih"}
+                          </div>
+                          <div className="text-[11px] text-gray-500">Format yang diizinkan: PDF</div>
+                        </div>
+                        <label htmlFor="pendadaran-file-main" className="shrink-0 inline-flex items-center px-3 py-1.5 rounded-full text-white bg-orange-600 hover:bg-orange-700 text-xs cursor-pointer">
+                          Pilih File
+                        </label>
+                      </div>
+                      {pendadaranForm.fileError ? (
+                        <div className="mt-2 text-xs text-red-600">{pendadaranForm.fileError}</div>
+                      ) : null}
+                    </div>
                   </div>
                   <div className="flex justify-end space-x-2">
-                    <button className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                    <button className="px-4 py-2 bg-gray-600 text-white rounded-full hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
                       Batal
                     </button>
-                    <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    <button className="px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       onClick={() => {
                         const newPengajuan = {
                           judul: ta.judul,
                           tanggal: new Date().toLocaleDateString(),
-                          status: 'Menunggu Persetujuan'
+                          status: 'Menunggu Persetujuan',
+                          fileName: pendadaranForm.fileName,
                         };
                         setPengajuanPendadaran(prev => [...prev, newPengajuan]);
+                        setPendadaranForm({});
                       }}>
                       Ajukan Pendadaran
                     </button>
@@ -631,7 +734,7 @@ export default function Pengajuan() {
                       </div>
                       <div className="text-[11px] text-gray-500">Format yang diizinkan: PDF</div>
                     </div>
-                    <label htmlFor="proposal-file" className="shrink-0 inline-flex items-center px-3 py-1.5 rounded-full text-white bg-blue-600 hover:bg-blue-700 text-xs cursor-pointer">
+                    <label htmlFor="proposal-file" className="shrink-0 inline-flex items-center px-3 py-1.5 rounded-full text-white bg-orange-600 hover:bg-orange-700 text-xs cursor-pointer">
                       Pilih File
                     </label>
                   </div>
@@ -820,7 +923,7 @@ export default function Pengajuan() {
                       <div className="text-sm text-gray-800 truncate">{cutiForm.fileName ? `Dipilih: ${cutiForm.fileName}` : "Belum ada file yang dipilih"}</div>
                       <div className="text-[11px] text-gray-500">Format yang diizinkan: PDF</div>
                     </div>
-                    <label htmlFor="cuti-file" className="shrink-0 inline-flex items-center px-3 py-1.5 rounded-full text-white bg-blue-600 hover:bg-blue-700 text-xs cursor-pointer">Pilih File</label>
+                    <label htmlFor="cuti-file" className="shrink-0 inline-flex items-center px-3 py-1.5 rounded-full text-white bg-orange-600 hover:bg-orange-700 text-xs cursor-pointer">Pilih File</label>
                   </div>
                   {cutiForm.fileError ? (<div className="mt-2 text-xs text-red-600">{cutiForm.fileError}</div>) : null}
                 </div>
