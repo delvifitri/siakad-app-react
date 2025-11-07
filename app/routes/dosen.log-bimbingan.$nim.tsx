@@ -240,6 +240,22 @@ export default function DosenLogBimbingan() {
           </div>
         </div>
 
+        {logs.length > 0 && (
+          <div className="mb-4">
+            <div className="relative bg-white/20 backdrop-blur-md rounded-full border border-white/30 shadow-lg">
+              <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Cari log bimbingan..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 bg-transparent focus:outline-none focus:ring-0 text-gray-900 placeholder-gray-500"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Buttons (Pilih Semua, Download CSV) moved here */}
         <div className="mb-4 flex items-center gap-4">
           {logs.length > 0 && (
             <>
@@ -260,22 +276,6 @@ export default function DosenLogBimbingan() {
             </>
           )}
         </div>
-
-        {/* Search Bar */}
-        {logs.length > 0 && (
-          <div className="mb-4">
-            <div className="relative bg-white/20 backdrop-blur-md rounded-full border border-white/30 shadow-lg">
-              <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Cari log bimbingan..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-transparent focus:outline-none focus:ring-0 text-gray-900 placeholder-gray-500"
-              />
-            </div>
-          </div>
-        )}
 
         <div className="space-y-3">
           {logs.length === 0 ? (
