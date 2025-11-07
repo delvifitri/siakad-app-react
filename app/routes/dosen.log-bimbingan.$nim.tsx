@@ -316,32 +316,35 @@ export default function DosenLogBimbingan() {
               ))}
               
               {/* Button bulk action dipindah ke bawah */}
-              {selectedLogs.size > 0 && (
-                <div className="mt-4 p-4 bg-white/60 rounded-xl border border-gray-200">
-                  <div className="flex items-center justify-center">
-                    <div className="flex items-center gap-2">
-                      <button
-                        className="px-3 py-2 rounded-full text-white bg-emerald-600 hover:bg-emerald-700 text-sm"
-                        onClick={() => updateSelectedLogsStatus("Disetujui")}
-                      >
-                        Approve ({selectedLogs.size})
-                      </button>
-                      <button
-                        className="px-3 py-2 rounded-full text-white bg-red-600 hover:bg-red-700 text-sm"
-                        onClick={() => updateSelectedLogsStatus("Ditolak")}
-                      >
-                        Tolak ({selectedLogs.size})
-                      </button>
-                      <button
-                        className="px-3 py-2 rounded-full text-white bg-blue-600 hover:bg-blue-700 text-sm"
-                        onClick={() => updateSelectedLogsStatus("Menunggu")}
-                      >
-                        Reset ({selectedLogs.size})
-                      </button>
-                    </div>
-                  </div>
+              <div className="mt-4 flex justify-center">
+                <div className="flex items-center gap-2">
+                  {/** Buttons always visible; no background card. Show selected count (no slash). */}
+                  <button
+                    className={`px-3 py-2 rounded-full text-white text-sm ${selectedLogs.size === 0 ? 'bg-emerald-300 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700'}`}
+                    onClick={() => updateSelectedLogsStatus("Disetujui")}
+                    disabled={selectedLogs.size === 0}
+                    aria-disabled={selectedLogs.size === 0}
+                  >
+                    Approve{selectedLogs.size > 0 ? ` (${selectedLogs.size})` : ''}
+                  </button>
+                  <button
+                    className={`px-3 py-2 rounded-full text-white text-sm ${selectedLogs.size === 0 ? 'bg-red-300 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'}`}
+                    onClick={() => updateSelectedLogsStatus("Ditolak")}
+                    disabled={selectedLogs.size === 0}
+                    aria-disabled={selectedLogs.size === 0}
+                  >
+                    Tolak{selectedLogs.size > 0 ? ` (${selectedLogs.size})` : ''}
+                  </button>
+                  <button
+                    className={`px-3 py-2 rounded-full text-white text-sm ${selectedLogs.size === 0 ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+                    onClick={() => updateSelectedLogsStatus("Menunggu")}
+                    disabled={selectedLogs.size === 0}
+                    aria-disabled={selectedLogs.size === 0}
+                  >
+                    Reset{selectedLogs.size > 0 ? ` (${selectedLogs.size})` : ''}
+                  </button>
                 </div>
-              )}
+              </div>
               
               {visibleCount < filteredLogs.length && (
                 <div className="mt-3 flex justify-center">
