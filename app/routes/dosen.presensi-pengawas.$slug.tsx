@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import DosenLayout from "../layouts/DosenLayout";
-import { ArrowLeftIcon, CameraIcon, PaperClipIcon } from "@heroicons/react/24/outline";
+import { CameraIcon, PaperClipIcon } from "@heroicons/react/24/outline";
+import ArrowLeftIcon from "../components/ArrowLeftIcon";
 
 export function meta() {
   return [{ title: "Presensi Pengawas - Siakad" }];

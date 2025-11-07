@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import DosenLayout from "../layouts/DosenLayout";
-import { CheckCircleIcon, ExclamationTriangleIcon, XCircleIcon, ClockIcon, ArrowLeftIcon, MagnifyingGlassIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
+import { CheckCircleIcon, ExclamationTriangleIcon, XCircleIcon, ClockIcon, MagnifyingGlassIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
+import ArrowLeftIcon from "../components/ArrowLeftIcon";
 
 export function meta() {
   return [{ title: "Detail Presensi - Siakad" }];

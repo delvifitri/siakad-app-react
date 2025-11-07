@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router";
 import DosenLayout from "../layouts/DosenLayout";
-import { ArrowDownTrayIcon, Cog6ToothIcon, ArrowLeftIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { ArrowDownTrayIcon, Cog6ToothIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import ArrowLeftIcon from "../components/ArrowLeftIcon";
 
 export function meta() {
   return [{ title: "LIhat Nilai - Siakad" }];

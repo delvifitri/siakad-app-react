@@ -24,6 +24,7 @@ export default [
 	route("dosen/detail-ta/:nim", "routes/dosen.detail-ta.$nim.tsx"),
 	route("dosen/log-bimbingan/:nim", "routes/dosen.log-bimbingan.$nim.tsx"),
 	route("dosen/kelola-rps", "routes/dosen.kelola-rps.tsx"),
+	route("dosen/input-rps/:id/:kelas", "routes/dosen.input-rps.$id.$kelas.tsx"),
 	route("dosen/profile", "routes/dosen.profile.tsx"),
 	route("dosen/edit-profile", "routes/dosen.edit-profile.tsx"),
 	route("nilai-presensi", "routes/nilai-presensi.tsx"),

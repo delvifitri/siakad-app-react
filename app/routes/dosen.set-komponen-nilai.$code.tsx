@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import DosenLayout from "../layouts/DosenLayout";
-import { ArrowLeftIcon, CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import ArrowLeftIcon from "../components/ArrowLeftIcon";
 
 export function meta() {
   return [{ title: "Set Komponen Nilai - Siakad" }];

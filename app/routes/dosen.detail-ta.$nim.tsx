@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import DosenLayout from "../layouts/DosenLayout";
-import { ArrowLeftIcon, ArrowDownTrayIcon, UserIcon, CalendarDaysIcon, AcademicCapIcon } from "@heroicons/react/24/outline";
+import { ArrowDownTrayIcon, UserIcon, CalendarDaysIcon, AcademicCapIcon } from "@heroicons/react/24/outline";
+import ArrowLeftIcon from "../components/ArrowLeftIcon";
 
 export function meta() {
   return [{ title: "Detail TA - Siakad" }];

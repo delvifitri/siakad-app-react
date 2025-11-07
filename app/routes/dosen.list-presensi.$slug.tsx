@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router";
 import DosenLayout from "../layouts/DosenLayout";
-import { PlusCircleIcon, ArrowLeftIcon, CalendarDaysIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { PlusCircleIcon, CalendarDaysIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import ArrowLeftIcon from "../components/ArrowLeftIcon";
 
 export function meta() {
   return [{ title: "Daftar Presensi - Siakad" }];
