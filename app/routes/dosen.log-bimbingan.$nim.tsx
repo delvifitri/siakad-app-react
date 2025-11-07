@@ -316,7 +316,7 @@ export default function DosenLogBimbingan() {
               ))}
               
               {/* Button bulk action dipindah ke bawah */}
-              <div className="mt-4 flex justify-center">
+              <div className="mt-4 flex justify-start">
                 <div className="flex items-center gap-2">
                   {/** Buttons always visible; no background card. Show selected count (no slash). */}
                   <button
