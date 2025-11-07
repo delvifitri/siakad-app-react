@@ -21,6 +21,7 @@ export default [
 	route("dosen/ujian", "routes/dosen.ujian.tsx"),
 	route("dosen/ujian-pendadaran", "routes/dosen.ujian-pendadaran.tsx"),
 	route("dosen/bimbingan", "routes/dosen.bimbingan.tsx"),
+	route("dosen/detail-ta/:nim", "routes/dosen.detail-ta.$nim.tsx"),
 	route("dosen/log-bimbingan/:nim", "routes/dosen.log-bimbingan.$nim.tsx"),
 	route("dosen/kelola-rps", "routes/dosen.kelola-rps.tsx"),
 	route("dosen/profile", "routes/dosen.profile.tsx"),
