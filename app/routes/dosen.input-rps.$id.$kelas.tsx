@@ -266,9 +266,23 @@ export default function DosenInputRpsPage() {
           <h3 className="text-sm font-bold text-gray-700">List data RPS yang sudah diinputkan</h3>
         </div>
 
-        {/* search + pilih semua placed above the list */}
-        <div className="mb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <div>
+        {/* search + pilih semua: search first, then Pilih Semua below it */}
+        <div className="mb-3">
+          <div className="relative">
+            <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M16.65 16.65A7.5 7.5 0 1 0 6.65 6.65a7.5 7.5 0 0 0 10 10z" />
+            </svg>
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Cari materi atau pertemuan..."
+              aria-label="Cari materi atau pertemuan"
+              className="w-full pl-10 px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div className="mt-2">
             <button
               onClick={() => {
                 if (visibleIndices.length === 0) return;
@@ -290,19 +304,6 @@ export default function DosenInputRpsPage() {
             >
               {visibleIndices.length > 0 && visibleIndices.every(i => selectedIndexes.has(i)) ? 'Batal Pilih Semua' : 'Pilih Semua'}
             </button>
-          </div>
-          <div className="flex-1 relative">
-            <svg xmlns="http://www.w3.org/2000/svg" className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M16.65 16.65A7.5 7.5 0 1 0 6.65 6.65a7.5 7.5 0 0 0 10 10z" />
-            </svg>
-            <input
-              type="search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Cari materi atau pertemuan..."
-              aria-label="Cari materi atau pertemuan"
-              className="w-full pl-10 px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
           </div>
         </div>
 
