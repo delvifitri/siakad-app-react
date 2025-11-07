@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import DosenLayout from "../layouts/DosenLayout";
-import { ArrowLeftIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftIcon, ArrowDownTrayIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 export function meta() {
   return [{ title: "Log Bimbingan - Siakad" }];
@@ -53,6 +53,14 @@ export default function DosenLogBimbingan() {
   const [visibleCount, setVisibleCount] = useState<number>(5);
   const [student, setStudent] = useState<{ name: string; nim: string } | null>(null);
   const [selectedLogs, setSelectedLogs] = useState<Set<string>>(new Set());
+  const [searchQuery, setSearchQuery] = useState<string>("");
+
+  // Filter logs based on search query
+  const filteredLogs = logs.filter((log) =>
+    log.isi.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    log.approve.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    `pembimbing ${log.pembimbing}`.includes(searchQuery.toLowerCase())
+  );
 
   useEffect(() => {
     try {
@@ -143,7 +151,7 @@ export default function DosenLogBimbingan() {
   }
 
   function handleSelectAll() {
-    const visibleLogIds = logs.slice(0, visibleCount).map(log => log.id);
+    const visibleLogIds = filteredLogs.slice(0, visibleCount).map(log => log.id);
     const allSelected = visibleLogIds.every(id => selectedLogs.has(id));
     
     if (allSelected) {
@@ -238,7 +246,7 @@ export default function DosenLogBimbingan() {
                 className="inline-flex items-center gap-2 px-3 py-2 rounded-full text-sm bg-gray-600 text-white hover:bg-gray-700 shadow-sm"
                 onClick={handleSelectAll}
               >
-                {logs.slice(0, visibleCount).every(log => selectedLogs.has(log.id)) ? 'Batal Pilih Semua' : 'Pilih Semua'}
+                {filteredLogs.slice(0, visibleCount).every(log => selectedLogs.has(log.id)) ? 'Batal Pilih Semua' : 'Pilih Semua'}
               </button>
               
               <button
@@ -248,40 +256,36 @@ export default function DosenLogBimbingan() {
                 <ArrowDownTrayIcon className="w-4 h-4" />
                 Download CSV
               </button>
-              
-              {selectedLogs.size > 0 && (
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600">{selectedLogs.size} dipilih</span>
-                  <button
-                    className="px-2 py-1 rounded-full text-white bg-emerald-600 hover:bg-emerald-700 text-xs"
-                    onClick={() => updateSelectedLogsStatus("Disetujui")}
-                  >
-                    Approve ({selectedLogs.size})
-                  </button>
-                  <button
-                    className="px-2 py-1 rounded-full text-white bg-red-600 hover:bg-red-700 text-xs"
-                    onClick={() => updateSelectedLogsStatus("Ditolak")}
-                  >
-                    Tolak ({selectedLogs.size})
-                  </button>
-                  <button
-                    className="px-2 py-1 rounded-full border border-gray-300 text-gray-700 text-xs"
-                    onClick={() => updateSelectedLogsStatus("Menunggu")}
-                  >
-                    Reset ({selectedLogs.size})
-                  </button>
-                </div>
-              )}
             </>
           )}
         </div>
 
+        {/* Search Bar */}
+        {logs.length > 0 && (
+          <div className="mb-4">
+            <div className="relative bg-white/20 backdrop-blur-md rounded-full border border-white/30 shadow-lg">
+              <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Cari log bimbingan..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 bg-transparent focus:outline-none focus:ring-0 text-gray-900 placeholder-gray-500"
+              />
+            </div>
+          </div>
+        )}
+
         <div className="space-y-3">
           {logs.length === 0 ? (
             <div className="text-sm text-gray-600 bg-white/60 rounded-xl border border-gray-200 p-4">Belum ada catatan bimbingan.</div>
+          ) : filteredLogs.length === 0 ? (
+            <div className="text-sm text-gray-600 bg-white/60 rounded-xl border border-gray-200 p-4">
+              Tidak ada log yang cocok dengan pencarian "{searchQuery}"
+            </div>
           ) : (
             <>
-              {logs.slice(0, visibleCount).map((item) => (
+              {filteredLogs.slice(0, visibleCount).map((item) => (
                 <div key={item.id} className="p-4 rounded-xl border border-gray-200 bg-white/60 shadow-sm">
                   <div className="flex items-start gap-3">
                     <input
@@ -305,37 +309,46 @@ export default function DosenLogBimbingan() {
                         }`}>{item.approve}</span>
                       </div>
                       <div className="mt-2 text-sm text-gray-800 whitespace-pre-wrap">{item.isi}</div>
-                      <div className="mt-3 flex items-center gap-2 text-xs">
-                        <button
-                          className="px-2 py-1 rounded-full text-white bg-emerald-600 hover:bg-emerald-700"
-                          onClick={() => updateLogStatus(item.id, "Disetujui")}
-                        >
-                          Approve
-                        </button>
-                        <button
-                          className="px-2 py-1 rounded-full text-white bg-red-600 hover:bg-red-700"
-                          onClick={() => updateLogStatus(item.id, "Ditolak")}
-                        >
-                          Tolak
-                        </button>
-                        <button
-                          className="px-2 py-1 rounded-full border border-gray-300 text-gray-700"
-                          onClick={() => updateLogStatus(item.id, "Menunggu")}
-                        >
-                          Reset
-                        </button>
-                      </div>
                     </div>
                   </div>
                 </div>
               ))}
-              {visibleCount < logs.length && (
+              
+              {/* Button bulk action dipindah ke bawah */}
+              {selectedLogs.size > 0 && (
+                <div className="mt-4 p-4 bg-white/60 rounded-xl border border-gray-200">
+                  <div className="flex items-center justify-center">
+                    <div className="flex items-center gap-2">
+                      <button
+                        className="px-3 py-2 rounded-full text-white bg-emerald-600 hover:bg-emerald-700 text-sm"
+                        onClick={() => updateSelectedLogsStatus("Disetujui")}
+                      >
+                        Approve ({selectedLogs.size})
+                      </button>
+                      <button
+                        className="px-3 py-2 rounded-full text-white bg-red-600 hover:bg-red-700 text-sm"
+                        onClick={() => updateSelectedLogsStatus("Ditolak")}
+                      >
+                        Tolak ({selectedLogs.size})
+                      </button>
+                      <button
+                        className="px-3 py-2 rounded-full text-white bg-blue-600 hover:bg-blue-700 text-sm"
+                        onClick={() => updateSelectedLogsStatus("Menunggu")}
+                      >
+                        Reset ({selectedLogs.size})
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {visibleCount < filteredLogs.length && (
                 <div className="mt-3 flex justify-center">
                   <button
                     className="px-3 py-2 rounded-full border border-gray-300 text-sm bg-white hover:bg-gray-50"
-                    onClick={() => setVisibleCount((c) => Math.min(c + 5, logs.length))}
+                    onClick={() => setVisibleCount((c) => Math.min(c + 5, filteredLogs.length))}
                   >
-                    Muat lagi ({Math.min(visibleCount + 5, logs.length)}/{logs.length})
+                    Muat lagi ({Math.min(visibleCount + 5, filteredLogs.length)}/{filteredLogs.length})
                   </button>
                 </div>
               )}
