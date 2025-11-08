@@ -240,17 +240,7 @@ export default function DosenInputRpsPage() {
           />
         </div>
 
-        <div className="mb-3">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-          <select
-            value={formData.status}
-            onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
-            className="w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="draft">Draft</option>
-            <option value="aktif">Aktif</option>
-          </select>
-        </div>
+        {/* Status selector removed per request */}
 
         <div className="flex items-center gap-2 mb-4">
           <button
