@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import DosenLayout from "../layouts/DosenLayout";
 
@@ -13,6 +13,13 @@ export default function DosenInputRpsPage() {
   // render the form immediately and populate from localStorage when ready.
   const [loading, setLoading] = useState(false);
   const [notFound, setNotFound] = useState(false);
+  
+  // Infinite scroll controls
+  const INITIAL_COUNT = 3;
+  const LOAD_MORE_COUNT = 3;
+  const [visibleCount, setVisibleCount] = useState<number>(INITIAL_COUNT);
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   const [formData, setFormData] = useState({
     id: id || "",
@@ -54,6 +61,21 @@ export default function DosenInputRpsPage() {
       pertemuan: '3',
       materiIndonesia: `Pembahasan hasil awal dan evaluasi: Mahasiswa menunjukkan hasil eksperimen awal dengan metrik akurasi, presisi, recall, dan F1. Diskusikan langkah perbaikan seperti tuning hyperparameter, melakukan cross-validation yang lebih ketat, dan memperbaiki pipeline evaluasi agar metrik tidak over-optimistic. Sertakan contoh tabel hasil eksperimen dan langkah lanjutan.`,
       materiInggris: `Discussion on initial results and evaluation: The student presented initial experimental results with accuracy, precision, recall, and F1 metrics. Discuss improvements like hyperparameter tuning, stricter cross-validation, and refining the evaluation pipeline to avoid optimistic metrics. Include sample result tables and next steps.`
+    },
+    {
+      pertemuan: '4',
+      materiIndonesia: `Review implementasi dan dokumentasi kode: Evaluasi struktur proyek, penggunaan design patterns, dan kualitas dokumentasi. Pastikan kode mengikuti best practices, termasuk error handling, logging, dan unit testing. Bahas juga performa dan optimisasi yang sudah diterapkan atau yang masih bisa ditingkatkan.`,
+      materiInggris: `Code implementation and documentation review: Evaluate project structure, design patterns usage, and documentation quality. Ensure code follows best practices, including error handling, logging, and unit testing. Discuss performance and optimization measures implemented or potential improvements.`
+    },
+    {
+      pertemuan: '5',
+      materiIndonesia: `Persiapan dan simulasi presentasi: Latihan presentasi dengan fokus pada penyampaian latar belakang, metodologi, dan hasil penelitian. Siapkan slide yang efektif dengan visualisasi data yang informatif. Antisipasi pertanyaan-pertanyaan kritis dari penguji terkait validitas hasil dan batasan penelitian.`,
+      materiInggris: `Presentation preparation and simulation: Practice presentation focusing on background, methodology, and research results delivery. Prepare effective slides with informative data visualization. Anticipate critical questions from examiners regarding result validity and research limitations.`
+    },
+    {
+      pertemuan: '6',
+      materiIndonesia: `Finalisasi laporan dan dokumentasi: Review menyeluruh terhadap format penulisan, konsistensi referensi, dan kelengkapan lampiran. Pastikan semua feedback dari pembimbing sudah diintegrasikan. Persiapkan juga paket deployment dan panduan penggunaan sistem untuk keperluan demo.`,
+      materiInggris: `Report and documentation finalization: Comprehensive review of writing format, reference consistency, and appendix completeness. Ensure all feedback from supervisors has been integrated. Also prepare deployment package and system usage guide for demo purposes.`
     }
   ];
   // compute visible indices according to search query so rendering and
@@ -69,9 +91,43 @@ export default function DosenInputRpsPage() {
     );
   });
 
+  // Reset visible count when search changes
+  useEffect(() => {
+    setVisibleCount(INITIAL_COUNT);
+  }, [search]);
+
+  // Set up intersection observer for infinite scroll
+  useEffect(() => {
+    if (!sentinelRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const first = entries[0];
+        if (first.isIntersecting) {
+          setIsLoadingMore(true);
+          // Simulate network delay
+          setTimeout(() => {
+            setVisibleCount(count => count + LOAD_MORE_COUNT);
+            setIsLoadingMore(false);
+          }, 500);
+        }
+      },
+      {
+        root: null,
+        rootMargin: "0px",
+        threshold: 1.0,
+      }
+    );
+
+    observer.observe(sentinelRef.current);
+    return () => observer.disconnect();
+  }, [sentinelRef.current]);
+
   const listContent = (() => {
     if (formData.topics.length === 0) {
-      return demoTopics.map((topic, dIdx) => (
+      // Apply pagination to demo topics
+      const visibleDemoTopics = demoTopics.slice(0, visibleCount);
+      return visibleDemoTopics.map((topic, dIdx) => (
         <div key={`demo-${dIdx}`} className="p-3 bg-white/80 rounded-lg ring-1 ring-gray-200">
           <div className="flex items-start justify-between">
             <div className="flex items-start gap-3">
@@ -119,7 +175,7 @@ export default function DosenInputRpsPage() {
     if (visibleIndices.length === 0) {
       return <div className="text-sm text-gray-500">Tidak ada materi yang cocok dengan pencarian.</div>;
     }
-    return visibleIndices.map((idx) => {
+    return visibleIndices.slice(0, visibleCount).map((idx) => {
       const topic = formData.topics[idx];
       return (
         <div key={idx} className="p-3 bg-white/80 rounded-lg ring-1 ring-gray-200">
@@ -429,11 +485,27 @@ export default function DosenInputRpsPage() {
           </div>
         </div>
 
-        <div className="space-y-2 mb-4">
+          <div className="space-y-2 mb-4">
           {listContent}
-        </div>
-
-        {/* bulk delete action + Edit modal */}
+          {((formData.topics.length === 0 && visibleCount < demoTopics.length) || 
+            (formData.topics.length > 0 && visibleCount < visibleIndices.length)) && (
+            <div ref={sentinelRef} className="py-4 flex justify-center">
+              {isLoadingMore ? (
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <svg className="animate-spin h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Memuat data...</span>
+                </div>
+              ) : (
+                <div className="text-sm text-gray-500">
+                  Scroll untuk melihat lebih banyak
+                </div>
+              )}
+            </div>
+          )}
+        </div>        {/* bulk delete action + Edit modal */}
 
         <div className="flex items-center justify-end mb-4">
           <div className="flex items-center gap-2">

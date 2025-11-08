@@ -51,7 +51,11 @@ export default function DosenLogBimbingan() {
   const { nim } = useParams();
   const navigate = useNavigate();
   const [logs, setLogs] = useState<LogItem[]>([]);
-  const [visibleCount, setVisibleCount] = useState<number>(4);
+  // Infinite scroll controls (match behavior with log-bimbingan.tsx)
+  const INITIAL_COUNT = 3;
+  const LOAD_MORE_COUNT = 3;
+  const [visibleCount, setVisibleCount] = useState<number>(INITIAL_COUNT);
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const [detailLogId, setDetailLogId] = useState<string | null>(null);
   const [student, setStudent] = useState<{ name: string; nim: string } | null>(null);
@@ -87,34 +91,130 @@ export default function DosenLogBimbingan() {
             id: "log-001",
             pembimbing: 1,
             tanggalBimbingan: "2025-10-15",
-            isi: "Mahasiswa telah menyelesaikan bab 1 dengan baik. Perlu diperbaiki bagian metodologi penelitian agar lebih detail. Selain itu, bagian latar belakang masih kurang fokus pada gap penelitian yang ingin ditangani — mohon tambahkan minimal tiga referensi terbaru dan jelaskan bagaimana kontribusi penelitian ini berbeda dari studi sebelumnya. Juga sarankan agar mahasiswa menyusun ulang tujuan penelitian menjadi tujuan umum dan tiga tujuan khusus agar lebih terukur.",
+            isi: "Mahasiswa telah menyelesaikan bab 1 dengan baik. Perlu diperbaiki bagian metodologi penelitian agar lebih detail. Selain itu, bagian latar belakang masih kurang fokus pada gap penelitian yang ingin ditangani — mohon tambahkan minimal tiga referensi terbaru dan jelaskan bagaimana kontribusi penelitian ini berbeda dari studi sebelumnya.",
             approve: "Disetujui",
-            tanggalInput: "2025-10-15T10:30:00Z"
+            tanggalInput: "2025-10-15T10:30:00Z",
           },
           {
             id: "log-002",
             pembimbing: 2,
             tanggalBimbingan: "2025-10-20",
-            isi: "Presentasi bab 2 sudah cukup baik. Mahasiswa diminta untuk menambahkan referensi lebih banyak pada tinjauan pustaka. Perlu juga memperjelas alur argumentasi: setiap subbab harus diakhiri dengan rangkuman singkat yang menghubungkan teori dengan hipotesis yang diajukan. Selain itu, periksa kembali kutipan dan format referensi agar konsisten dengan gaya sitasi yang dipilih.",
+            isi: "Presentasi bab 2 sudah cukup baik. Mahasiswa diminta untuk menambahkan referensi lebih banyak pada tinjauan pustaka.",
             approve: "Disetujui",
-            tanggalInput: "2025-10-20T14:15:00Z"
+            tanggalInput: "2025-10-20T14:15:00Z",
           },
           {
             id: "log-003",
             pembimbing: 1,
             tanggalBimbingan: "2025-10-25",
-            isi: "Bab 3 masih perlu diperbaiki. Diagram alur aplikasi kurang jelas dan perlu ditambahkan penjelasan lebih detail. Tolong sertakan diagram konteks, diagram alur data, dan penjelasan singkat untuk setiap komponen sistem. Selain itu jelaskan asumsi yang digunakan dalam perancangan, batasan sistem, dan skenario pengujian yang direncanakan sehingga implementasi dan evaluasi dapat berjalan sesuai rencana.",
+            isi: "Bab 3 masih perlu diperbaiki. Diagram alur aplikasi kurang jelas dan perlu ditambahkan penjelasan lebih detail.",
             approve: "Menunggu",
-            tanggalInput: "2025-10-25T09:45:00Z"
+            tanggalInput: "2025-10-25T09:45:00Z",
           },
           {
             id: "log-004",
             pembimbing: 2,
             tanggalBimbingan: "2025-11-01",
-            isi: "Proposal sudah cukup lengkap. Mahasiswa akan segera mengumpulkan proposal final setelah revisi kecil pada bagian kesimpulan. Mohon perhatikan penyusunan ringkasan hasil yang realistis sesuai metodologi yang diusulkan, dan tambahkan rencana timeline yang lebih rinci untuk 3 bulan ke depan. Jika memungkinkan, siapkan pula lampiran berisi daftar dataset dan contoh format pengumpulan data.",
+            isi: "Proposal sudah cukup lengkap. Mahasiswa akan segera mengumpulkan proposal final setelah revisi kecil pada bagian kesimpulan.",
             approve: "Disetujui",
-            tanggalInput: "2025-11-01T16:20:00Z"
-          }
+            tanggalInput: "2025-11-01T16:20:00Z",
+          },
+          {
+            id: "log-005",
+            pembimbing: 1,
+            tanggalBimbingan: "2025-09-30",
+            isi: "Diskusi tentang pemilihan metodologi; sarankan model eksperimen A dan B.",
+            approve: "Disetujui",
+            tanggalInput: "2025-09-30T11:05:00Z",
+          },
+          {
+            id: "log-006",
+            pembimbing: 2,
+            tanggalBimbingan: "2025-10-02",
+            isi: "Perbaiki format tabel pada bab hasil; gunakan 2 desimal untuk semua angka.",
+            approve: "Disetujui",
+            tanggalInput: "2025-10-02T09:20:00Z",
+          },
+          {
+            id: "log-007",
+            pembimbing: 1,
+            tanggalBimbingan: "2025-10-05",
+            isi: "Konsultasi dataset: validasi kebersihan data sebelum analisis.",
+            approve: "Menunggu",
+            tanggalInput: "2025-10-05T13:45:00Z",
+          },
+          {
+            id: "log-008",
+            pembimbing: 2,
+            tanggalBimbingan: "2025-10-08",
+            isi: "Diskusikan rencana pengujian dan metrik evaluasi yang akan dipakai.",
+            approve: "Ditolak",
+            tanggalInput: "2025-10-08T15:10:00Z",
+          },
+          {
+            id: "log-009",
+            pembimbing: 1,
+            tanggalBimbingan: "2025-10-12",
+            isi: "Tambahkan kajian pustaka terkait studi serupa dalam 5 tahun terakhir.",
+            approve: "Disetujui",
+            tanggalInput: "2025-10-12T08:40:00Z",
+          },
+          {
+            id: "log-010",
+            pembimbing: 2,
+            tanggalBimbingan: "2025-10-18",
+            isi: "Perbaikan pada Bab 4: jelaskan prosedur eksperimen lebih rinci.",
+            approve: "Menunggu",
+            tanggalInput: "2025-10-18T12:00:00Z",
+          },
+          {
+            id: "log-011",
+            pembimbing: 1,
+            tanggalBimbingan: "2025-10-22",
+            isi: "Rekomendasi referensi tambahan dan pengecekan kutipan.",
+            approve: "Disetujui",
+            tanggalInput: "2025-10-22T10:30:00Z",
+          },
+          {
+            id: "log-012",
+            pembimbing: 2,
+            tanggalBimbingan: "2025-10-26",
+            isi: "Perjelas hipotesis dan hubungkan dengan metode yang dipilih.",
+            approve: "Disetujui",
+            tanggalInput: "2025-10-26T09:10:00Z",
+          },
+          {
+            id: "log-013",
+            pembimbing: 1,
+            tanggalBimbingan: "2025-10-28",
+            isi: "Cek kembali naming convention variabel dan dokumentasi kode.",
+            approve: "Menunggu",
+            tanggalInput: "2025-10-28T14:55:00Z",
+          },
+          {
+            id: "log-014",
+            pembimbing: 2,
+            tanggalBimbingan: "2025-10-30",
+            isi: "Susun timeline final sampai ujian pendadaran.",
+            approve: "Disetujui",
+            tanggalInput: "2025-10-30T16:00:00Z",
+          },
+          {
+            id: "log-015",
+            pembimbing: 1,
+            tanggalBimbingan: "2025-11-03",
+            isi: "Review metodologi statistik dan uji asumsi normalitas.",
+            approve: "Disetujui",
+            tanggalInput: "2025-11-03T11:22:00Z",
+          },
+          {
+            id: "log-016",
+            pembimbing: 2,
+            tanggalBimbingan: "2025-11-05",
+            isi: "Final check: pastikan semua lampiran terunggah dan format sesuai.",
+            approve: "Menunggu",
+            tanggalInput: "2025-11-05T09:00:00Z",
+          },
         ];
         localStorage.setItem("logBimbinganData", JSON.stringify(sampleLogs));
         setLogs(sampleLogs);
@@ -215,19 +315,28 @@ export default function DosenLogBimbingan() {
   // IntersectionObserver to auto-load more when sentinel is visible
   useEffect(() => {
     if (!sentinelRef.current) return;
-    const obs = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          setVisibleCount((c) => {
-            if (c >= filteredLogs.length) return c;
-            return Math.min(c + 4, filteredLogs.length);
-          });
-        }
-      });
-    }, { root: null, rootMargin: '200px', threshold: 0.1 });
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting && !isLoadingMore && visibleCount < filteredLogs.length) {
+            setIsLoadingMore(true);
+            setTimeout(() => {
+              setVisibleCount((c) => Math.min(c + LOAD_MORE_COUNT, filteredLogs.length));
+              setIsLoadingMore(false);
+            }, 600);
+          }
+        });
+      },
+      { root: null, rootMargin: "200px", threshold: 0.1 }
+    );
     obs.observe(sentinelRef.current);
     return () => obs.disconnect();
   }, [sentinelRef, filteredLogs.length]);
+
+  // Reset visible count when search query or logs change so UX matches list page
+  useEffect(() => {
+    setVisibleCount(INITIAL_COUNT);
+  }, [searchQuery, logs.length]);
 
   if (!student) {
     return (
@@ -385,17 +494,20 @@ export default function DosenLogBimbingan() {
               </div>
               
               {visibleCount < filteredLogs.length && (
-                <div className="mt-3 flex justify-center">
-                  <button
-                    className="px-3 py-2 rounded-full border border-gray-300 text-sm bg-white hover:bg-gray-50"
-                    onClick={() => setVisibleCount((c) => Math.min(c + 4, filteredLogs.length))}
-                  >
-                    Muat lagi ({Math.min(visibleCount + 4, filteredLogs.length)}/{filteredLogs.length})
-                  </button>
+                <div ref={sentinelRef} className="h-10 flex items-center justify-center text-xs text-gray-500">
+                  {isLoadingMore ? (
+                    <span className="inline-flex items-center gap-2">
+                      <svg className="w-4 h-4 animate-spin text-gray-400" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                      </svg>
+                      Memuat...
+                    </span>
+                  ) : (
+                    <span>Gulir untuk memuat lagi</span>
+                  )}
                 </div>
               )}
-              {/* sentinel for infinite scroll */}
-              <div ref={sentinelRef} />
             </>
           )}
         </div>
