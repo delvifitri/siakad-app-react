@@ -5,12 +5,13 @@ import DosenLayout from "../layouts/DosenLayout";
 export function meta() {
   return [{ title: "Input RPS - Dosen" }];
 }
-
 export default function DosenInputRpsPage() {
   const { id, kelas } = useParams();
   const navigate = useNavigate();
 
-  const [loading, setLoading] = useState(true);
+  // Don't show a global "Memuat..." screen when navigating into this page —
+  // render the form immediately and populate from localStorage when ready.
+  const [loading, setLoading] = useState(false);
   const [notFound, setNotFound] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -35,7 +36,26 @@ export default function DosenInputRpsPage() {
   const [editMateriInggris, setEditMateriInggris] = useState("");
   const [selectedIndexes, setSelectedIndexes] = useState<Set<number>>(new Set());
   const [search, setSearch] = useState("");
+  const [detailIndex, setDetailIndex] = useState<number | null>(null);
+  const [detailDemoIndex, setDetailDemoIndex] = useState<number | null>(null);
 
+  const demoTopics = [
+    {
+      pertemuan: '1',
+      materiIndonesia: `Diskusi metodologi dan rencana eksperimen: Mahasiswa diminta untuk menyusun ulang bagian metodologi agar mencakup desain eksperimen, variabel yang diukur, dan langkah-langkah pengolahan data. Selain itu, tambahkan referensi utama untuk metode statistik yang digunakan serta penjelasan lebih rinci mengenai sampling dan validasi. Pastikan penjelasan cukup detail untuk memungkinkan replikasi oleh pembaca lain. Tambahkan juga tabel ringkasan variabel, contoh skrip preprocessing, dan catatan mengenai batasan eksperimen sehingga pembimbing dan penguji mendapatkan konteks yang lengkap.`,
+      materiInggris: `Discussion on methodology and experimental plan: The student is requested to revise the methodology section to include experimental design, measured variables, and data processing steps. Also add major references for the statistical methods and a more detailed description of sampling and validation. Ensure the explanation is detailed enough for reproducibility.`
+    },
+    {
+      pertemuan: '2',
+      materiIndonesia: `Konsultasi terkait pemilihan dataset dan preprocessing: Pilih dataset yang representatif, jelaskan alasan pemilihan fitur, dan berikan langkah-langkah preprocessing termasuk cleaning, normalisasi, serta teknik augmentasi jika diperlukan. Sertakan juga rencana evaluasi dan metrik yang akan digunakan. Jelaskan juga cara membagi data (train/val/test), rasio yang digunakan, serta pertimbangan handling missing values dan outlier.`,
+      materiInggris: `Consultation on dataset selection and preprocessing: Choose a representative dataset, explain feature selection rationale, and provide preprocessing steps including cleaning, normalization, and augmentation techniques if needed. Also include evaluation plans and metrics.`
+    },
+    {
+      pertemuan: '3',
+      materiIndonesia: `Pembahasan hasil awal dan evaluasi: Mahasiswa menunjukkan hasil eksperimen awal dengan metrik akurasi, presisi, recall, dan F1. Diskusikan langkah perbaikan seperti tuning hyperparameter, melakukan cross-validation yang lebih ketat, dan memperbaiki pipeline evaluasi agar metrik tidak over-optimistic. Sertakan contoh tabel hasil eksperimen dan langkah lanjutan.`,
+      materiInggris: `Discussion on initial results and evaluation: The student presented initial experimental results with accuracy, precision, recall, and F1 metrics. Discuss improvements like hyperparameter tuning, stricter cross-validation, and refining the evaluation pipeline to avoid optimistic metrics. Include sample result tables and next steps.`
+    }
+  ];
   // compute visible indices according to search query so rendering and
   // selection operate on the same original-topic indexes
   const visibleIndices = formData.topics.map((t, i) => i).filter(i => {
@@ -48,6 +68,118 @@ export default function DosenInputRpsPage() {
       String(topic.materiInggris || '').toLowerCase().includes(q)
     );
   });
+
+  const listContent = (() => {
+    if (formData.topics.length === 0) {
+      return demoTopics.map((topic, dIdx) => (
+        <div key={`demo-${dIdx}`} className="p-3 bg-white/80 rounded-lg ring-1 ring-gray-200">
+          <div className="flex items-start justify-between">
+            <div className="flex items-start gap-3">
+              <div className="flex-1">
+                <div className="text-xs text-gray-500">Pertemuan ke {topic.pertemuan}</div>
+                <div
+                  className="font-medium text-gray-900 mt-1 text-sm"
+                  style={{
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden'
+                  }}
+                >
+                  {topic.materiIndonesia}
+                </div>
+              </div>
+            </div>
+            <div className="ml-3 flex items-start gap-2">
+              <button onClick={() => setDetailDemoIndex(dIdx)} className="text-orange-500 hover:underline">Detail</button>
+            </div>
+          </div>
+          {detailDemoIndex === dIdx && (
+            <div className="mt-3 p-3 bg-white rounded-md border border-gray-200">
+              <div className="text-xs text-gray-500">Isi RPS:</div>
+              <div className="text-xs text-gray-500 mt-2">Materi (Indonesia)</div>
+              <div className="mt-1 text-sm text-gray-800 whitespace-pre-wrap">{topic.materiIndonesia}</div>
+              {topic.materiInggris && (
+                <div className="mt-4 text-sm text-gray-600">
+                  <div className="text-xs text-gray-500">Materi (English)</div>
+                  <div className="mt-1 whitespace-pre-wrap">{topic.materiInggris}</div>
+                </div>
+              )}
+              <div className="mt-3 flex justify-end">
+                <button onClick={() => setDetailDemoIndex(null)} className="text-sm text-gray-700">Sembunyikan</button>
+              </div>
+            </div>
+          )}
+          <div className="mt-3">
+            <button disabled className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm opacity-70">Edit</button>
+          </div>
+        </div>
+      ));
+    }
+    if (visibleIndices.length === 0) {
+      return <div className="text-sm text-gray-500">Tidak ada materi yang cocok dengan pencarian.</div>;
+    }
+    return visibleIndices.map((idx) => {
+      const topic = formData.topics[idx];
+      return (
+        <div key={idx} className="p-3 bg-white/80 rounded-lg ring-1 ring-gray-200">
+          <div className="flex items-start justify-between">
+            <div className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                checked={selectedIndexes.has(idx)}
+                onChange={() => {
+                  setSelectedIndexes(prev => {
+                    const copy = new Set(prev);
+                    if (copy.has(idx)) copy.delete(idx);
+                    else copy.add(idx);
+                    return copy;
+                  });
+                }}
+                className="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded"
+              />
+              <div className="flex-1">
+                <div className="text-xs text-gray-500">Pertemuan ke {topic.pertemuan}</div>
+                <div
+                  className="font-medium text-gray-900 mt-1 text-sm"
+                  style={{
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden'
+                  }}
+                >
+                  {topic.materiIndonesia || '-'}
+                </div>
+              </div>
+            </div>
+            <div className="ml-3 flex items-start gap-2">
+              <button onClick={() => setDetailIndex(idx)} className="text-orange-500 hover:underline">Detail</button>
+            </div>
+          </div>
+          {detailIndex === idx && (
+            <div className="mt-3 p-3 bg-white rounded-md border border-gray-200">
+              <div className="text-xs text-gray-500">Isi RPS:</div>
+              <div className="text-xs text-gray-500 mt-2">Materi (Indonesia)</div>
+              <div className="mt-1 text-sm text-gray-800 whitespace-pre-wrap">{topic.materiIndonesia || '-'}</div>
+              {topic.materiInggris && (
+                <div className="mt-4 text-sm text-gray-600">
+                  <div className="text-xs text-gray-500">Materi (English)</div>
+                  <div className="mt-1 whitespace-pre-wrap">{topic.materiInggris}</div>
+                </div>
+              )}
+              <div className="mt-3 flex justify-end">
+                <button onClick={() => setDetailIndex(null)} className="text-sm text-gray-700">Sembunyikan</button>
+              </div>
+            </div>
+          )}
+          <div className="mt-3">
+            <button onClick={() => startEditTopic(idx)} className="px-3 py-1 bg-blue-600 text-white rounded-full text-sm">Edit</button>
+          </div>
+        </div>
+      );
+    });
+  })();
 
   useEffect(() => {
     try {
@@ -298,44 +430,7 @@ export default function DosenInputRpsPage() {
         </div>
 
         <div className="space-y-2 mb-4">
-          {formData.topics.length === 0 ? (
-            <div className="text-sm text-gray-500">Belum ada materi yang ditambahkan.</div>
-          ) : visibleIndices.length === 0 ? (
-            <div className="text-sm text-gray-500">Tidak ada materi yang cocok dengan pencarian.</div>
-          ) : (
-            visibleIndices.map((idx) => {
-              const topic = formData.topics[idx];
-              return (
-                <div key={idx} className="p-3 bg-white/80 rounded-lg ring-1 ring-gray-200">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-3">
-                      <input
-                        type="checkbox"
-                        checked={selectedIndexes.has(idx)}
-                        onChange={() => {
-                          setSelectedIndexes(prev => {
-                            const copy = new Set(prev);
-                            if (copy.has(idx)) copy.delete(idx);
-                            else copy.add(idx);
-                            return copy;
-                          });
-                        }}
-                        className="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded"
-                      />
-                      <div className="flex-1">
-                        <div className="text-xs text-gray-500">Pertemuan ke {topic.pertemuan}</div>
-                        <div className="font-medium text-gray-900">{topic.materiIndonesia}</div>
-                        {topic.materiInggris && <div className="text-sm text-gray-600 mt-1">{topic.materiInggris}</div>}
-                      </div>
-                    </div>
-                    <div className="ml-3 flex items-start gap-2">
-                      <button onClick={() => startEditTopic(idx)} className="text-blue-600 hover:text-blue-800">Edit</button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })
-          )}
+          {listContent}
         </div>
 
         {/* bulk delete action + Edit modal */}
@@ -356,6 +451,7 @@ export default function DosenInputRpsPage() {
             </button>
           </div>
         </div>
+        {/* detail now rendered inline per-card; full-screen modal removed */}
         {showEditModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
             <div className="relative w-full max-w-xl mx-4">
