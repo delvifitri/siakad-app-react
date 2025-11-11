@@ -16,8 +16,13 @@ export default function MobileLayout({
         ? { backgroundImage: `url('${bgImage}')`, backgroundSize: "cover", backgroundPosition: "center" }
         : undefined;
 
+    const combinedStyle: React.CSSProperties = {
+        ...(style as React.CSSProperties),
+        minHeight: 'var(--app-height, 100vh)'
+    };
+
     return (
-        <div className="min-h-screen bg-gray-50 " style={style}>
+        <div className="min-h-app bg-gray-50 " style={combinedStyle}>
             <main className="pb-24">{/* leave space for bottom nav (24 = ~72px) */}
                 {children}
             </main>

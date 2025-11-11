@@ -7,8 +7,15 @@ interface SimpleLayoutProps {
 }
 
 export default function SimpleLayout({ title, children, footer }: SimpleLayoutProps) {
+  const baseStyle: React.CSSProperties = {
+    backgroundImage: 'url("/bg simple.png")',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    minHeight: 'var(--app-height, 100vh)'
+  };
+
   return (
-    <div className="min-h-screen flex flex-col text-gray-900 " style={{ backgroundImage: 'url("/bg simple.png")', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+    <div className="min-h-app flex flex-col text-gray-900 " style={baseStyle}>
       <header className="flex items-center justify-between p-4 bg-white/10 backdrop-blur-md border-b border-gray-200 ">
         <button onClick={() => window.history.back()} className="text-sm font-medium text-blue-600 ">
           <ArrowLeftIcon className="w-5 h-5" />

@@ -24,10 +24,12 @@ export default function Login() {
     }
   };
 
+  const mainStyle: React.CSSProperties = { backgroundImage: "url('/bg color.png')", minHeight: 'var(--app-height, 100vh)' };
+
   return (
     <main
-      className="min-h-screen flex items-center justify-center p-4 bg-cover bg-center"
-      style={{ backgroundImage: "url('/bg color.png')" }}
+      className="min-h-app flex items-center justify-center p-4 bg-cover bg-center"
+      style={mainStyle}
     >
       <div className="w-full max-w-sm space-y-6">
         <header className="text-center mb-24">

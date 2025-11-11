@@ -13,3 +13,18 @@ body {
     color-scheme: dark;
   } */
 }
+
+/* Dynamic viewport height for mobile / WebView (fixes 100vh cropping on Android WebView)
+   JS will set --app-height to window.innerHeight in the layout component. */
+:root {
+  --app-height: 100vh;
+}
+
+.min-h-app {
+  min-height: var(--app-height);
+}
+
+/* Ensure base elements don't collapse unexpectedly */
+html, body {
+  height: 100%;
+}
