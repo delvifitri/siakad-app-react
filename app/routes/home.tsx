@@ -14,6 +14,8 @@ import {
 } from "@heroicons/react/24/outline";
 import QuickAction from "../components/QuickAction";
 import StatCard from "../components/StatCard";
+import { useKrsContext } from "../context/KrsContext";
+import { khsData, gradePoint } from "../data/khsData";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -23,6 +25,31 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
+  const { submission } = useKrsContext();
+  const approvedCount = submission.items.filter((i) => i.status === "disetujui").length;
+  const totalCount = submission.items.length || 20;
+  const summary = submission.submitted ? `${approvedCount}/${totalCount} Disetujui` : "19/20 Disetujui";
+
+  // Hitung IPK terbaru dari data KHS bersama
+  const semesters = Object.keys(khsData).map(Number).sort((a, b) => a - b);
+  let cumSks = 0;
+  let cumNxS = 0;
+  for (const s of semesters) {
+    const sem = khsData[s];
+    if (!sem) continue;
+    cumSks += sem.courses.reduce((sum, c) => sum + c.sks, 0);
+    cumNxS += sem.courses.reduce((sum, c) => sum + gradePoint(c.grade) * c.sks, 0);
+  }
+  const latestIpk = cumSks > 0 ? cumNxS / cumSks : 0;
+  // Total SKS dari data IPK (kumulatif lulus). Default: lulus jika gradePoint > 0
+  const totalSks = semesters.reduce((sum, s) => {
+    const sem = khsData[s];
+    if (!sem) return sum;
+    const sksLulus = sem.courses
+      .filter((c) => gradePoint(c.grade) > 0)
+      .reduce((acc, c) => acc + c.sks, 0);
+    return sum + sksLulus;
+  }, 0);
   return (
     <MobileLayout title="Siakad" bgImage="/bg white.png">
       <HeaderIcons />
@@ -34,26 +61,34 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-2 gap-3 mt-6">
-          <StatCard
-            icon={<AcademicCapIcon className="w-6 h-6 text-blue-600" />}
-            title="IPK"
-            value={3.75}
-          />
-          <StatCard
-            icon={<DocumentDuplicateIcon className="w-6 h-6 text-green-600" />}
-            title="Total SKS"
-            value={120}
-          />
-          <StatCard
-            icon={<DocumentTextIcon className="w-6 h-6 text-orange-500" />}
-            title="KRS / KHS"
-            value="Lihat"
-          />
-          <StatCard
-            icon={<DocumentCheckIcon className="w-6 h-6 text-purple-600" />}
-            title="Status KRS"
-            value="Disetujui"
-          />
+          <a href="/krs-khs?tab=ipk" className="block" aria-label="Lihat IPK">
+            <StatCard
+              icon={<AcademicCapIcon className="w-6 h-6 text-blue-600" />}
+              title="IPK"
+              value={latestIpk.toFixed(2)}
+            />
+          </a>
+          <a href="/krs-khs?tab=ipk" className="block" aria-label="Lihat IPK">
+            <StatCard
+              icon={<DocumentDuplicateIcon className="w-6 h-6 text-green-600" />}
+              title="Total SKS"
+              value={totalSks}
+            />
+          </a>
+          <a href="/krs-khs?tab=khs" className="block">
+            <StatCard
+              icon={<DocumentTextIcon className="w-6 h-6 text-orange-500" />}
+              title="KRS / KHS"
+              value="Lihat"
+            />
+          </a>
+          <a href="/status-krs" className="block">
+            <StatCard
+              icon={<DocumentCheckIcon className="w-6 h-6 text-purple-600" />}
+              title="Status KRS"
+              value={summary}
+            />
+          </a>
         </div>
 
         <div className="grid grid-cols-3 gap-3 mt-6">
@@ -73,17 +108,18 @@ export default function Home() {
             icon={<ShieldCheckIcon className="w-7 h-7 mb-2 text-blue-600" />}
             label="Pengajuan"
             className="bg-white text-blue-600 border border-gray-200"
+            to="/pengajuan"
           />
         </div>
 
         <div className="mt-3">
-          <h2 className="text-base font-semibold text-gray-900 mb-3">
-            Berita Kampus
-          </h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-base font-semibold text-gray-900">Berita Kampus</h2>
+            <a href="/news" className="text-sm font-medium text-orange-600">Read more</a>
+          </div>
           <div className="space-y-3">
             <NewsItem
               title="Pendaftaran Beasiswa Dibuka"
-              excerpt="Pendaftaran beasiswa semester genap telah dibuka. Mahasiswa diharapkan menyiapkan berkas persyaratan sebelum tanggal tutup."
               to="/news/1"
               day="07"
               month="Sep"
@@ -91,7 +127,6 @@ export default function Home() {
 
             <NewsItem
               title="Seminar Industri Minggu Ini"
-              excerpt="Ikuti seminar bersama perusahaan mitra untuk insight karir dan peluang magang. Terbuka untuk seluruh mahasiswa."
               to="/news/2"
               day="17"
               month="Des"

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import SimpleLayout from "../layouts/SimpleLayout";
-import { ArrowLeftIcon, CameraIcon } from "@heroicons/react/24/outline";
+import { CameraIcon } from "@heroicons/react/24/outline";
 
 export default function EditProfile() {
   const [name, setName] = useState("Budi Santoso");
@@ -16,37 +16,37 @@ export default function EditProfile() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const prevObjectUrlRef = useRef<string | null>(null);
 
+  useEffect(() => {
+    return () => {
+      if (prevObjectUrlRef.current) URL.revokeObjectURL(prevObjectUrlRef.current);
+    };
+  }, []);
+
   const handleSave = () => {
-    // Handle save logic here
+    try {
+      localStorage.setItem('profileName', name);
+      localStorage.setItem('profileEmail', email);
+      localStorage.setItem('profileNIM', nim);
+      localStorage.setItem('profileMajor', major);
+      localStorage.setItem('profileSemester', semester);
+      localStorage.setItem('profilePhone', phone);
+      localStorage.setItem('profileAddress', address);
+    } catch {}
     setIsSaved(true);
     setShowToast(true);
-    setTimeout(() => setShowToast(false), 3000); // Hide toast after 3 seconds
+    setTimeout(() => setShowToast(false), 3000);
   };
 
-  const handlePhotoClick = () => {
-    fileInputRef.current?.click();
-  };
+  const handlePhotoClick = () => fileInputRef.current?.click();
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const url = URL.createObjectURL(file);
-    // Revoke previous object URL if any
-    if (prevObjectUrlRef.current) {
-      URL.revokeObjectURL(prevObjectUrlRef.current);
-    }
+    if (prevObjectUrlRef.current) URL.revokeObjectURL(prevObjectUrlRef.current);
     prevObjectUrlRef.current = url;
     setProfilePhoto(url);
-    // Here you could also upload the file to the server
   };
-
-  useEffect(() => {
-    return () => {
-      if (prevObjectUrlRef.current) {
-        URL.revokeObjectURL(prevObjectUrlRef.current);
-      }
-    };
-  }, []);
 
   return (
     <SimpleLayout title="Edit Profil">
@@ -89,8 +89,7 @@ export default function EditProfile() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              disabled
-              className="w-full px-3 py-2 border border-gray-300  rounded-lg bg-gray-100  text-gray-500  cursor-not-allowed"
+              className="w-full px-3 py-2 border border-orange-500 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-200"
             />
           </div>
 
@@ -100,8 +99,7 @@ export default function EditProfile() {
               type="text"
               value={nim}
               onChange={(e) => setNim(e.target.value)}
-              disabled
-              className="w-full px-3 py-2 border border-gray-300  rounded-lg bg-gray-100  text-gray-500  cursor-not-allowed"
+              className="w-full px-3 py-2 border border-orange-500 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-200"
             />
           </div>
 
@@ -111,8 +109,7 @@ export default function EditProfile() {
               type="text"
               value={major}
               onChange={(e) => setMajor(e.target.value)}
-              disabled
-              className="w-full px-3 py-2 border border-gray-300  rounded-lg bg-gray-100  text-gray-500  cursor-not-allowed"
+              className="w-full px-3 py-2 border border-orange-500 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-200"
             />
           </div>
 
@@ -122,8 +119,7 @@ export default function EditProfile() {
               type="number"
               value={semester}
               onChange={(e) => setSemester(e.target.value)}
-              disabled
-              className="w-full px-3 py-2 border border-gray-300  rounded-lg bg-gray-100  text-gray-500  cursor-not-allowed"
+              className="w-full px-3 py-2 border border-orange-500 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-200"
             />
           </div>
 

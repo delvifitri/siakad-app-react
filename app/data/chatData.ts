@@ -32,4 +32,60 @@ export const chatData: Record<number, ChatThread> = {
       { sender: "You", text: "Baik, saya baca.", time: "Kemarin" },
     ],
   },
+  4: {
+    name: "Komisi Tugas Akhir",
+    messages: [
+      { sender: "Komisi TA", text: "Selamat, proposal Anda telah diterima untuk penjadwalan seminar.", time: "08:15" },
+      { sender: "You", text: "Terima kasih informasinya, Bu/Pak.", time: "08:17" },
+    ],
+  },
+  5: {
+    name: "Dosen Pembimbing 1",
+    messages: [
+      { sender: "Dosen Pembimbing 1", text: "Silakan perbaiki Bab 1 sesuai catatan terakhir.", time: "Kemarin" },
+      { sender: "You", text: "Baik Pak, akan saya revisi hari ini.", time: "Kemarin" },
+    ],
+  },
+  6: {
+    name: "Dosen Pembimbing 2",
+    messages: [
+      { sender: "Dosen Pembimbing 2", text: "Mohon kirimkan draft Bab 3 sebelum Jumat.", time: "09:00" },
+      { sender: "You", text: "Siap, Pak. Saya kirim Kamis sore.", time: "09:05" },
+    ],
+  },
+  7: {
+    name: "Penguji 1",
+    messages: [
+      { sender: "Penguji 1", text: "Mohon siapkan ringkasan metodologi 1 halaman.", time: "12:20" },
+      { sender: "You", text: "Baik Pak/Bu, segera saya siapkan.", time: "12:23" },
+    ],
+  },
+  8: {
+    name: "Penguji 2",
+    messages: [
+      { sender: "Penguji 2", text: "Pastikan referensi menggunakan format terbaru.", time: "Kemarin" },
+      { sender: "You", text: "Baik, akan saya sesuaikan.", time: "Kemarin" },
+    ],
+  },
+  9: {
+    name: "Ani Lestari",
+    messages: [
+      { sender: "You", text: "Halo Ani, bagaimana progres akademiknya?", time: "08:00" },
+      { sender: "Ani Lestari", text: "Baik Bu/Pak, IP semester kemarin 3.5.", time: "08:02" },
+    ],
+  },
+  10: {
+    name: "Budi Santoso",
+    messages: [
+      { sender: "Budi Santoso", text: "Pak/Bu, saya ingin konsultasi rencana KRS.", time: "09:10" },
+      { sender: "You", text: "Boleh, silakan share mata kuliah yang diambil.", time: "09:12" },
+    ],
+  },
+  11: {
+    name: "Citra Rahma",
+    messages: [
+      { sender: "You", text: "Citra, ada kendala pada perkuliahan?", time: "Kemarin" },
+      { sender: "Citra Rahma", text: "Tidak Bu/Pak, semua lancar.", time: "Kemarin" },
+    ],
+  },
 };

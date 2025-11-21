@@ -14,47 +14,105 @@ export default function Pembayaran() {
     navigate(`/pembayaran/${paymentId}`);
   };
 
+  // Group payments by semester
+  const grouped = paymentList.reduce<Record<string, typeof paymentList>>((acc, p) => {
+    if (!acc[p.semester]) acc[p.semester] = [];
+    acc[p.semester].push(p);
+    return acc;
+  }, {});
+
+  // Build display entries and append placeholder semesters if needed
+  const groupedEntries = Object.entries(grouped);
+  const displayEntries: Array<[string, typeof paymentList]> = [...groupedEntries];
+
+  // Placeholder data for semester 3 and 4 (50% progress)
+  const placeholders = [
+    [
+      "Ganjil 2020/2021",
+      [
+        { id: "ph-3-a", semester: "Ganjil 2020/2021", type: "UKT/SPP", amount: 2000000, dueDate: "15 Jan 2021", status: "Lunas", description: "UKT Pokok" },
+        { id: "ph-3-b", semester: "Ganjil 2020/2021", type: "Praktikum", amount: 2000000, dueDate: "15 Jan 2021", status: "Belum Dibayar", description: "Biaya Praktikum" }
+      ] as typeof paymentList
+    ],
+    [
+      "Genap 2022/2023",
+      [
+        { id: "ph-4-a", semester: "Genap 2022/2023", type: "UKT/SPP", amount: 3000000, dueDate: "15 Mei 2023", status: "Lunas", description: "UKT Pokok" },
+        { id: "ph-4-b", semester: "Genap 2022/2023", type: "Praktikum", amount: 3000000, dueDate: "15 Mei 2023", status: "Belum Dibayar", description: "Biaya Praktikum" }
+      ] as typeof paymentList
+    ]
+  ];
+
+  for (let i = displayEntries.length; i < 4; i++) {
+    const ph = placeholders[i - displayEntries.length];
+    if (ph) displayEntries.push(ph as [string, typeof paymentList]);
+  }
+
   return (
     <MobileLayout title="Pembayaran" bgImage="/bg simple.png">
       <div className="p-4 space-y-2">
-        <h1 className="text-2xl font-semibold text-gray-900 ">Daftar Pembayaran</h1>
+        <h1 className="text-2xl font-bold text-gray-900 ">Pembayaran Biaya Semester</h1>
+  {displayEntries.map(([semester, payments], index) => {
+          const unpaidCount = payments.filter((p) => p.status !== "Lunas").length;
+          const totalAmount = payments.reduce((s, p) => s + p.amount, 0);
+          // create a slug for route (safe)
+          const slug = encodeURIComponent(semester.replace(/\s+/g, '-').toLowerCase());
+          const semesterLabel = `Semester ${index + 1}`;
 
-        {paymentList.map((payment) => (
-          <div
-            key={payment.id}
-            onClick={() => handlePaymentClick(payment.id)}
-            className="rounded-xl p-1 cursor-pointer transition-shadow"
-          >
-            <div className="backdrop-blur-md bg-white/40  border border-white/20  rounded-xl p-3 shadow-sm hover:shadow-md">
-            <div className="flex justify-between items-start mb-3">
-              <div className="flex-1">
-                <h3 className="font-semibold text-gray-900 ">{payment.type}</h3>
-                <p className="text-sm text-gray-600 ">{payment.semester}</p>
-              </div>
-              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                payment.status === "Lunas"
-                  ? "bg-green-100 text-green-800  "
-                  : "bg-red-100 text-red-800  "
-              }`}>
-                {payment.status}
-              </span>
-            </div>
+          // override academic year and season per semester index (1-based)
+          const preset = [
+            { year: '2020/2021', season: 'Ganjil' },
+            { year: '2021/2022', season: 'Genap' },
+            { year: '2023/2024', season: 'Ganjil' },
+            { year: '2024/2025', season: 'Genap' }
+          ];
 
-              <div className="flex justify-between items-center">
-              <div className="flex items-center gap-1">
-                <BanknotesIcon className="w-4 h-4 text-blue-600" />
-                <span className="font-medium text-gray-900 ">
-                  Rp {payment.amount.toLocaleString()}
-                </span>
-              </div>
-              <div className="flex items-center gap-1 text-xs text-gray-500 ">
-                <CalendarDaysIcon className="w-3 h-3" />
-                <span>{payment.dueDate}</span>
+          const info = preset[index] || null;
+          const academicYear = info ? info.year : payments[0].semester.replace(/\b(Ganjil|Genap)\b/ig, '').trim();
+          const season = info ? info.season : (payments[0].semester.match(/\b(Ganjil|Genap)\b/i) || [])[0] || '';
+
+          return (
+            <div key={semester} className="py-2">
+              <div className="bg-white/60 backdrop-blur-sm border border-white/20 rounded-2xl shadow-sm p-4 flex items-center justify-between">
+                <div>
+                  <div className="text-sm font-bold text-gray-800">{semesterLabel}</div>
+                  <div className="text-sm font-bold text-gray-900">Rp {totalAmount.toLocaleString()}</div>
+                </div>
+
+                <div className="flex flex-col items-end gap-2">
+                  <div className="text-xs text-gray-500 flex items-center gap-2">
+                    <span>{academicYear}</span>
+                    {season && (
+                      <span className="text-xs px-2 py-0.5 bg-gray-100 rounded-full text-gray-600">{season}</span>
+                    )}
+                  </div>
+                  <div className="w-36 bg-gray-100 rounded-full h-2 overflow-hidden">
+                    {(() => {
+                      // compute percent paid
+                      const lunasCount = payments.filter(p => p.status === 'Lunas').length;
+                      let percent = Math.round((lunasCount / payments.length) * 100);
+                      // Force Semester 1 to show 50% like placeholders
+                      if (index === 0) percent = 50;
+                      const barColor = percent === 100 ? 'bg-teal-400' : 'bg-orange-500';
+                      return <div className={`h-2 ${barColor}`} style={{ width: `${percent}%` }} />;
+                    })()}
+                  </div>
+                  <div className="flex items-center gap-2 mt-1">
+                    {unpaidCount === 0 && (
+                      <span className="text-xs text-teal-600 font-medium">Lunas</span>
+                    )}
+                    <button
+                      onClick={() => navigate(`/detail-pembayaran?sem=${index + 1}`)}
+                      className="text-sm text-orange-500 font-medium"
+                    >
+                      Lihat Detail
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </MobileLayout>
   );

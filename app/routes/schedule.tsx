@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import SimpleLayout from "../layouts/SimpleLayout";
 
 interface ScheduleItem {
@@ -11,6 +13,208 @@ interface ScheduleItem {
 
 export default function Schedule() {
   const [activeTab, setActiveTab] = useState<'today' | 'week'>('today');
+  const navigate = useNavigate();
+
+  const isDosen = useMemo(() => {
+    try {
+      return localStorage.getItem('userRole') === 'dosen';
+    } catch {
+      return false;
+    }
+  }, []);
+
+  // Dosen-specific view (moved from Dosen dashboard quick preview)
+  if (isDosen) {
+    type DosenWeekItem = { day: 'Min' | 'Sen' | 'Sel' | 'Rab' | 'Kam' | 'Jum' | 'Sab'; time: string; course: string; cls?: string; room: string; type: 'kuliah'; code: string };
+    // Semua: jadwal kuliah Senin s/d Jumat
+    const scheduleWeek: DosenWeekItem[] = [
+      { day: 'Sen', time: "08:00–09:40", course: "Pemrograman Web", cls: "A", room: "R-301", type: 'kuliah', code: "IF301" },
+      { day: 'Sen', time: "10:00–11:40", course: "Basis Data", cls: "B", room: "R-205", type: 'kuliah', code: "IF205" },
+      { day: 'Sel', time: "09:00–10:40", course: "Algoritma & Struktur Data", cls: "B", room: "R-204", type: 'kuliah', code: "IF102" },
+      { day: 'Rab', time: "13:30–15:10", course: "Jaringan Komputer", cls: "A", room: "Lab-2", type: 'kuliah', code: "IF210" },
+      { day: 'Kam', time: "08:00–09:40", course: "Sistem Operasi", cls: "A", room: "R-210", type: 'kuliah', code: "IF401" },
+      { day: 'Jum', time: "10:00–11:40", course: "Rekayasa Perangkat Lunak", cls: "C", room: "R-110", type: 'kuliah', code: "IF501" },
+    ];
+
+    // Helpers: sort by day then start time, and by start time within a day
+    const dayOrder = useMemo<Record<DosenWeekItem['day'], number>>(
+      () => ({ Min: 0, Sen: 1, Sel: 2, Rab: 3, Kam: 4, Jum: 5, Sab: 6 }),
+      []
+    );
+    const dayLabel = useMemo<Record<DosenWeekItem['day'], string>>(
+      () => ({ Min: 'Minggu', Sen: 'Senin', Sel: 'Selasa', Rab: 'Rabu', Kam: 'Kamis', Jum: 'Jumat', Sab: 'Sabtu' }),
+      []
+    );
+    const dayColor = useMemo<Record<DosenWeekItem['day'], string>>(
+      () => ({
+        Min: 'bg-pink-500 text-white',
+        Sen: 'bg-blue-500 text-white',
+        Sel: 'bg-green-500 text-white',
+        Rab: 'bg-orange-500 text-white',
+        Kam: 'bg-purple-500 text-white',
+        Jum: 'bg-red-500 text-white',
+        Sab: 'bg-indigo-500 text-white',
+      }),
+      []
+    );
+    const parseStartMinutes = (time: string) => {
+      const start = time.split(/[–-]/)[0]?.trim() ?? '';
+      const [hh, mm] = start.split(':').map((v) => parseInt(v, 10));
+      if (Number.isNaN(hh) || Number.isNaN(mm)) return 0;
+      return hh * 60 + mm;
+    };
+    const weekKuliahSorted = useMemo(
+      () =>
+        scheduleWeek
+          .filter((it) => it.type === 'kuliah')
+          .slice()
+          .sort((a, b) => dayOrder[a.day] - dayOrder[b.day] || parseStartMinutes(a.time) - parseStartMinutes(b.time)),
+      [scheduleWeek, dayOrder]
+    );
+
+    // (Reverted) No grouping headers; list items with aligned day and time
+
+    // Hari Ini: hanya jadwal kuliah pada hari ini
+    // Override: 'Hari Ini' menampilkan jadwal hari Senin sesuai permintaan
+    const todayCode = useMemo<DosenWeekItem['day']>(() => 'Sen', []);
+    const todayKuliah = useMemo(
+      () =>
+        scheduleWeek
+          .filter((it) => it.day === todayCode)
+          .slice()
+          .sort((a, b) => parseStartMinutes(a.time) - parseStartMinutes(b.time)),
+      [scheduleWeek, todayCode]
+    );
+
+    // Week view now always shows all kuliah this week (exclude ujian/agenda)
+
+    // per-tab search UI state
+    const [queryToday, setQueryToday] = useState('');
+    const [queryWeek, setQueryWeek] = useState('');
+    const [showSearchToday, setShowSearchToday] = useState(false);
+    const [showSearchWeek, setShowSearchWeek] = useState(false);
+
+    const filteredToday = useMemo(() => {
+      const q = queryToday.trim().toLowerCase();
+      if (!q) return todayKuliah;
+      return todayKuliah.filter((s) => (`${s.course} ${s.code} ${s.cls ?? ''} ${s.room} ${s.time}`).toLowerCase().includes(q));
+    }, [todayKuliah, queryToday]);
+
+    const filteredWeek = useMemo(() => {
+      const q = queryWeek.trim().toLowerCase();
+      if (!q) return weekKuliahSorted;
+      return weekKuliahSorted.filter((s) => (`${s.course} ${s.code} ${s.cls ?? ''} ${s.room} ${s.time}`).toLowerCase().includes(q));
+    }, [weekKuliahSorted, queryWeek]);
+
+    return (
+      <SimpleLayout title="Jadwal Dosen">
+        {/* Tabs */}
+        <div className="mb-4">
+          <div className="flex bg-gray-100 rounded-lg p-1">
+            <button
+              onClick={() => setActiveTab('today')}
+              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                activeTab === 'today' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
+              }`}
+            >
+              Hari Ini
+            </button>
+            <button
+              onClick={() => setActiveTab('week')}
+              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                activeTab === 'week' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
+              }`}
+            >
+              Semua
+            </button>
+          </div>
+        </div>
+
+        {activeTab === 'today' ? (
+          <div className="space-y-3">
+            <div className="flex items-center">
+              <div className="relative w-full max-w-md">
+                <MagnifyingGlassIcon className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+                <input
+                  value={queryToday}
+                  onChange={(e) => setQueryToday(e.target.value)}
+                  placeholder="Cari mata kuliah atau ruangan..."
+                  className="w-full pl-10 pr-3 py-1 border rounded-md text-sm"
+                />
+              </div>
+            </div>
+            {filteredToday.length === 0 ? (
+              <div className="p-4 rounded-xl border border-gray-200 bg-white/60 text-sm text-gray-600">Tidak ada jadwal kuliah hari ini.</div>
+            ) : (
+              filteredToday.map((s, idx) => {
+                const slug = `${s.code}-${s.cls}`.toLowerCase().replace(/\s+/g, '-');
+                return (
+                <div key={idx} className="w-full text-left p-4 rounded-xl border border-gray-200 bg-white/60 hover:bg-white/80 transition-colors">
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="font-semibold text-gray-900">
+                      {s.course}{s.cls ? ` (${s.cls})` : ''}{s.code ? ` - ${s.code}` : ''}
+                    </div>
+                    <div className="w-32 flex-shrink-0 text-right text-gray-600">{s.time}</div>
+                  </div>
+                  <div className="mt-1 text-[12px] text-gray-600">Ruangan: <span className="font-medium text-gray-900">{s.room}</span></div>
+                  <div className="mt-3">
+                    <button
+                      onClick={() => navigate(`/dosen/input-presensi/${slug}`, { state: { course: s.course, cls: s.cls, code: s.code, time: s.time, room: s.room } })}
+                      className="inline-flex items-center px-3 py-1.5 bg-blue-500 text-white text-sm font-medium rounded-full hover:bg-blue-600 transition-colors"
+                    >
+                      Input Presensi
+                    </button>
+                  </div>
+                </div>
+                );
+              })
+            )}
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <div className="flex items-center">
+              <div className="relative w-full max-w-md">
+                <MagnifyingGlassIcon className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+                <input
+                  value={queryWeek}
+                  onChange={(e) => setQueryWeek(e.target.value)}
+                  placeholder="Cari mata kuliah atau ruangan..."
+                  className="w-full pl-10 pr-3 py-1 border rounded-md text-sm"
+                />
+              </div>
+            </div>
+            {filteredWeek.map((s, idx) => {
+              const slug = `${s.code}-${s.cls}`.toLowerCase().replace(/\s+/g, '-');
+              return (
+                <div key={idx} className="w-full text-left flex rounded-xl border border-gray-200 bg-white/60 hover:bg-white/80 transition-colors overflow-hidden">
+                <div className={`w-24 flex-shrink-0 flex items-start pl-3 py-4 text-sm font-semibold ${dayColor[s.day]}`}>
+                  {dayLabel[s.day]}
+                </div>
+                <div className="flex-1 p-4 text-sm flex flex-col justify-between">
+                  <div className="flex items-center justify-between">
+                    <div className="font-semibold text-gray-900">
+                      {s.course}{s.cls ? ` (${s.cls})` : ''}{s.code ? ` - ${s.code}` : ''}
+                    </div>
+                    <div className="w-32 text-right text-gray-600">{s.time}</div>
+                  </div>
+                  <div className="mt-1 text-[12px] text-gray-600">Ruang: <span className="font-medium text-gray-900">{s.room}</span></div>
+                  <div className="mt-3">
+                    <button
+                      onClick={() => navigate(`/dosen/input-presensi/${slug}`, { state: { course: s.course, cls: s.cls, code: s.code, time: s.time, room: s.room } })}
+                      className="inline-flex items-center px-3 py-1.5 bg-blue-500 text-white text-sm font-medium rounded-full hover:bg-blue-600 transition-colors"
+                    >
+                      Input Presensi
+                    </button>
+                  </div>
+                </div>
+              </div>
+              );
+            })}
+          </div>
+        )}
+      </SimpleLayout>
+    );
+  }
 
   const todaySchedule: ScheduleItem[] = [
     {
@@ -121,7 +325,7 @@ export default function Schedule() {
                 </div>
                 <div className="flex">
                   <span className="w-16 font-medium">Jam</span>
-                  <span>: {item.time}</span>
+                  <span className="flex-1 text-right">: {item.time}</span>
                 </div>
                 <div className="flex">
                   <span className="w-16 font-medium">Ruang</span>
@@ -143,7 +347,7 @@ export default function Schedule() {
                   </div>
                   <div className="flex">
                     <span className="w-16 font-medium">Jam</span>
-                    <span>: {item.time}</span>
+                    <span className="flex-1 text-right">: {item.time}</span>
                   </div>
                   <div className="flex">
                     <span className="w-16 font-medium">Ruang</span>

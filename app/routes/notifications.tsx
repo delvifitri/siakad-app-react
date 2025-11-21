@@ -1,90 +1,71 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import SimpleLayout from "../layouts/SimpleLayout";
+import notificationsData from "../data/notificationData";
 
 export default function Notifications() {
-  const [activeTab, setActiveTab] = useState<'notifications' | 'announcements'>('notifications');
+  // Single list page: only Notifikasi (announcements tab removed)
 
-  const notifications = [
-    {
-      title: "Pengumuman Sistem",
-      description: "Sistem akan menjalankan maintenance pada pukul 02:00.",
-    },
-    {
-      title: "Jadwal Kuliah",
-      description: "Perubahan jadwal untuk Mata Kuliah Pemrograman Web.",
-    },
-    {
-      title: "Pembayaran",
-      description: "Pembayaran Anda diterima pada 10 Oktober 2025.",
-    },
-  ];
+  const [readIds, setReadIds] = useState<string[]>(() => {
+    try {
+      const raw = localStorage.getItem('notificationsReadIds');
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      return [];
+    }
+  });
 
-  const announcements = [
-    {
-      id: 1,
-      title: "Maintenance Sistem",
-      description: "Sistem akan menjalankan maintenance pada pukul 02:00.",
-    },
-    {
-      id: 2,
-      title: "Perubahan Jadwal Kuliah",
-      description: "Perubahan jadwal untuk Mata Kuliah Pemrograman Web.",
-    },
-    {
-      id: 3,
-      title: "Pembayaran SPP",
-      description: "Pembayaran SPP semester ini telah dibuka.",
-    },
-  ];
+  // Keep localStorage in sync when readIds change
+  useEffect(() => {
+    try {
+      localStorage.setItem('notificationsReadIds', JSON.stringify(readIds));
+      // notify other listeners in the same tab
+      window.dispatchEvent(new CustomEvent('notifications-changed'));
+    } catch (e) {
+      // ignore
+    }
+  }, [readIds]);
+
+  const notifications = notificationsData;
+
+  // Announcements tab removed per request
+
+  const markAsRead = (id: string) => {
+    if (readIds.includes(id)) return;
+    setReadIds((s) => [...s, id]);
+  };
 
   return (
     <SimpleLayout title="Pemberitahuan">
-      <div className="mb-4">
-        <div className="flex bg-gray-100  rounded-lg p-1">
-          <button
-            onClick={() => setActiveTab('notifications')}
-            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-              activeTab === 'notifications'
-                ? 'bg-white  text-gray-900  shadow-sm'
-                : 'text-gray-600 '
-            }`}
-          >
-            Notifikasi
-          </button>
-          <button
-            onClick={() => setActiveTab('announcements')}
-            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-              activeTab === 'announcements'
-                ? 'bg-white  text-gray-900  shadow-sm'
-                : 'text-gray-600'
-            }`}
-          >
-            Pengumuman
-          </button>
-        </div>
-      </div>
+      {/* Tabs removed: only Notifikasi is shown */}
 
       <div className="space-y-4">
-        {activeTab === 'notifications' ? (
-          notifications.map((item, index) => (
-            <div key={index} className="p-4 rounded-lg bg-white  shadow-sm">
-              <h2 className="font-medium">{item.title}</h2>
-              <p className="text-sm text-gray-600 ">{item.description}</p>
-            </div>
-          ))
-        ) : (
-          announcements.map((item) => (
+        {notifications.map((item) => {
+          const isRead = readIds.includes(item.id);
+          const baseClass = `p-4 rounded-lg shadow-sm ${isRead ? 'bg-white/30 backdrop-blur-sm border border-white/20' : 'bg-white'}`;
+
+          return (
             <Link
               key={item.id}
-              to={`/announcements/${item.id}`}
-              className="block p-4 rounded-lg bg-white  shadow-sm hover:bg-gray-50  transition-colors"
+              to={`/notification/${item.id}`}
+              onClick={() => markAsRead(item.id)}
+              className={baseClass + ' block'}
             >
-              <h2 className="font-medium">{item.title}</h2>
+              <h2 className="font-bold">{item.title}</h2>
               <p className="text-sm text-gray-600 ">{item.description}</p>
+              {item.course || item.time ? (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {item.course ? (
+                    <span className="text-xs px-2 py-1 rounded-full bg-orange-50 text-orange-700 border border-orange-100">{item.course}{item.className ? ` - ${item.className}` : ''}</span>
+                  ) : null}
+                  {item.time ? (
+                    <span className="text-xs px-2 py-1 rounded-full bg-gray-50 text-gray-800 border border-gray-100">{item.time}</span>
+                  ) : null}
+                </div>
+              ) : null}
             </Link>
-          ))
-        )}
+          );
+        })}
       </div>
     </SimpleLayout>
   );

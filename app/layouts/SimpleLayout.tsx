@@ -31,10 +31,19 @@ export default function SimpleLayout({
         <div className="w-8" />
       </header>
 
+      <main
+        className={`flex-1 p-4 ${footer ? 'pb-24' : ''}`}
+        style={footer ? { paddingBottom: 'calc(6rem + env(safe-area-inset-bottom))' } : undefined}
+      >
+        {children}
+      </main>
       <main className={`flex-1 p-4 ${footer ? "pb-20" : ""}`}>{children}</main>
 
       {footer && (
-        <footer className="fixed bottom-0 left-0 right-0 p-4 bg-white/10 backdrop-blur-md border-t border-gray-200 ">
+        <footer
+          className="fixed bottom-0 left-0 right-0 p-4 bg-white/10 backdrop-blur-md border-t border-gray-200 "
+          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 12px)' }}
+        >
           {footer}
         </footer>
       )}
