@@ -61,14 +61,14 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-2 gap-3 mt-6">
-          <a href="/krs-khs?tab=ipk" className="block" aria-label="Lihat IPK">
+          <a href="/krs-khs?tab=ipk&disableKrs=true" className="block" aria-label="Lihat IPK">
             <StatCard
               icon={<AcademicCapIcon className="w-6 h-6 text-blue-600" />}
               title="IPK"
               value={latestIpk.toFixed(2)}
             />
           </a>
-          <a href="/krs-khs?tab=ipk" className="block" aria-label="Lihat IPK">
+          <a href="/krs-khs?tab=ipk&disableKrs=true" className="block" aria-label="Lihat IPK">
             <StatCard
               icon={<DocumentDuplicateIcon className="w-6 h-6 text-green-600" />}
               title="Total SKS"

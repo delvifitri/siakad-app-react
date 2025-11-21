@@ -14,7 +14,7 @@ export default function BottomNavDosen() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 w-full bg-white/40 backdrop-blur-md border-t border-white/10 shadow-lg rounded-t-4xl overflow-hidden"
+      className={`fixed bottom-0 left-0 right-0 w-full bg-white/80 backdrop-blur-md border-t border-gray-200 shadow-lg rounded-t-4xl overflow-hidden`}
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <ul className="flex items-center justify-around text-xs py-3 px-2">
@@ -23,7 +23,7 @@ export default function BottomNavDosen() {
           return (
             <li key={it.to} className="flex-1">
               <Link to={it.to} aria-label={it.label} className={`flex flex-col items-center gap-1 py-2 ${active ? "text-blue-600" : "text-gray-700"}`}>
-                <span className={`${active ? "bg-blue-100/70 text-blue-600" : "bg-white/0"} p-2 rounded-full`}>{it.icon}</span>
+                <span className={`${active ? "bg-blue-100/90 text-blue-600" : "bg-transparent text-gray-700"} p-2 rounded-full`}>{it.icon}</span>
               </Link>
             </li>
           );

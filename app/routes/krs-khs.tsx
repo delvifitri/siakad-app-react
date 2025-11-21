@@ -253,9 +253,9 @@ export default function KrsKhs() {
   const [submitErrors, setSubmitErrors] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Redirect to IPK tab if KRS is disabled and user tries to access KRS
+  // Redirect to IPK tab if KRS is disabled and user tries to access KRS or KHS
   useEffect(() => {
-    if (disableKrs && tab === "krs") {
+    if (disableKrs && (tab === "krs" || tab === "khs")) {
       setTab("ipk");
       const next = new URLSearchParams(sp);
       next.set("tab", "ipk");
@@ -442,12 +442,20 @@ export default function KrsKhs() {
           </button>
           <button
             onClick={() => {
+              if (disableKrs) return;
               setTab("khs");
               const next = new URLSearchParams(sp);
               next.set("tab", "khs");
               setSp(next);
             }}
-            className={`px-4 py-1.5 text-sm rounded-full transition ${tab === "khs" ? "bg-blue-600 text-white" : "text-gray-700"}`}
+            disabled={disableKrs}
+            className={`px-4 py-1.5 text-sm rounded-full transition ${
+              disableKrs
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : tab === "khs"
+                ? "bg-blue-600 text-white"
+                : "text-gray-700"
+            }`}
           >
             Lihat KHS
           </button>

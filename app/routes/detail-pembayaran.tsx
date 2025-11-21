@@ -2,6 +2,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useMemo } from "react";
 import { paymentList } from "../data/paymentData";
 import SimpleLayout from "../layouts/SimpleLayout";
+import BottomNav from "../components/BottomNav";
 import { CreditCardIcon, BanknotesIcon } from "@heroicons/react/24/outline";
 
 export default function Pembayaran() {
@@ -103,7 +104,7 @@ export default function Pembayaran() {
   };
 
   return (
-    <SimpleLayout title="Pembayaran">
+    <SimpleLayout title="Pembayaran" footer={<BottomNav />}>
       <div className="space-y-4">
         {/* Semester Bill Selector */}
         <div className="bg-white rounded-2xl p-4 shadow-sm">

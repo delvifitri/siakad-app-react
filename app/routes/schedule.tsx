@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import SimpleLayout from "../layouts/SimpleLayout";
 import BottomNavDosen from "../components/BottomNavDosen";
+import BottomNav from "../components/BottomNav";
 
 interface ScheduleItem {
   course: string;
@@ -150,18 +151,22 @@ export default function Schedule() {
               filteredToday.map((s, idx) => {
                 const slug = `${s.code}-${s.cls}`.toLowerCase().replace(/\s+/g, '-');
                 return (
-                <div key={idx} className="w-full text-left p-4 rounded-xl border border-gray-200 bg-white/60 hover:bg-white/80 transition-colors">
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="font-semibold text-gray-900">
-                      {s.course}{s.cls ? ` (${s.cls})` : ''}{s.code ? ` - ${s.code}` : ''}
-                    </div>
-                    <div className="w-32 flex-shrink-0 text-right text-gray-600">{s.time}</div>
+                <div key={idx} className="w-full text-left rounded-xl border border-gray-200 bg-white/70 hover:bg-white transition-colors overflow-hidden relative p-4">
+                  <div className="flex items-start justify-between">
+                    <h3 className="font-semibold text-lg mb-0">{s.course}{s.cls ? ` (${s.cls})` : ''}{s.code ? ` - ${s.code}` : ''}</h3>
+                    <div className="text-sm text-gray-500 ml-4">{s.time}</div>
                   </div>
-                  <div className="mt-1 text-[12px] text-gray-600">Ruangan: <span className="font-medium text-gray-900">{s.room}</span></div>
-                  <div className="mt-3">
+                  <div className="mt-2 text-[12px] text-gray-600">
+                    <div className="flex">
+                      <span className="w-20 font-medium">Ruangan</span>
+                      <span className="w-2">:</span>
+                      <span className="flex-1">{s.room}</span>
+                    </div>
+                  </div>
+                  <div className="mt-4">
                     <button
                       onClick={() => navigate(`/dosen/input-presensi/${slug}`, { state: { course: s.course, cls: s.cls, code: s.code, time: s.time, room: s.room } })}
-                      className="inline-flex items-center px-3 py-1.5 bg-blue-500 text-white text-sm font-medium rounded-full hover:bg-blue-600 transition-colors"
+                      className="inline-flex items-center px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-full hover:bg-blue-600 transition-colors shadow-sm"
                     >
                       Input Presensi
                     </button>
@@ -186,23 +191,27 @@ export default function Schedule() {
             </div>
             {filteredWeek.map((s, idx) => {
               const slug = `${s.code}-${s.cls}`.toLowerCase().replace(/\s+/g, '-');
-              return (
-                <div key={idx} className="w-full text-left flex rounded-xl border border-gray-200 bg-white/60 hover:bg-white/80 transition-colors overflow-hidden">
-                <div className={`w-24 flex-shrink-0 flex items-start pl-3 py-4 text-sm font-semibold ${dayColor[s.day]}`}>
+                return (
+                <div key={idx} className="w-full text-left flex rounded-xl border border-gray-200 bg-white/70 hover:bg-white transition-colors overflow-hidden">
+                <div className={`w-28 flex-shrink-0 flex items-center justify-center p-4 text-sm font-semibold rounded-l-xl ${dayColor[s.day]}`}>
                   {dayLabel[s.day]}
                 </div>
                 <div className="flex-1 p-4 text-sm flex flex-col justify-between">
-                  <div className="flex items-center justify-between">
-                    <div className="font-semibold text-gray-900">
-                      {s.course}{s.cls ? ` (${s.cls})` : ''}{s.code ? ` - ${s.code}` : ''}
-                    </div>
-                    <div className="w-32 text-right text-gray-600">{s.time}</div>
+                  <div className="flex items-start justify-between">
+                    <h3 className="font-semibold text-lg mb-0">{s.course}{s.code ? ` - ${s.code}` : ''}</h3>
+                    <div className="text-sm text-gray-500 ml-4">{s.time}</div>
                   </div>
-                  <div className="mt-1 text-[12px] text-gray-600">Ruang: <span className="font-medium text-gray-900">{s.room}</span></div>
+                  <div className="mt-2 text-[12px] text-gray-600">
+                    <div className="flex mt-1">
+                      <span className="w-16 font-medium">Ruang</span>
+                      <span className="w-2">:</span>
+                      <span className="flex-1">{s.room}</span>
+                    </div>
+                  </div>
                   <div className="mt-3">
                     <button
                       onClick={() => navigate(`/dosen/input-presensi/${slug}`, { state: { course: s.course, cls: s.cls, code: s.code, time: s.time, room: s.room } })}
-                      className="inline-flex items-center px-3 py-1.5 bg-blue-500 text-white text-sm font-medium rounded-full hover:bg-blue-600 transition-colors"
+                      className="inline-flex items-center px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-full hover:bg-blue-600 transition-colors shadow-sm"
                     >
                       Input Presensi
                     </button>
@@ -288,7 +297,7 @@ export default function Schedule() {
   };
 
   return (
-    <SimpleLayout title="Jadwal Kuliah">
+    <SimpleLayout title="Jadwal Kuliah" footer={<BottomNav />}>
       <div className="mb-4">
         <div className="flex bg-gray-100  rounded-lg p-1">
           <button
@@ -322,15 +331,18 @@ export default function Schedule() {
               <div className="space-y-1 text-sm text-gray-600 ">
                 <div className="flex">
                   <span className="w-16 font-medium">Dosen</span>
-                  <span>: {item.lecturer}</span>
+                  <span className="w-2">:</span>
+                  <span className="flex-1">{item.lecturer}</span>
                 </div>
                 <div className="flex">
                   <span className="w-16 font-medium">Jam</span>
-                  <span className="flex-1 text-right">: {item.time}</span>
+                  <span className="w-2">:</span>
+                  <span className="w-24 text-right">{item.time}</span>
                 </div>
                 <div className="flex">
                   <span className="w-16 font-medium">Ruang</span>
-                  <span>: {item.room}</span>
+                  <span className="w-2">:</span>
+                  <span className="flex-1">{item.room}</span>
                 </div>
               </div>
             </div>
@@ -344,15 +356,18 @@ export default function Schedule() {
                 <div className="space-y-1 text-sm text-gray-600 ">
                   <div className="flex">
                     <span className="w-16 font-medium">Dosen</span>
-                    <span>: {item.lecturer}</span>
+                    <span className="w-2">:</span>
+                    <span className="flex-1">{item.lecturer}</span>
                   </div>
                   <div className="flex">
                     <span className="w-16 font-medium">Jam</span>
-                    <span className="flex-1 text-right">: {item.time}</span>
+                    <span className="w-2">:</span>
+                    <span className="w-24 text-right">{item.time}</span>
                   </div>
                   <div className="flex">
                     <span className="w-16 font-medium">Ruang</span>
-                    <span>: {item.room}</span>
+                    <span className="w-2">:</span>
+                    <span className="flex-1">{item.room}</span>
                   </div>
                 </div>
               </div>
