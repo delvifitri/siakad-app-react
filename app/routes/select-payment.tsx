@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import SimpleLayout from "../layouts/SimpleLayout";
+import BottomNav from "../components/BottomNav";
 import { BuildingLibraryIcon, CreditCardIcon, WalletIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
 
 export default function SelectPayment() {
@@ -95,7 +96,7 @@ export default function SelectPayment() {
     [...paymentChannels.banks, ...paymentChannels.cards, ...paymentChannels.ewallet].find(c => c.id === selectedChannel) : null;
 
   return (
-    <SimpleLayout title="Pilih Channel Pembayaran">
+    <SimpleLayout title="Pilih Channel Pembayaran" footer={<BottomNav />}>
       <div className="space-y-6">
         {/* Bank Transfer */}
         <div className="bg-blue-50/80  backdrop-blur-md rounded-2xl p-6 shadow-sm border border-blue-200/50 ">

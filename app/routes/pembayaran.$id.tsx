@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import SimpleLayout from "../layouts/SimpleLayout";
-import { CreditCardIcon, CalendarDaysIcon, BanknotesIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { CreditCardIcon, CalendarDaysIcon, BanknotesIcon } from "@heroicons/react/24/outline";
+import ArrowLeftIcon from "../components/ArrowLeftIcon";
 import { paymentDetails, type PaymentDetail } from "../data/paymentData";
 
 export function meta() {

@@ -1,6 +1,7 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import SimpleLayout from "../layouts/SimpleLayout";
+import BottomNav from "../components/BottomNav";
 import { CreditCardIcon, CalendarDaysIcon, BanknotesIcon } from "@heroicons/react/24/outline";
 import { defaultPaymentDetails } from "../data/paymentData";
 
@@ -51,7 +52,7 @@ export default function ConfirmPayment() {
   };
 
   return (
-    <SimpleLayout title="Konfirmasi Pembayaran">
+    <SimpleLayout title="Konfirmasi Pembayaran" footer={<BottomNav />}>
       <div className="space-y-6">
         {/* Payment Channel Selected */}
         <div className="bg-white/90  backdrop-blur-sm rounded-2xl p-6 shadow-sm">

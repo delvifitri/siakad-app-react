@@ -1,15 +1,18 @@
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
 import SimpleLayout from "../layouts/SimpleLayout";
 import { chatData } from "../data/chatData";
 
 export default function Chat() {
   const { id } = useParams();
-
+  const [searchParams] = useSearchParams();
+  
+  const studentName = searchParams.get('name');
   const chat = chatData[Number(id) as keyof typeof chatData] || { name: "Unknown", messages: [] };
+  const displayName = studentName || chat.name;
 
   return (
-    <SimpleLayout title={chat.name} footer={
+    <SimpleLayout title={displayName} footer={
       <div className="flex items-center gap-2">
         <input
           type="text"

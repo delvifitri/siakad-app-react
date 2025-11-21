@@ -53,7 +53,7 @@ export default function StatusKrs() {
   }, [items]);
 
   return (
-    <MobileLayout title="Status KRS" showNav={false} bgImage="/bg simple.png">
+    <MobileLayout title="Status KRS" showNav={true} bgImage="/bg simple.png">
       <div className="p-4 space-y-4">
         <header className="space-y-1">
           <h1 className="text-xl font-semibold text-gray-900">Status Pengajuan KRS</h1>

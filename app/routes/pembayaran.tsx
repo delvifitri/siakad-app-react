@@ -49,7 +49,7 @@ export default function Pembayaran() {
   }
 
   return (
-    <MobileLayout title="Pembayaran" bgImage="/bg simple.png">
+    <MobileLayout title="Pembayaran" showNav={true} bgImage="/bg simple.png">
       <div className="p-4 space-y-2">
         <h1 className="text-2xl font-bold text-gray-900 ">Pembayaran Biaya Semester</h1>
   {displayEntries.map(([semester, payments], index) => {

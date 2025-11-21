@@ -24,7 +24,7 @@ export default function NilaiPresensi() {
                 <div className="font-medium text-gray-900">{c.name}</div>
               </div>
               <div className="flex gap-2">
-                <button onClick={() => navigate(`/dosen/input-nilai/${c.code}`, { state: { course: c.name } })} className="px-3 py-1 rounded-full text-xs bg-blue-600 text-white">Input Nilai</button>
+                <button onClick={() => navigate(`/dosen/lihat-nilai/${c.code}`, { state: { course: c.name } })} className="px-3 py-1 rounded-full text-xs bg-blue-600 text-white">Input Nilai</button>
                 <button onClick={() => navigate(`/dosen/input-presensi/${c.code}`, { state: { course: c.name } })} className="px-3 py-1 rounded-full text-xs bg-emerald-600 text-white">Input Presensi</button>
                 <button className="px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-700">Download Form</button>
               </div>

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router";
+import { useParams, useLocation, useNavigate } from "react-router";
 import DosenLayout from "../layouts/DosenLayout";
 import { CheckCircleIcon, ExclamationTriangleIcon, XCircleIcon, ClockIcon, MagnifyingGlassIcon, ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import ArrowLeftIcon from "../components/ArrowLeftIcon";
 
 export function meta() {
-  return [{ title: "Detail Presensi - Siakad" }];
+  return [{ title: "Detail Presensi Ujian - Siakad" }];
 }
 
 const statuses = [
@@ -14,15 +14,22 @@ const statuses = [
   { key: "sakit", label: "Sakit", color: "bg-red-500", icon: XCircleIcon },
   { key: "alfa", label: "Alfa", color: "bg-gray-500", icon: ClockIcon },
 ];
+
+// Dummy students for exam attendance
 const dummyStudents = [
   { nim: "12345678", name: "Ahmad Fauzi" },
   { nim: "12345679", name: "Budi Santoso" },
   { nim: "12345680", name: "Citra Dewi" },
   { nim: "12345681", name: "Dedi Rahman" },
   { nim: "12345682", name: "Eka Putri" },
+  { nim: "12345683", name: "Fajar Nugraha" },
+  { nim: "12345684", name: "Gita Sari" },
+  { nim: "12345685", name: "Hendra Wijaya" },
 ];
-export default function DosenPresensiDetail() {
+
+export default function DosenDetailPresensiUjian() {
   const { slug } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
 
   const [presensi, setPresensi] = useState<Record<string, string>>({});
@@ -30,8 +37,12 @@ export default function DosenPresensiDetail() {
   const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [approved, setApproved] = useState<Record<string, boolean>>({});
   const [pendingPresensi, setPendingPresensi] = useState<Record<string, string>>({});
-  const [session, setSession] = useState<any>(null);
   const [toast, setToast] = useState<string | null>(null);
+
+  const course = (location as any).state?.course || "Mata Kuliah";
+  const time = (location as any).state?.time || "";
+  const room = (location as any).state?.room || "";
+  const academicYear = (location as any).state?.academicYear || "";
 
   useEffect(() => {
     try {
@@ -41,41 +52,43 @@ export default function DosenPresensiDetail() {
   }, [navigate]);
 
   useEffect(() => {
-    // initialize presensi & keterangan in-memory (do not use localStorage)
+    // Initialize presensi & keterangan for exam attendance
     const p: Record<string, string> = {};
     const k: Record<string, string> = {};
-    if (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.MODE === "development") {
-      // dev: prefill some dummy statuses for convenience
-      dummyStudents.forEach((s, idx) => {
-        if (idx === 0 || idx === 1) p[s.nim] = "hadir";
-        else if (idx === 2) p[s.nim] = "izin";
-        else p[s.nim] = "";
-        k[s.nim] = idx === 2 ? "Menunggu surat izin" : "";
-      });
-    } else {
-      dummyStudents.forEach((s) => {
-        p[s.nim] = "";
-        k[s.nim] = "";
-      });
-    }
+
+    // Simulate some students already present for the exam
+    dummyStudents.forEach((s, idx) => {
+      if (idx < 5) p[s.nim] = "hadir"; // First 5 students are present
+      else if (idx === 5) p[s.nim] = "izin"; // One student has permission
+      else if (idx === 6) p[s.nim] = "sakit"; // One student is sick
+      else p[s.nim] = "alfa"; // Others are absent
+
+      // Add some notes
+      if (idx === 5) k[s.nim] = "Surat izin dari dokter";
+      else if (idx === 6) k[s.nim] = "Sakit demam";
+      else k[s.nim] = "";
+    });
+
     setPresensi(p);
     setKeterangan(k);
 
-    // always ensure selection keys exist (start unchecked)
+    // Initialize selection keys
     const sel: Record<string, boolean> = {};
     dummyStudents.forEach((s) => (sel[s.nim] = false));
     setSelected(sel);
-    // initialize approved flags
+
+    // Initialize approved flags
     const ap: Record<string, boolean> = {};
     dummyStudents.forEach((s) => (ap[s.nim] = false));
     setApproved(ap);
-    // initialize pending presensi (for Belum Presensi selections)
+
+    // Initialize pending presensi
     const pp: Record<string, string> = {};
     dummyStudents.forEach((s) => (pp[s.nim] = ""));
     setPendingPresensi(pp);
   }, [slug]);
 
-  // separate search states for Sudah Presensi and Belum Presensi sections
+  // Search states
   const [searchFieldSudah, setSearchFieldSudah] = useState<string>("all");
   const [searchQuerySudah, setSearchQuerySudah] = useState<string>("");
   const [searchFieldBelum, setSearchFieldBelum] = useState<string>("all");
@@ -130,16 +143,14 @@ export default function DosenPresensiDetail() {
   const submitPending = (nim: string) => {
     const val = pendingPresensi[nim] ?? "";
     if (!val) return;
-    // commit pending status to presensi
     setPresensi((prev) => ({ ...prev, [nim]: val }));
-    // clear pending for this nim
     setPendingPresensi((prev) => ({ ...prev, [nim]: "" }));
     setToast("Presensi dicatat");
     setTimeout(() => setToast(null), 2000);
   };
 
   const approveSelected = () => {
-  const list = filteredSudahStudents.filter((s) => (presensi[s.nim] ?? "") !== "" && selected[s.nim]).map((s) => s.nim);
+    const list = filteredSudahStudents.filter((s) => (presensi[s.nim] ?? "") !== "" && selected[s.nim]).map((s) => s.nim);
     if (list.length === 0) return;
     setApproved((prev) => {
       const next = { ...prev };
@@ -197,39 +208,19 @@ export default function DosenPresensiDetail() {
   };
 
   const allSelectedSudah = filteredSudahStudents.length > 0 && filteredSudahStudents.every((s) => !!selected[s.nim]);
-
   const allSelectedBelum = filteredBelumStudents.length > 0 && filteredBelumStudents.every((s) => !!selected[s.nim]);
 
   const savePresensi = () => {
-    // no persistence to localStorage — keep presensi in state only
-    setToast("Presensi disimpan (state saja)");
+    setToast("Presensi ujian disimpan");
     setTimeout(() => setToast(null), 3000);
   };
 
-  const resetDummyData = () => {
-    if (!(typeof import.meta !== "undefined" && import.meta.env && import.meta.env.MODE === "development")) return;
-    const p: Record<string, string> = {};
-    const k: Record<string, string> = {};
-    dummyStudents.forEach((s, idx) => {
-      if (idx === 0 || idx === 1) p[s.nim] = "hadir";
-      else if (idx === 2) p[s.nim] = "izin";
-      else p[s.nim] = "";
-      k[s.nim] = idx === 2 ? "Menunggu surat izin" : "";
-    });
-    setPresensi(p);
-    setKeterangan(k);
-    setToast("Dummy data di-reset (state saja)");
-    setTimeout(() => setToast(null), 2000);
-  };
-
   const downloadPresensi = () => {
-    // build CSV from current state
     const headers = ["NIM", "Nama", "Status", "Keterangan", "Approved"];
     const rows = dummyStudents.map((s) => {
       const status = presensi[s.nim] ?? "";
       const ket = keterangan[s.nim] ?? "";
       const ap = approved[s.nim] ? "YA" : "";
-      // escape quotes
       const esc = (v: string) => `"${(v || "").replace(/"/g, '""')}"`;
       return [esc(s.nim), esc(s.name), esc(status), esc(ket), esc(ap)].join(",");
     });
@@ -239,14 +230,14 @@ export default function DosenPresensiDetail() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    const name = `presensi-${slug || "session"}.csv`;
+    const name = `presensi-ujian-${slug || "session"}.csv`;
     a.download = name;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    setToast(`Presensi diunduh: ${name}`);
+    setToast(`Presensi ujian diunduh: ${name}`);
     setTimeout(() => setToast(null), 2500);
   };
 
@@ -258,16 +249,15 @@ export default function DosenPresensiDetail() {
             <ArrowLeftIcon className="w-5 h-5" />
           </button>
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-gray-900">Detail Presensi</h1>
-            <p className="text-sm text-gray-600">{session ? `${session.topik || ""} — ${session.pertemuan || ""}` : "Sesi belum terisi"}</p>
+            <h1 className="text-xl font-bold text-gray-900">Detail Presensi Ujian</h1>
+            <p className="text-sm text-gray-600">{course} • {room} • {time} • {academicYear}</p>
           </div>
-          {/* download presensi */}
           <div className="flex items-center gap-2">
             <button
               onClick={downloadPresensi}
               className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-blue-600 text-white text-sm shadow-sm hover:bg-blue-700"
-              title="Unduh presensi"
-              aria-label="Unduh presensi"
+              title="Unduh presensi ujian"
+              aria-label="Unduh presensi ujian"
             >
               <ArrowDownTrayIcon className="w-5 h-5" />
               <span>Download</span>
@@ -278,7 +268,7 @@ export default function DosenPresensiDetail() {
         <div className="space-y-4">
           <section className="bg-white/60 rounded-xl border border-gray-200 p-3">
             <div className="mb-3">
-              <h3 className="text-base font-semibold text-gray-900">Sudah Presensi</h3>
+              <h3 className="text-base font-semibold text-gray-900">Sudah Presensi ({filteredSudahStudents.length})</h3>
               <div className="mt-2 flex items-center gap-2">
                 <select
                   value={searchFieldSudah}
@@ -316,47 +306,51 @@ export default function DosenPresensiDetail() {
 
             <div className="space-y-3">
               {filteredSudahStudents.length === 0 && (
-                <div className="text-sm text-gray-600">Belum ada yang dipresensi.</div>
+                <div className="text-sm text-gray-600">Belum ada yang presensi ujian.</div>
               )}
 
               {filteredSudahStudents.map((s) => (
-                  <div key={s.nim} className="flex items-center justify-between p-3 rounded-lg bg-white shadow-sm">
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="checkbox"
-                        checked={selected[s.nim] ?? false}
-                        onChange={() => toggleSelected(s.nim)}
-                        className="w-5 h-5 text-blue-600 rounded border-gray-300"
-                        aria-label={`Pilih ${s.name}`}
-                      />
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <div className="text-base font-medium text-gray-900">{s.name}</div>
-                          {approved[s.nim] && (
-                            <span className="flex items-center gap-1 text-green-600 text-sm font-medium">
-                              <CheckCircleIcon className="w-4 h-4" />
-                              <span>Approved</span>
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-sm text-gray-600">NIM: {s.nim}</div>
+                <div key={s.nim} className="flex items-center justify-between p-3 rounded-lg bg-white shadow-sm">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      checked={selected[s.nim] ?? false}
+                      onChange={() => toggleSelected(s.nim)}
+                      className="w-5 h-5 text-blue-600 rounded border-gray-300"
+                      aria-label={`Pilih ${s.name}`}
+                    />
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <div className="text-base font-medium text-gray-900">{s.name}</div>
+                        {approved[s.nim] && (
+                          <span className="flex items-center gap-1 text-green-600 text-sm font-medium">
+                            <CheckCircleIcon className="w-4 h-4" />
+                            <span>Approved</span>
+                          </span>
+                        )}
                       </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      {/* show a colored badge for the student's status (hadir/izin/sakit/alfa) */}
-                      {(() => {
-                        const key = presensi[s.nim] ?? "";
-                        const st = statuses.find((x) => x.key === key);
-                        if (!st) return null;
-                        return (
-                          <span className={`${st.color} text-white text-sm px-3 py-1 rounded-full inline-flex items-center font-medium`}>{st.label}</span>
-                        );
-                      })()}
+                      <div className="text-sm text-gray-600">NIM: {s.nim}</div>
+                      {keterangan[s.nim] && (
+                        <div className="text-xs text-gray-500 mt-1">{keterangan[s.nim]}</div>
+                      )}
                     </div>
                   </div>
-                ))}
-              {/* approve action for selected sudapresensi */}
+
+                  <div className="flex items-center gap-2">
+                    {(() => {
+                      const key = presensi[s.nim] ?? "";
+                      const st = statuses.find((x) => x.key === key);
+                      if (!st) return null;
+                      return (
+                        <span className={`${st.color} text-white text-sm px-3 py-1 rounded-full inline-flex items-center font-medium`}>
+                          {st.label}
+                        </span>
+                      );
+                    })()}
+                  </div>
+                </div>
+              ))}
+
               <div className="pt-3 flex items-center gap-2">
                 <button
                   onClick={approveSelected}
@@ -379,7 +373,7 @@ export default function DosenPresensiDetail() {
 
           <section className="bg-white/60 rounded-xl border border-gray-200 p-3">
             <div className="mb-3">
-              <h3 className="text-base font-semibold text-gray-900">Belum Presensi</h3>
+              <h3 className="text-base font-semibold text-gray-900">Belum Presensi ({filteredBelumStudents.length})</h3>
               <div className="mt-2 flex items-center gap-2">
                 <select
                   value={searchFieldBelum}
@@ -417,65 +411,56 @@ export default function DosenPresensiDetail() {
 
             <div className="space-y-3">
               {filteredBelumStudents.length === 0 && (
-                <div className="text-sm text-gray-600">Semua mahasiswa sudah dipresensi.</div>
+                <div className="text-sm text-gray-600">Semua mahasiswa sudah presensi.</div>
               )}
 
               {filteredBelumStudents.map((s) => (
-                  <div key={s.nim} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 rounded-lg bg-white shadow-sm gap-3">
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="checkbox"
-                        checked={selected[s.nim] ?? false}
-                        onChange={() => toggleSelected(s.nim)}
-                        className="w-5 h-5 text-blue-600 rounded border-gray-300"
-                        aria-label={`Pilih ${s.name}`}
-                      />
-                      <div>
-                        <div className="text-base font-medium text-gray-900">{s.name}</div>
-                        <div className="text-sm text-gray-600">NIM: {s.nim}</div>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
-                      <div className="w-full sm:w-44 md:w-56">
-                        <label htmlFor={`status-${s.nim}`} className="sr-only">Pilih status untuk {s.name}</label>
-                        <select
-                          id={`status-${s.nim}`}
-                          value={pendingPresensi[s.nim] ?? ""}
-                          onChange={(e) => setPendingPresensi((prev) => ({ ...prev, [s.nim]: e.target.value }))}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                          <option value="">Pilih Status</option>
-                          {statuses.map((st) => (
-                            <option key={st.key} value={st.key}>{st.label}</option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div className="w-full sm:w-56">
-                        <label htmlFor={`keterangan-${s.nim}`} className="sr-only">Keterangan untuk {s.name}</label>
-                        <textarea
-                          id={`keterangan-${s.nim}`}
-                          value={keterangan[s.nim] ?? ""}
-                          onChange={(e) => updateKeterangan(s.nim, e.target.value)}
-                          placeholder="Keterangan (opsional)"
-                          rows={2}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
+                <div key={s.nim} className="flex items-center justify-between p-3 rounded-lg bg-white shadow-sm">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      checked={selected[s.nim] ?? false}
+                      onChange={() => toggleSelected(s.nim)}
+                      className="w-5 h-5 text-blue-600 rounded border-gray-300"
+                      aria-label={`Pilih ${s.name}`}
+                    />
+                    <div>
+                      <div className="text-base font-medium text-gray-900">{s.name}</div>
+                      <div className="text-sm text-gray-600">NIM: {s.nim}</div>
                     </div>
                   </div>
-                ))}
-              {/* manual presensi action for selected belum-presensi */}
+
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={pendingPresensi[s.nim] ?? ""}
+                      onChange={(e) => setPendingPresensi((prev) => ({ ...prev, [s.nim]: e.target.value }))}
+                      className="px-2 py-1 border border-gray-300 rounded text-sm"
+                    >
+                      <option value="">Pilih Status</option>
+                      {statuses.map((st) => (
+                        <option key={st.key} value={st.key}>
+                          {st.label}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      onClick={() => submitPending(s.nim)}
+                      disabled={!pendingPresensi[s.nim]}
+                      className="px-2 py-1 bg-blue-600 text-white text-sm rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Simpan
+                    </button>
+                  </div>
+                </div>
+              ))}
+
               <div className="pt-3">
                 <button
                   onClick={manualPresensi}
-                  disabled={
-                    dummyStudents.filter((s) => (presensi[s.nim] ?? "") === "" && selected[s.nim]).length === 0
-                  }
-                  className="px-3 py-2 rounded-full bg-blue-600 text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={filteredBelumStudents.filter((s) => selected[s.nim]).length === 0}
+                  className="px-3 py-2 rounded-full bg-emerald-600 text-white text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Manual Presensi
+                  Catat Presensi Manual
                 </button>
               </div>
             </div>
@@ -483,9 +468,11 @@ export default function DosenPresensiDetail() {
         </div>
 
         {toast && (
-          <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-full shadow-lg">{toast}</div>
+          <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-full shadow-lg">
+            {toast}
+          </div>
         )}
       </section>
-        </DosenLayout>
-      );
-    }
+    </DosenLayout>
+  );
+}

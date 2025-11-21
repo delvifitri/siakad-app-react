@@ -1,7 +1,8 @@
 import DosenLayout from "../layouts/DosenLayout";
 import { useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router";
-import { MagnifyingGlassIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import ArrowLeftIcon from "../components/ArrowLeftIcon";
 
 export function meta() {
   return [{ title: "Detail Pengajuan KRS - Dosen" }];
@@ -33,6 +34,7 @@ export default function DosenApproveKrsDetail() {
 
   const [courses, setCourses] = useState<CourseRow[]>(initialCourses);
   const [search, setSearch] = useState<string>("");
+  const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
 
   // dummy approval window dates (display only)
   const approvalStart = "01 Okt 2025";
@@ -43,6 +45,69 @@ export default function DosenApproveKrsDetail() {
   };
   const rejectCourse = (code: string) => {
     setCourses((prev) => prev.map((c) => (c.code === code ? { ...c, status: "ditolak" } : c)));
+  };
+
+  const handleSelectCourse = (code: string) => {
+    setSelectedCourses(prev => 
+      prev.includes(code) 
+        ? prev.filter(c => c !== code) 
+        : [...prev, code]
+    );
+  };
+
+  const handleSelectAllCourses = () => {
+    const filteredCourses = courses.filter((c) => {
+      const q = search.trim().toLowerCase();
+      if (!q) return true;
+      return c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q);
+    });
+    
+    const allSelected = filteredCourses.every(c => selectedCourses.includes(c.code));
+    if (allSelected) {
+      setSelectedCourses(prev => prev.filter(code => !filteredCourses.some(c => c.code === code)));
+    } else {
+      const newSelections = filteredCourses.map(c => c.code).filter(code => !selectedCourses.includes(code));
+      setSelectedCourses(prev => [...prev, ...newSelections]);
+    }
+  };
+
+  const handleBulkApprove = () => {
+    if (selectedCourses.length === 0) {
+      alert("Pilih mata kuliah terlebih dahulu");
+      return;
+    }
+    setCourses((prev) => prev.map((c) => 
+      selectedCourses.includes(c.code) 
+        ? { ...c, status: "disetujui" } 
+        : c
+    ));
+    setSelectedCourses([]);
+  };
+
+  const handleRemoveAllApprovals = () => {
+    const hasApprovedCourses = courses.some(c => c.status === "disetujui");
+    if (!hasApprovedCourses) {
+      alert("Tidak ada mata kuliah yang disetujui");
+      return;
+    }
+    setCourses((prev) => prev.map((c) => 
+      c.status === "disetujui" 
+        ? { ...c, status: "menunggu" } 
+        : c
+    ));
+  };
+
+  const handleBulkReject = () => {
+    if (selectedCourses.length === 0) {
+      alert("Pilih mata kuliah terlebih dahulu");
+      return;
+    }
+    setCourses((prev) => prev.map((c) => 
+      selectedCourses.includes(c.code) 
+        ? { ...c, status: "ditolak" } 
+        : c
+    ));
+    setSelectedCourses([]);
   };
 
   const approvedCount = courses.filter((c) => c.status === "disetujui").length;
@@ -94,6 +159,30 @@ export default function DosenApproveKrsDetail() {
           </div>
         </div>
 
+        {/* Action buttons - Select All and Remove Approvals */}
+        <div className="mb-4 flex items-center gap-3">
+          <button
+            onClick={handleSelectAllCourses}
+            className="px-4 py-2 bg-orange-600 text-white rounded-full text-sm hover:bg-orange-700 transition-colors"
+          >
+            {(() => {
+              const filteredCourses = courses.filter((c) => {
+                const q = search.trim().toLowerCase();
+                if (!q) return true;
+                return c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q);
+              });
+              return filteredCourses.every(c => selectedCourses.includes(c.code)) ? 'Batal Pilih Semua' : 'Pilih Semua';
+            })()}
+          </button>
+          <button
+            onClick={handleRemoveAllApprovals}
+            disabled={!courses.some(c => c.status === "disetujui")}
+            className="px-4 py-2 bg-red-700 text-white rounded-full text-sm hover:bg-red-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+          >
+            Hapus Disetujui
+          </button>
+        </div>
+
         <section className="space-y-3">
           {courses.filter((c) => {
             const q = search.trim().toLowerCase();
@@ -101,19 +190,22 @@ export default function DosenApproveKrsDetail() {
             return c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q);
           }).map((c) => (
             <div key={c.code} className="flex items-center justify-between bg-white/70 backdrop-blur-md rounded-xl px-3 py-2 ring-1 ring-gray-200">
-              <div>
-                <p className="text-sm font-medium text-gray-900">{c.name} <span className="text-xs text-gray-600">({c.code})</span></p>
-                <p className="text-xs text-gray-600">Kelas {c.cls} • {c.sks} SKS</p>
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  checked={selectedCourses.includes(c.code)}
+                  onChange={() => handleSelectCourse(c.code)}
+                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{c.name} <span className="text-xs text-gray-600">({c.code})</span></p>
+                  <p className="text-xs text-gray-600">Kelas {c.cls} • {c.sks} SKS</p>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                {c.status === "menunggu" && (
-                  <>
-                    <button onClick={() => approveCourse(c.code)} className="px-3 py-1.5 bg-emerald-600 text-white rounded-full text-sm">Approve</button>
-                    <button onClick={() => rejectCourse(c.code)} className="px-3 py-1.5 bg-red-600 text-white rounded-full text-sm">Reject</button>
-                  </>
-                )}
+              <div className="flex items-center">
                 {c.status === "disetujui" && <span className="text-[11px] px-2 py-0.5 rounded-full bg-green-100 text-green-700 font-medium">Disetujui</span>}
                 {c.status === "ditolak" && <span className="text-[11px] px-2 py-0.5 rounded-full bg-red-100 text-red-700 font-medium">Ditolak</span>}
+                {c.status === "menunggu" && <span className="text-[11px] px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 font-medium">Menunggu</span>}
               </div>
             </div>
           ))}
@@ -128,7 +220,20 @@ export default function DosenApproveKrsDetail() {
         </section>
 
         <div className="flex items-center gap-3 mt-4">
-          <button onClick={() => setCourses((prev) => prev.map((c) => ({ ...c, status: "disetujui" })))} className="px-4 py-2 bg-emerald-600 text-white rounded-full">Approve All</button>
+          <button 
+            onClick={handleBulkApprove}
+            disabled={selectedCourses.length === 0}
+            className="px-4 py-2 bg-emerald-600 text-white rounded-full text-sm hover:bg-emerald-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+          >
+            Approve ({selectedCourses.length})
+          </button>
+          <button 
+            onClick={handleBulkReject}
+            disabled={selectedCourses.length === 0}
+            className="px-4 py-2 bg-red-600 text-white rounded-full text-sm hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+          >
+            Reject ({selectedCourses.length})
+          </button>
         </div>
       </div>
     </DosenLayout>

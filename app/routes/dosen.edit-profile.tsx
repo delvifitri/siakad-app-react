@@ -18,6 +18,9 @@ export default function DosenEditProfile() {
   const drawingRef = useRef(false);
   const lastPosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const [signatureDataUrl, setSignatureDataUrl] = useState<string | null>(null);
+  const [signatureMode, setSignatureMode] = useState<'digital' | 'image'>('digital');
+  const signatureImageInputRef = useRef<HTMLInputElement | null>(null);
+  const [signatureImageDataUrl, setSignatureImageDataUrl] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -25,6 +28,8 @@ export default function DosenEditProfile() {
       if (stored && stored.trim()) setName(stored);
       const sig = localStorage.getItem('profileSignature');
       if (sig) setSignatureDataUrl(sig);
+      const sigImg = localStorage.getItem('profileSignatureImage');
+      if (sigImg) setSignatureImageDataUrl(sigImg);
       const m = localStorage.getItem('profileMajor');
       if (m) setMajor(m);
       const e = localStorage.getItem('profileEmail');
@@ -87,6 +92,22 @@ export default function DosenEditProfile() {
     } catch {}
   };
 
+  // signature image handlers
+  const handleSignatureImageClick = () => signatureImageInputRef.current?.click();
+  const handleSignatureImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string | null;
+      if (result) {
+        setSignatureImageDataUrl(result);
+        try { localStorage.setItem('profileSignatureImage', result); } catch {}
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   // Setup canvas context SEKALI saja
   const setupCanvas = () => {
     const c = signatureRef.current;
@@ -142,17 +163,29 @@ export default function DosenEditProfile() {
   };
 
   const clearSignature = () => {
+    // clear both digital and image signatures
     setupCanvas();
     setSignatureDataUrl(null);
-    try { localStorage.removeItem('profileSignature'); } catch {}
+    setSignatureImageDataUrl(null);
+    try {
+      localStorage.removeItem('profileSignature');
+      localStorage.removeItem('profileSignatureImage');
+    } catch {}
   };
 
   const saveSignature = () => {
-    const c = signatureRef.current;
-    if (!c) return;
-    const dataUrl = c.toDataURL('image/png');
-    setSignatureDataUrl(dataUrl);
-    try { localStorage.setItem('profileSignature', dataUrl); } catch {}
+    if (signatureMode === 'digital') {
+      const c = signatureRef.current;
+      if (!c) return;
+      const dataUrl = c.toDataURL('image/png');
+      setSignatureDataUrl(dataUrl);
+      try { localStorage.setItem('profileSignature', dataUrl); } catch {}
+    } else {
+      // image mode: image is already saved on selection, but ensure stored
+      if (signatureImageDataUrl) {
+        try { localStorage.setItem('profileSignatureImage', signatureImageDataUrl); } catch {}
+      }
+    }
   };
 
   useEffect(() => {
@@ -171,6 +204,11 @@ export default function DosenEditProfile() {
       img.src = signatureDataUrl;
     }
   }, [signatureDataUrl]);
+
+  useEffect(() => {
+    // if switched to digital, ensure canvas is ready
+    if (signatureMode === 'digital') setupCanvas();
+  }, [signatureMode]);
 
   const handleSave = () => {
     try {
@@ -224,26 +262,66 @@ export default function DosenEditProfile() {
             <label className="block text-sm font-medium text-gray-700 mt-3 mb-2">Tanda Tangan (TTD)</label>
             <div className="bg-white border rounded-lg p-3">
               <div className="mb-2">
-                <div className="w-full h-36 border border-dashed rounded-md overflow-hidden">
-                  <canvas
-                    ref={signatureRef}
-                    className="w-full h-full touch-none"
-                    style={{ touchAction: 'none' }}
-                    onMouseDown={(e) => startDraw(e.clientX, e.clientY)}
-                    onMouseMove={(e) => drawMove(e.clientX, e.clientY)}
-                    onMouseUp={endDraw}
-                    onMouseLeave={endDraw}
-                    onTouchStart={(e) => { e.preventDefault(); const t = e.touches[0]; if (t) startDraw(t.clientX, t.clientY); }}
-                    onTouchMove={(e) => { e.preventDefault(); const t = e.touches[0]; if (t) drawMove(t.clientX, t.clientY); }}
-                    onTouchEnd={(e) => { e.preventDefault(); endDraw(); }}
-                  />
+                <div className="flex gap-2 mb-2">
+                  <button type="button" onClick={() => setSignatureMode('digital')} className={`px-3 py-1 rounded-full text-sm ${signatureMode === 'digital' ? 'bg-orange-500 text-white' : 'bg-gray-200'}`}>Digital</button>
+                  <button type="button" onClick={() => setSignatureMode('image')} className={`px-3 py-1 rounded-full text-sm ${signatureMode === 'image' ? 'bg-orange-500 text-white' : 'bg-gray-200'}`}>Foto/Gambar</button>
                 </div>
+
+                {signatureMode === 'digital' ? (
+                  <div className="w-full h-36 border border-dashed rounded-md overflow-hidden">
+                    <canvas
+                      ref={signatureRef}
+                      className="w-full h-full touch-none"
+                      style={{ touchAction: 'none' }}
+                      onMouseDown={(e) => startDraw(e.clientX, e.clientY)}
+                      onMouseMove={(e) => drawMove(e.clientX, e.clientY)}
+                      onMouseUp={endDraw}
+                      onMouseLeave={endDraw}
+                      onTouchStart={(e) => { e.preventDefault(); const t = e.touches[0]; if (t) startDraw(t.clientX, t.clientY); }}
+                      onTouchMove={(e) => { e.preventDefault(); const t = e.touches[0]; if (t) drawMove(t.clientX, t.clientY); }}
+                      onTouchEnd={(e) => { e.preventDefault(); endDraw(); }}
+                    />
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="text-center">
+                      <p className="text-sm text-gray-600 mb-4">Pilih gambar tanda tangan dari galeri</p>
+                      
+                      {signatureImageDataUrl ? (
+                        <div className="flex items-center justify-center gap-4">
+                          <img src={signatureImageDataUrl} alt="ttd-img-preview" className="h-16 w-16 object-contain border rounded" />
+                          <button type="button" onClick={handleSignatureImageClick} className="px-4 py-2 bg-blue-600 text-white rounded-full text-sm">Pilih Gambar</button>
+                          <input ref={signatureImageInputRef} type="file" accept="image/*" className="hidden" onChange={handleSignatureImageChange} />
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center">
+                          <button type="button" onClick={handleSignatureImageClick} className="px-4 py-2 bg-blue-600 text-white rounded-full text-sm">Pilih Gambar</button>
+                          <input ref={signatureImageInputRef} type="file" accept="image/*" className="hidden" onChange={handleSignatureImageChange} />
+                        </div>
+                      )}
+                      
+                      {signatureImageDataUrl && (
+                        <div className="flex items-center justify-center gap-2 mt-4">
+                          <button onClick={() => { try { localStorage.setItem('profileSignatureImage', signatureImageDataUrl); } catch {} }} type="button" className="px-3 py-1 bg-green-600 text-white rounded-full text-sm">Simpan</button>
+                          <button onClick={() => { setSignatureImageDataUrl(null); try { localStorage.removeItem('profileSignatureImage'); } catch {} }} type="button" className="px-3 py-1 bg-red-600 text-white rounded-full text-sm">Hapus</button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
-              <div className="flex items-center gap-2">
-                <button onClick={saveSignature} type="button" className="px-3 py-1 bg-blue-600 text-white rounded-full text-sm">Simpan TTD</button>
-                <button onClick={clearSignature} type="button" className="px-3 py-1 bg-gray-200 rounded-full text-sm">Bersihkan</button>
-                {signatureDataUrl && (<img src={signatureDataUrl} alt="ttd-preview" className="h-16 ml-3 object-contain border rounded" />)}
-              </div>
+              {signatureMode === 'digital' && (
+                <div className="flex items-center gap-2">
+                  <button onClick={saveSignature} type="button" className="px-3 py-1 bg-blue-600 text-white rounded-full text-sm">Simpan TTD</button>
+                  <button onClick={clearSignature} type="button" className="px-3 py-1 bg-gray-200 rounded-full text-sm">Bersihkan</button>
+                  {signatureDataUrl && (<img src={signatureDataUrl} alt="ttd-preview" className="h-16 ml-3 object-contain border rounded" />)}
+                </div>
+              )}
+              {/* {signatureMode === 'image' && signatureImageDataUrl && (
+                <div className="flex items-center justify-center mt-2">
+                  <img src={signatureImageDataUrl} alt="ttd-preview-img" className="h-16 object-contain border rounded" />
+                </div>
+              )} */}
             </div>
           </div>
         </div>

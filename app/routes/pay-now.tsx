@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import SimpleLayout from "../layouts/SimpleLayout";
+import BottomNav from "../components/BottomNav";
 
 const MIN_BY_TYPE: Record<string, number> = {
 	ukt: 100_000,
@@ -154,7 +155,7 @@ export default function PayNow() {
 	}, [paymentDetailsForSummary]);
 
 	return (
-		<SimpleLayout title="Detail Pembayaran">
+		<SimpleLayout title="Detail Pembayaran" footer={<BottomNav />}>
 			<div className="space-y-6">
 				<div className="rounded-2xl p-6 bg-white/70 backdrop-blur-md ring-1 ring-white/40 shadow-sm">
 					<div className="space-y-2">

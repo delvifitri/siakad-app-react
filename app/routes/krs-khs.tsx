@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import MobileLayout from "../layouts/MobileLayout";
 import { useKrsContext } from "../context/KrsContext";
 import { khsData, gradePoint } from "../data/khsData";
+import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 
 export function meta() {
   return [{ title: "KRS/KHS - Siakad" }];
@@ -224,7 +225,10 @@ const otherSemesterCourses: OtherCourse[] = [
 export default function KrsKhs() {
   const { submitKrs } = useKrsContext();
   const [sp, setSp] = useSearchParams();
-  const initialTab = (sp.get("tab") as "krs" | "khs" | "ipk") || "krs";
+  const navigate = useNavigate();
+  const fromDosen = sp.get("from") === "dosen";
+  const disableKrs = sp.get("disableKrs") === "true";
+  const initialTab = (sp.get("tab") as "krs" | "khs" | "ipk") || (disableKrs ? "ipk" : "krs");
   const [tab, setTab] = useState<"krs" | "khs" | "ipk">(initialTab);
   const [krsFilter, setKrsFilter] = useState<"active" | "other">("active");
   const khsRef = useRef<HTMLDivElement>(null);
@@ -248,6 +252,16 @@ export default function KrsKhs() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [submitErrors, setSubmitErrors] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Redirect to IPK tab if KRS is disabled and user tries to access KRS or KHS
+  useEffect(() => {
+    if (disableKrs && (tab === "krs" || tab === "khs")) {
+      setTab("ipk");
+      const next = new URLSearchParams(sp);
+      next.set("tab", "ipk");
+      setSp(next);
+    }
+  }, [disableKrs, tab, sp, setSp]);
   const [submitted, setSubmitted] = useState(false);
   const [khsSemester, setKhsSemester] = useState<number>(currentSemester - 1);
 
@@ -353,28 +367,9 @@ export default function KrsKhs() {
   const totalSksMemo = useMemo(() => selectedCoursesMemo.reduce((sum, c) => sum + c.sks, 0), [selectedCoursesMemo]);
 
   function validateBeforeSubmit() {
-    const errs: string[] = [];
-    const selectedCourses = selectedCoursesMemo;
-    const totalSks = totalSksMemo;
-
-    if (selectedCourses.length === 0) errs.push("Pilih minimal satu mata kuliah.");
-    if (totalSks < 12) errs.push("Minimal 12 SKS untuk pengajuan KRS.");
-    if (totalSks > 24) errs.push("Maksimal 24 SKS per semester.");
-
-    const allSelected = [...krsCourses, ...otherSemesterCourses].filter((c) => selectedMap[c.id]);
-    for (const c of allSelected as (Course | OtherCourse)[]) {
-      const clsKey = selectedClasses[c.id] ?? "A";
-      const cls = c.classes[clsKey];
-      const day = selectedDays[c.id] || cls.day;
-      const time = selectedTimes[c.id] || cls.time;
-      const lecturer = selectedLecturers[c.id] || cls.lecturer;
-      if (!day || !time) errs.push(`Jadwal belum dipilih lengkap untuk ${c.name}.`);
-      if (!lecturer) errs.push(`Dosen belum dipilih untuk ${c.name}.`);
-      if (cls.remaining === 0) errs.push(`${c.name} kelas ${clsKey} kuota habis.`);
-    }
-
-    setSubmitErrors(errs);
-    return errs.length === 0;
+    // Validasi dihapus sesuai permintaan
+    setSubmitErrors([]);
+    return true;
   }
 
   async function confirmSubmit() {
@@ -401,32 +396,66 @@ export default function KrsKhs() {
   }
 
   return (
-    <MobileLayout title="KRS / KHS" bgImage="/bg simple.png">
+    <MobileLayout title={fromDosen ? "Detail Akademik Mahasiswa" : "KRS / KHS"} bgImage="/bg simple.png">
       <div className="p-4 space-y-4">
+        {fromDosen && (
+          <div className="flex items-center gap-2 mb-4">
+            <button
+              onClick={() => navigate("/dosen/bimbingan-akademik")}
+              className="inline-flex items-center gap-2 text-sm text-blue-600 hover:underline"
+            >
+              <ArrowLeftIcon className="w-5 h-5" />
+              Kembali ke Bimbingan Akademik
+            </button>
+          </div>
+        )}
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">KRS/KHS</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            {fromDosen ? "Detail Akademik Mahasiswa" : "KRS/KHS"}
+          </h1>
+          {fromDosen && (
+            <p className="text-sm text-gray-600 mt-1">
+              Melihat data akademik mahasiswa bimbingan
+            </p>
+          )}
         </div>
 
         <div className="flex items-center gap-2 bg-white/60 backdrop-blur-sm border border-white/20 rounded-full p-1 w-fit">
           <button
             onClick={() => {
+              if (disableKrs) return;
               setTab("krs");
               const next = new URLSearchParams(sp);
               next.set("tab", "krs");
               setSp(next);
             }}
-            className={`px-4 py-1.5 text-sm rounded-full transition ${tab === "krs" ? "bg-blue-600 text-white" : "text-gray-700"}`}
+            disabled={disableKrs}
+            className={`px-4 py-1.5 text-sm rounded-full transition ${
+              disableKrs 
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
+                : tab === "krs" 
+                  ? "bg-blue-600 text-white" 
+                  : "text-gray-700"
+            }`}
           >
             Isi KRS
           </button>
           <button
             onClick={() => {
+              if (disableKrs) return;
               setTab("khs");
               const next = new URLSearchParams(sp);
               next.set("tab", "khs");
               setSp(next);
             }}
-            className={`px-4 py-1.5 text-sm rounded-full transition ${tab === "khs" ? "bg-blue-600 text-white" : "text-gray-700"}`}
+            disabled={disableKrs}
+            className={`px-4 py-1.5 text-sm rounded-full transition ${
+              disableKrs
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : tab === "khs"
+                ? "bg-blue-600 text-white"
+                : "text-gray-700"
+            }`}
           >
             Lihat KHS
           </button>

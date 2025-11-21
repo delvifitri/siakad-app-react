@@ -77,25 +77,25 @@ export default function DosenDashboard() {
 
         {/* Kartu Ringkasan Cepat */}
         <div className="grid grid-cols-2 gap-3 mt-6">
-          <div className="block">
+          <a href="/schedule" className="block" aria-label="Lihat Jadwal">
           <StatCard variant="small" wrapTitle icon={<CalendarDaysIcon className="w-6 h-6 text-blue-600" />} title="Mata Kuliah Aktif" value={activeCourses} />
-          </div>
+          </a>
           <a href="/dosen/bimbingan-akademik" className="block" aria-label="Bimbingan Akademik">
           <StatCard variant="small" wrapTitle icon={<UserGroupIcon className="w-6 h-6 text-green-600" />} title="Bimbingan Akademik" value={bimbinganCount} />
           </a>
           <a href="/dosen/approve-krs" className="block" aria-label="Approve KRS">
           <StatCard variant="small" wrapTitle icon={<DocumentCheckIcon className="w-6 h-6 text-purple-600" />} title="Approve KRS" value={krsSummary} />
           </a>
-          <div className="block">
+          <a href="/dosen/ujian-pendadaran" className="block" aria-label="Ujian Pendadaran">
           <StatCard variant="small" wrapTitle icon={<AcademicCapIcon className="w-6 h-6 text-orange-500" />} title="Ujian Pendadaran" value={examsThisWeek} />
-          </div>
+          </a>
         </div>
 
         {/* Shortcut Aksi Cepat */}
   <div className="grid grid-cols-3 gap-3 mt-6">
   <QuickAction size="lg" centered icon={<AcademicCapIcon className="w-7 h-7 mb-2 text-white" />} label="Lihat Nilai" className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white" to="/dosen/nilai-presensi" />
   <QuickAction size="lg" centered icon={<CalendarDaysIcon className="w-7 h-7 mb-2 text-white" />} label="Input Presensi" className="bg-gradient-to-br from-sky-500 to-blue-600 text-white" to="/schedule" />
-  <QuickAction size="lg" centered icon={<DocumentTextIcon className="w-7 h-7 mb-2 text-white" />} label="Kelola RPS" className="bg-gradient-to-br from-emerald-500 to-green-600 text-white" to="/dosen/kelola-rps" />
+  <QuickAction size="lg" centered icon={<DocumentTextIcon className="w-7 h-7 mb-2 text-white" />} label="Bimbingan TA" className="bg-gradient-to-br from-emerald-500 to-green-600 text-white" to="/dosen/bimbingan" />
     </div>
 
         {/* Berita Kampus untuk Dosen */}

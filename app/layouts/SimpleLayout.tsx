@@ -1,4 +1,5 @@
-import { ArrowLeftIcon } from "@heroicons/react/24/outline";
+import ArrowLeftIcon from "../components/ArrowLeftIcon";
+import React from "react";
 
 interface SimpleLayoutProps {
   title: string;
@@ -6,20 +7,16 @@ interface SimpleLayoutProps {
   footer?: React.ReactNode;
 }
 
-export default function SimpleLayout({
-  title,
-  children,
-  footer,
-}: SimpleLayoutProps) {
+export default function SimpleLayout({ title, children, footer }: SimpleLayoutProps) {
+  const baseStyle: React.CSSProperties = {
+    backgroundImage: 'url("/bg simple.png")',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    minHeight: 'var(--app-height, 100vh)'
+  };
+
   return (
-    <div
-      className="min-h-screen flex flex-col text-gray-900"
-      style={{
-        backgroundImage: 'url("/bg simple.png")',
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-    >
+    <div className="min-h-app flex flex-col text-gray-900 " style={baseStyle}>
       <header className="flex items-center justify-between p-4 bg-white/10 backdrop-blur-md border-b border-gray-200 ">
         <button
           onClick={() => window.history.back()}
@@ -39,14 +36,25 @@ export default function SimpleLayout({
       </main>
       <main className={`flex-1 p-4 ${footer ? "pb-20" : ""}`}>{children}</main>
 
-      {footer && (
-        <footer
-          className="fixed bottom-0 left-0 right-0 p-4 bg-white/10 backdrop-blur-md border-t border-gray-200 "
-          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 12px)' }}
-        >
-          {footer}
-        </footer>
-      )}
+      {footer && (() => {
+        // If the footer is the BottomNav component (or BottomNavDosen), render it directly
+        // because those components already handle fixed positioning and background.
+        if (React.isValidElement(footer)) {
+          const typeName = (footer.type as any)?.name || (footer.type as any)?.displayName || '';
+          if (typeName === 'BottomNav' || typeName === 'BottomNavDosen') {
+            return footer;
+          }
+        }
+
+        return (
+          <footer
+            className="fixed bottom-0 left-0 right-0 p-4 bg-white/10 backdrop-blur-md border-t border-gray-200 "
+            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 12px)' }}
+          >
+            {footer}
+          </footer>
+        );
+      })()}
     </div>
   );
 }

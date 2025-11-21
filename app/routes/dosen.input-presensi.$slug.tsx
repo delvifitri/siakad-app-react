@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router";
 import DosenLayout from "../layouts/DosenLayout";
-import { ArrowLeftIcon } from "@heroicons/react/24/outline";
+import ArrowLeftIcon from "../components/ArrowLeftIcon";
 
 export function meta() {
   return [{ title: "Input Presensi - Siakad" }];
@@ -25,12 +25,13 @@ export default function DosenInputPresensi() {
   });
 
   const [photoMasukPreview, setPhotoMasukPreview] = useState<string | null>(null);
-  const [photoKeluarPreview, setPhotoKeluarPreview] = useState<string | null>(null);
 
   const course = (location as any).state?.course || "Mata Kuliah";
   const cls = (location as any).state?.cls || "Kelas";
   const code = (location as any).state?.code || "Kode";
   const time = (location as any).state?.time || "";
+  const room = (location as any).state?.room || "";
+  const academicYear = (location as any).state?.academicYear || "";
 
   useEffect(() => {
     try {
@@ -67,7 +68,6 @@ export default function DosenInputPresensi() {
   }, [slug, time]);
 
   const photoMasukRef = useRef<HTMLInputElement | null>(null);
-  const photoKeluarRef = useRef<HTMLInputElement | null>(null);
 
   const handlePhotoMasukChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files && e.target.files[0];
@@ -85,25 +85,9 @@ export default function DosenInputPresensi() {
     reader.readAsDataURL(f);
   };
 
-  const handlePhotoKeluarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files && e.target.files[0];
-    if (!f) {
-      setPhotoKeluarPreview(null);
-      setSession((prev: any) => ({ ...prev, photoKeluar: "" }));
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = () => {
-      const data = typeof reader.result === "string" ? reader.result : null;
-      setPhotoKeluarPreview(data);
-      setSession((prev: any) => ({ ...prev, photoKeluar: data || "" }));
-    };
-    reader.readAsDataURL(f);
-  };
-
   const proceedToDetail = () => {
-    if (!session.photoMasuk || !session.photoKeluar) {
-      setToast("Foto bukti masuk dan keluar harus diisi sebelum memulai sesi");
+    if (!session.photoMasuk) {
+      setToast("Foto bukti masuk harus diisi sebelum memulai sesi");
       setTimeout(() => setToast(null), 3000);
       return;
     }
@@ -127,7 +111,7 @@ export default function DosenInputPresensi() {
           </button>
           <div>
             <h1 className="text-xl font-bold text-gray-900">Input Presensi</h1>
-            <p className="text-sm text-gray-600">{course} ({cls}) - {code}</p>
+            <p className="text-sm text-gray-600">{course} • {room} • {academicYear}</p>
           </div>
         </div>
 
@@ -150,7 +134,7 @@ export default function DosenInputPresensi() {
                 type="number"
                 value={session.pertemuan}
                 disabled
-                className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50"
+                className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-100"
               />
             </div>
 
@@ -166,58 +150,41 @@ export default function DosenInputPresensi() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Mulai</label>
-              <input value={session.mulai} disabled className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50" />
+              <input value={session.mulai} disabled className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-100" />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Selesai</label>
-              <input value={session.selesai} disabled className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50" />
+              <input value={session.selesai} disabled className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-100" />
             </div>
 
             <div className="md:col-span-2">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Foto Bukti Masuk</label>
-                  <div className="flex flex-col items-start gap-2">
-                    <button
-                      type="button"
-                      onClick={() => (photoMasukRef.current as HTMLInputElement | null)?.click()}
-                      className="px-4 py-2 rounded-full bg-orange-500 text-white text-sm shadow-md hover:bg-orange-600 transition"
-                    >
-                      Ambil Foto Masuk
-                    </button>
-                    <input ref={photoMasukRef} id="photo-masuk-input" type="file" accept="image/*" capture="environment" onChange={(e) => handlePhotoMasukChange(e as any)} style={{ display: 'none' }} />
-                    {photoMasukPreview && (
-                      <div className="mt-2">
-                        <img src={photoMasukPreview} alt="Masuk" className="w-32 h-20 object-cover rounded-md border" />
-                        <div>
-                          <button type="button" onClick={() => { setPhotoMasukPreview(null); setSession((prev: any) => ({ ...prev, photoMasuk: '' })); }} className="text-sm text-red-600 hover:underline mt-2">Hapus</button>
-                        </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Bukti Masuk</label>
+                <div className="flex flex-col items-start gap-2">
+                  <button
+                    type="button"
+                    onClick={() => (photoMasukRef.current as HTMLInputElement | null)?.click()}
+                    className="px-4 py-2 rounded-full bg-orange-500 text-white text-sm shadow-md hover:bg-orange-600 transition"
+                  >
+                    Pilih File Masuk
+                  </button>
+                  <button
+                    type="button"
+                    disabled
+                    className="px-4 py-2 rounded-full bg-gray-400 text-white text-sm shadow-md cursor-not-allowed"
+                  >
+                    Ambil Foto Masuk
+                  </button>
+                  <input ref={photoMasukRef} id="photo-masuk-input" type="file" accept="image/*" onChange={(e) => handlePhotoMasukChange(e as any)} style={{ display: 'none' }} />
+                  {photoMasukPreview && (
+                    <div className="mt-2">
+                      <img src={photoMasukPreview} alt="Masuk" className="w-32 h-20 object-cover rounded-md border" />
+                      <div>
+                        <button type="button" onClick={() => { setPhotoMasukPreview(null); setSession((prev: any) => ({ ...prev, photoMasuk: '' })); }} className="text-sm text-red-600 hover:underline mt-2">Hapus</button>
                       </div>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Foto Bukti Keluar</label>
-                  <div className="flex flex-col items-start gap-2">
-                    <button
-                      type="button"
-                      onClick={() => (photoKeluarRef.current as HTMLInputElement | null)?.click()}
-                      className="px-4 py-2 rounded-full bg-orange-500 text-white text-sm shadow-md hover:bg-orange-600 transition"
-                    >
-                      Ambil Foto Keluar
-                    </button>
-                    <input ref={photoKeluarRef} id="photo-keluar-input" type="file" accept="image/*" capture="environment" onChange={(e) => handlePhotoKeluarChange(e as any)} style={{ display: 'none' }} />
-                    {photoKeluarPreview && (
-                      <div className="mt-2">
-                        <img src={photoKeluarPreview} alt="Keluar" className="w-32 h-20 object-cover rounded-md border" />
-                        <div>
-                          <button type="button" onClick={() => { setPhotoKeluarPreview(null); setSession((prev: any) => ({ ...prev, photoKeluar: '' })); }} className="text-sm text-red-600 hover:underline mt-2">Hapus</button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

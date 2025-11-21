@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router";
 import DosenLayout from "../layouts/DosenLayout";
-import { ArrowDownTrayIcon, Cog6ToothIcon, ArrowLeftIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { ArrowDownTrayIcon, Cog6ToothIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import ArrowLeftIcon from "../components/ArrowLeftIcon";
 
 export function meta() {
   return [{ title: "LIhat Nilai - Siakad" }];
@@ -237,18 +238,18 @@ export default function DosenInputNilai() {
 
         <div className="space-y-3">
           {/* desktop table (horizontally scrollable on small screens) */}
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 overflow-hidden">
             {/* no negative margins here to avoid visual bleeding outside rounded corners */}
             <div className="overflow-x-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
               {/* add padding inside the scroll area so content doesn't touch the card edges */}
               <div className="min-w-max px-4 sm:px-6">
-                <table className="w-full table-auto text-sm">
+                <table className="w-full table-auto text-sm bg-transparent">
                   <thead className="text-left text-xs text-gray-600">
                     <tr>
-                      <th className="p-3 whitespace-nowrap">#</th>
-                      <th className="p-3 whitespace-nowrap">NIM / Nama</th>
+                      <th className="p-3 whitespace-nowrap bg-transparent">#</th>
+                      <th className="p-3 whitespace-nowrap bg-transparent">NIM / Nama</th>
                       {komponen.map((k) => (
-                        <th key={k.key} className="p-3 whitespace-nowrap">
+                        <th key={k.key} className="p-3 whitespace-nowrap bg-transparent">
                           <div className="hidden md:block flex items-center justify-between">
                             <span>{k.label}</span>
                             <span className="text-xs text-gray-500">{k.bobot}%</span>
@@ -258,9 +259,9 @@ export default function DosenInputNilai() {
                           </div>
                         </th>
                       ))}
-                      <th className="p-3 whitespace-nowrap">Nilai Akhir</th>
-                      <th className="p-3 whitespace-nowrap">Nilai Index</th>
-                      <th className="p-3 whitespace-nowrap">Nilai Huruf</th>
+                      <th className="p-3 whitespace-nowrap bg-transparent">Nilai Akhir</th>
+                      <th className="p-3 whitespace-nowrap bg-transparent">Nilai Index</th>
+                      <th className="p-3 whitespace-nowrap bg-transparent">Nilai Huruf</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -269,19 +270,19 @@ export default function DosenInputNilai() {
                       const g = gradeFromScore(row.akhir ?? 0);
                       return (
                         <tr key={s.nim} className="border-t">
-                          <td className="p-3 align-top whitespace-nowrap">{i + 1}</td>
-                          <td className="p-3 align-top whitespace-nowrap">
+                          <td className="p-3 align-top whitespace-nowrap bg-transparent">{i + 1}</td>
+                          <td className="p-3 align-top whitespace-nowrap bg-transparent">
                             <div className="font-medium">{s.name}</div>
                             <div className="text-xs text-gray-600">{s.nim}</div>
                           </td>
                           {komponen.map((k) => (
-                            <td key={k.key} className="p-3 align-top whitespace-nowrap">
+                            <td key={k.key} className="p-3 align-top whitespace-nowrap bg-transparent">
                               <div className="px-2 py-1">{row[k.key] ?? "-"}</div>
                             </td>
                           ))}
-                          <td className="p-3 align-top whitespace-nowrap">{(row.akhir ?? 0).toFixed(2)}</td>
-                          <td className="p-3 align-top whitespace-nowrap">{(g?.index ?? 0).toFixed(2)}</td>
-                          <td className="p-3 align-top whitespace-nowrap">{g?.letter ?? "-"}</td>
+                          <td className="p-3 align-top whitespace-nowrap bg-transparent">{(row.akhir ?? 0).toFixed(2)}</td>
+                          <td className="p-3 align-top whitespace-nowrap bg-transparent">{(g?.index ?? 0).toFixed(2)}</td>
+                          <td className="p-3 align-top whitespace-nowrap bg-transparent">{g?.letter ?? "-"}</td>
                         </tr>
                       );
                     })}
@@ -297,7 +298,7 @@ export default function DosenInputNilai() {
               const row = data[s.nim] || { uas: 0, presensi: 0, akhir: 0, keterangan: "" };
               const g = gradeFromScore(row.akhir ?? 0);
               return (
-                <div key={s.nim} className="bg-white rounded-xl p-3 border border-gray-200">
+                <div key={s.nim} className="bg-white/8 backdrop-blur-sm rounded-xl p-3 border border-white/10">
                   <div className="flex items-start justify-between mb-2">
                     <div>
                       <div className="font-medium">{s.name}</div>
@@ -315,11 +316,11 @@ export default function DosenInputNilai() {
                         <label className="block text-xs text-gray-600 mb-1">
                           {k.label} <span className="text-xs text-gray-500">({k.bobot}%)</span>
                         </label>
-                        <div className="w-full px-3 py-2 border rounded-md bg-gray-50">{row[k.key] ?? "-"}</div>
+                        <div className="w-full px-3 py-2 border rounded-md bg-transparent">{row[k.key] ?? "-"}</div>
 
                         {/* If this component is UAS, show final score below it on mobile */}
                         {k.key === "uas" && (
-                          <div className="mt-2 p-2 bg-gray-50 border rounded text-right">
+                          <div className="mt-2 p-2 bg-transparent border rounded text-right">
                             <div className="text-sm font-semibold">{(row.akhir ?? 0).toFixed(2)}</div>
                             <div className="text-xs text-gray-500">Nilai Akhir</div>
                           </div>

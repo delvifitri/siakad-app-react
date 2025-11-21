@@ -1,7 +1,8 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router";
 import DosenLayout from "../layouts/DosenLayout";
-import { PlusSmallIcon, ArrowLeftIcon, CalendarDaysIcon } from "@heroicons/react/24/outline";
+import { PlusCircleIcon, CalendarDaysIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import ArrowLeftIcon from "../components/ArrowLeftIcon";
 
 export function meta() {
   return [{ title: "Daftar Presensi - Siakad" }];
@@ -18,6 +19,7 @@ export default function DosenListPresensi() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const [search, setSearch] = useState("");
   const course = useMemo(() => (location.state as any)?.course || slug || "Mata Kuliah", [location.state, slug]);
   const cls = useMemo(() => (location.state as any)?.cls || "", [location.state]);
   const code = useMemo(() => (location.state as any)?.code || "", [location.state]);
@@ -46,14 +48,30 @@ export default function DosenListPresensi() {
             <p className="text-sm text-gray-600 mt-1">{course} {cls ? `• Kelas ${cls}` : ""}</p>
           </div>
           <div className="w-36">
-            <button onClick={goToAdd} className="inline-flex items-center justify-center gap-2 px-3 h-10 rounded-full text-sm text-white bg-green-600 hover:bg-green-700 w-full">
-              <PlusSmallIcon className="w-4 h-4" /> Tambah Presensi
+            <button onClick={goToAdd} className="inline-flex items-center justify-center px-3 h- rounded-full text-sm text-white bg-orange-500 hover:bg-orange-600 shadow-md hover:shadow-lg transition-all duration-200 w-full">
+              <PlusCircleIcon className="w-5 h-5" /> Tambah Presensi
             </button>
           </div>
         </div>
 
+        <div className="mb-4">
+          <div className="relative">
+            <MagnifyingGlassIcon className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Cari sesi presensi"
+              className="w-full pl-10 pr-3 py-2 border rounded-full text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+            />
+          </div>
+        </div>
+
         <div className="space-y-3">
-          {dummySessions.map((s) => (
+          {dummySessions.filter((s) => {
+            const q = search.trim().toLowerCase();
+            if (!q) return true;
+            return String(s.label).toLowerCase().includes(q) || String(s.date).toLowerCase().includes(q) || String(s.status).toLowerCase().includes(q);
+          }).map((s) => (
             <div key={s.id} className="bg-white rounded-xl border border-gray-200 p-3 flex items-center justify-between">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="rounded-md bg-blue-50 text-blue-700 p-2 flex items-center">
