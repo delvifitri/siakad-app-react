@@ -239,11 +239,11 @@ export default function DosenEditProfile() {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
-            <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="w-full px-3 py-2 border border-orange-500 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-200" />
+            <input type="text" value={name} onChange={(e) => setName(e.target.value)} disabled aria-disabled className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Program Studi</label>
-            <input type="text" value={major} onChange={(e) => setMajor(e.target.value)} className="w-full px-3 py-2 border border-orange-500 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-200" />
+            <input type="text" value={major} onChange={(e) => setMajor(e.target.value)} disabled aria-disabled className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
