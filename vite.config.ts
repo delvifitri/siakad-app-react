@@ -6,4 +6,13 @@ import netlifyPlugin from "@netlify/vite-plugin-react-router"
 
 export default defineConfig({
   plugins: [tailwindcss(), reactRouter(), tsconfigPaths(), netlifyPlugin()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://api-siakad.test',
+        changeOrigin: true,
+        secure: false,
+      }
+    }
+  }
 });

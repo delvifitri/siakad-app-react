@@ -72,7 +72,7 @@ export default function Pembayaran() {
           const season = info ? info.season : (payments[0].semester.match(/\b(Ganjil|Genap)\b/i) || [])[0] || '';
 
           return (
-            <div key={semester} className="py-2">
+            <div key={`${semester}-${index}`} className="py-2">
               <div className="bg-white/60 backdrop-blur-sm border border-white/20 rounded-2xl shadow-sm p-4 flex items-center justify-between">
                 <div>
                   <div className="text-sm font-bold text-gray-800">{semesterLabel}</div>
