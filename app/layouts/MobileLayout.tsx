@@ -16,13 +16,14 @@ export default function MobileLayout({
         ? { backgroundImage: `url('${bgImage}')`, backgroundSize: "cover", backgroundPosition: "center" }
         : undefined;
 
+    // Use 100vh on server to match, then let AppHeightSetter update it on client
     const combinedStyle: React.CSSProperties = {
         ...(style as React.CSSProperties),
-        minHeight: 'var(--app-height, 100vh)'
+        minHeight: '100vh'
     };
 
     return (
-        <div className="min-h-app bg-gray-50 " style={combinedStyle}>
+        <div className="bg-gray-50" style={combinedStyle}>
             <main className="pb-24">{/* leave space for bottom nav (24 = ~72px) */}
                 {children}
             </main>

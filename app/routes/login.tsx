@@ -2,9 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { EnvelopeIcon, LockClosedIcon } from "@heroicons/react/24/outline";
 import { authService } from "../services/auth.service";
-import { loginRequestSchema } from "../schemas/auth.schema";
 import Alert, { type AlertVariant } from "../components/Alert";
-import { z } from "zod";
 
 export function meta() {
   return [{ title: "Login - Siakad" }];
@@ -27,24 +25,6 @@ export default function Login() {
     setErrors({});
     setAlert(null);
 
-    // Validate form data
-    try {
-      loginRequestSchema.parse({ nim, password });
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const fieldErrors: { nim?: string; password?: string } = {};
-        error.issues.forEach((err: z.ZodIssue) => {
-          if (err.path[0] === "nim") {
-            fieldErrors.nim = err.message;
-          } else if (err.path[0] === "password") {
-            fieldErrors.password = err.message;
-          }
-        });
-        setErrors(fieldErrors);
-        return;
-      }
-    }
-
     // Make API request
     setIsLoading(true);
     try {
@@ -59,6 +39,22 @@ export default function Login() {
         }
       }
     } catch (error: any) {
+      // Handle validation errors from backend
+      if (error.data?.errors) {
+        const backendErrors = error.data.errors;
+        const fieldErrors: { nim?: string; password?: string } = {};
+
+        // Map backend errors to field errors
+        if (backendErrors.nim) {
+          fieldErrors.nim = backendErrors.nim[0];
+        }
+        if (backendErrors.password) {
+          fieldErrors.password = backendErrors.password[0];
+        }
+
+        setErrors(fieldErrors);
+      }
+
       // Show error alert
       const errorMessage = error?.message || "Login gagal. Silakan coba lagi.";
       setAlert({
@@ -69,7 +65,7 @@ export default function Login() {
     } finally {
       setIsLoading(false);
     }
-  };
+  };;
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !isLoading) {

@@ -1,5 +1,5 @@
 import type { Route } from "./+types/home";
-import { useNavigate, Navigate } from "react-router";
+import { useNavigate, Navigate, Link } from "react-router";
 import { useEffect, useState } from "react";
 import MobileLayout from "../layouts/MobileLayout";
 import HeaderIcons from "../components/HeaderIcons";
@@ -55,55 +55,7 @@ export default function Home() {
         return;
       }
 
-      // For 500 errors, show mock data for development
-      if (err.status === 500) {
-        const mockData = {
-          success: true,
-          message: "Mock data for development",
-          data: {
-            profile: {
-              nim: "2502004",
-              full_name: "Wanda Sri Rahayu",
-              email: "wandasrirahayu3@gmail.com",
-              gender: "P",
-              semester: 5,
-              program_studi: "Teknik Informatika"
-            },
-            photo: "",
-            stats: [
-              { id: 1, name: "IPK", value: "3.75", url: "#" },
-              { id: 2, name: "Total SKS", value: "96", url: "#" },
-              { id: 3, name: "SKS / KHS", value: "20", url: "#" },
-              { id: 4, name: "Status KRS", value: "Aktif", url: "#" }
-            ],
-            news: [
-              {
-                id: 1,
-                staf_id: 1,
-                judul: "Pengumuman Libur Semester",
-                slug: "pengumuman-libur-semester",
-                deskripsi: "Libur semester akan dimulai tanggal...",
-                gambar: null,
-                status: 1,
-                tgl_publish: "2024-12-01"
-              },
-              {
-                id: 2,
-                staf_id: 2,
-                judul: "Registrasi KRS Semester Genap",
-                slug: "registrasi-krs-genap",
-                deskripsi: "Registrasi KRS sudah dibuka...",
-                gambar: null,
-                status: 1,
-                tgl_publish: "2024-11-28"
-              }
-            ]
-          }
-        };
-        setHomeData(mockData);
-        return;
-      }
-
+      
       setError(err.message || "Failed to load home data");
     } finally {
       setIsLoading(false);
@@ -145,6 +97,9 @@ export default function Home() {
 
   const { data } = homeData;
 
+  // Reorder stats by ID based on API response order (1: IPK, 2: Total SKS, 3: SKS/KHS, 4: Status KRS)
+  const reorderedStats = data.stats.sort((a, b) => a.id - b.id);
+
   // Helper function to get icon for stat
   const getStatIcon = (statName: string) => {
     switch (statName) {
@@ -159,6 +114,14 @@ export default function Home() {
       default:
         return <AcademicCapIcon className="w-6 h-6 text-blue-600" />;
     }
+  };
+
+  // Helper function to format value display
+  const formatValue = (statName: string, value: string | number): string | number => {
+    if (statName === "SKS / KHS" && value === "Lihat") {
+      return "Lihat →";
+    }
+    return value;
   };
 
   // Format date for news
@@ -184,20 +147,35 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-2 gap-3 mt-6">
-          {data.stats.map((stat) => (
-            <a
-              key={stat.id}
-              href={stat.url}
-              className="block"
-              aria-label={`Lihat ${stat.name}`}
-            >
-              <StatCard
-                icon={getStatIcon(stat.name)}
-                title={stat.name}
-                value={stat.value}
-              />
-            </a>
-          ))}
+          {reorderedStats.map((stat) => {
+            // Only make Status KRS clickable (ID: 4) since it's the only route that exists
+            if (stat.id === 4) {
+              return (
+                <Link
+                  key={stat.id}
+                  to="/status-krs"
+                  className="block"
+                  aria-label="Lihat Status KRS"
+                >
+                  <StatCard
+                    icon={getStatIcon(stat.name)}
+                    title={stat.name}
+                    value={formatValue(stat.name, stat.value)}
+                  />
+                </Link>
+              );
+            }
+
+            return (
+              <div key={stat.id} className="cursor-default">
+                <StatCard
+                  icon={getStatIcon(stat.name)}
+                  title={stat.name}
+                  value={formatValue(stat.name, stat.value)}
+                />
+              </div>
+            );
+          })}
         </div>
 
         <div className="grid grid-cols-3 gap-3 mt-6">

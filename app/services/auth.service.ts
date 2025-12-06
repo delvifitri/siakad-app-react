@@ -1,5 +1,5 @@
 import apiClient from '../lib/api.config';
-import { loginRequestSchema, loginResponseSchema, type LoginRequest, type LoginResponse } from '../schemas/auth.schema';
+import { type LoginRequest, type LoginResponse } from "../schemas/auth.schema";
 import { storage } from '../utils/storage';
 
 export const authService = {
@@ -7,24 +7,18 @@ export const authService = {
    * Login with NIM and password
    */
   async login(credentials: LoginRequest): Promise<LoginResponse> {
-    // Validate request data
-    const validatedData = loginRequestSchema.parse(credentials);
-    
     // Make API request
     const response = await apiClient.post<LoginResponse>(
-      '/api/auth/mhs/login',
-      validatedData
+      "/api/auth/mhs/login",
+      credentials
     );
 
-    // Validate response data
-    const validatedResponse = loginResponseSchema.parse(response.data);
-
-    // Store user data in localStorage
-    if (validatedResponse.success && validatedResponse.data.user) {
-      storage.setUser(validatedResponse.data.user);
+    // Store user data in localStorage if successful
+    if (response.data.success && response.data.data?.user) {
+      storage.setUser(response.data.data.user);
     }
 
-    return validatedResponse;
+    return response.data;
   },
 
   /**

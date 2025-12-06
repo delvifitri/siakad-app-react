@@ -1,5 +1,5 @@
 import apiClient from '../lib/api.config';
-import { homeResponseSchema, type HomeResponse } from '../schemas/home.schema';
+import { type HomeResponse } from "../schemas/home.schema";
 
 export const homeService = {
   /**
@@ -9,9 +9,6 @@ export const homeService = {
     // Make API request
     const response = await apiClient.get<HomeResponse>('/api/mhs/home');
     
-    // Validate response data
-    const validatedResponse = homeResponseSchema.parse(response.data);
-    
-    return validatedResponse;
+    return response.data;
   },
 };
